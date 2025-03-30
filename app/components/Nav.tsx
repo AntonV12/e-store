@@ -10,27 +10,17 @@ export const Nav = () => {
 
   return (
     <nav className={styles.nav}>
-      <Link
-        className={`${styles.link} ${pathname === "/" ? styles.active : ""}`}
-        href="/"
-      >
+      <Link className={`${styles.link} ${pathname === "/" ? styles.active : ""}`} href="/">
         Home
       </Link>
-      <Link
-        className={`${styles.link} ${
-          pathname === "/verify" ? styles.active : ""
-        }`}
-        href="/verify"
-      >
+      <Link className={`${styles.link} ${pathname === "/verify" ? styles.active : ""}`} href="/verify">
         Verify
       </Link>
-      <Link
-        className={`${styles.link} ${
-          pathname === "/quotes" ? styles.active : ""
-        }`}
-        href="/quotes"
-      >
+      <Link className={`${styles.link} ${pathname === "/quotes" ? styles.active : ""}`} href="/quotes">
         Quotes
+      </Link>
+      <Link className={`${styles.link} ${pathname === "/users" ? styles.active : ""}`} href="/users">
+        Users
       </Link>
     </nav>
   );
