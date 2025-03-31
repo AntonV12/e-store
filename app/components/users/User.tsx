@@ -1,13 +1,16 @@
 "use client";
 import { UserType } from "@/lib/types/types";
+import { useGetUserByIdQuery } from "@/lib/features/users/usersApiSlice";
 
-export const User = ({ user }: { user: UserType | null }) => {
-  if (!user) return null;
+export const User = ({ id }: { id: number }) => {
+  const { data, isError, isLoading, isSuccess } = useGetUserByIdQuery(id);
+
+  if (!data) return null;
   return (
     <div>
-      <h3>{user.name}</h3>
-      <p>Age: {user.age}</p>
-      <p>Salary: {user.salary}</p>
+      <h3>{data?.name}</h3>
+      <p>Age: {data?.age}</p>
+      <p>Salary: {data?.salary}</p>
     </div>
   );
 };

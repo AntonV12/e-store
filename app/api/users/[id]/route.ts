@@ -4,9 +4,7 @@ import { fetchUserById } from "./userController";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = parseInt(searchParams.get("id") || "1");
-    console.log("id", searchParams.get("id"));
+    const id = Number(request.nextUrl.pathname.split("/").pop());
 
     const data = await fetchUserById(id);
     return NextResponse.json(data);

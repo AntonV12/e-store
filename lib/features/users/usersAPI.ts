@@ -1,46 +1,48 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
-import { UserType } from "@/lib/types/types";
+// import { createAsyncThunk } from "@reduxjs/toolkit";
+// import { UserType } from "@/lib/types/types";
 
-export const fetchUsers = createAsyncThunk<UserType[], number, { rejectValue: string }>(
-  "users/fetchUsers",
-  async (limit, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`/api/users?limit=${limit}`);
+// export const fetchUsers = createAsyncThunk<UserType[], number, { rejectValue: string }>(
+//   "users/fetchUsers",
+//   async (limit, { rejectWithValue }) => {
+//     console.log("fetching users");
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to fetch products");
-      }
+//     try {
+//       const response = await fetch(`/api/users?limit=${limit}`);
 
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      if (err instanceof Error) {
-        return rejectWithValue(err.message);
-      }
-      return rejectWithValue("Failed to fetch users");
-    }
-  }
-);
+//       if (!response.ok) {
+//         const error = await response.json();
+//         throw new Error(error.error || "Failed to fetch products");
+//       }
 
-export const fetchUserById = createAsyncThunk<UserType, number, { rejectValue: string }>(
-  "users/fetchUserById",
-  async (id, { rejectWithValue }) => {
-    try {
-      const response = await fetch(`/api/users/${id}`);
+//       const data = await response.json();
+//       return data;
+//     } catch (err) {
+//       if (err instanceof Error) {
+//         return rejectWithValue(err.message);
+//       }
+//       return rejectWithValue("Failed to fetch users");
+//     }
+//   }
+// );
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to fetch product");
-      }
+// export const fetchUserById = createAsyncThunk<UserType, number, { rejectValue: string }>(
+//   "users/fetchUserById",
+//   async (id, { rejectWithValue }) => {
+//     try {
+//       const response = await fetch(`/api/users/${id}`);
 
-      const data = await response.json();
-      return data;
-    } catch (err) {
-      if (err instanceof Error) {
-        return rejectWithValue(err.message);
-      }
-      return rejectWithValue("Failed to fetch user");
-    }
-  }
-);
+//       if (!response.ok) {
+//         const error = await response.json();
+//         throw new Error(error.error || "Failed to fetch product");
+//       }
+
+//       const data = await response.json();
+//       return data;
+//     } catch (err) {
+//       if (err instanceof Error) {
+//         return rejectWithValue(err.message);
+//       }
+//       return rejectWithValue("Failed to fetch user");
+//     }
+//   }
+// );
