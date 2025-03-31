@@ -1,11 +1,12 @@
 import { pool } from "@/lib/database";
+import { UserType } from "@/lib/types/types";
 
-export const fetchUsers = async (limit: number) => {
+export const fetchUsers = async (limit: number): Promise<UserType[] | null> => {
   try {
     const [rows] = await pool.query("SELECT * FROM users LIMIT ?", [limit]);
-    const length: any = await pool.query("SELECT COUNT(*) as count FROM users");
-    return { users: rows, total: length[0][0] };
+    return rows as UserType[];
   } catch (err) {
     console.error(err);
+    return null;
   }
 };
