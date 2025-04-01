@@ -1,0 +1,45 @@
+.skeleton {
+  box-sizing: border-box;
+  width: 140px;
+  height: 160px;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.skeleton__title {
+  height: 25px;
+  background-image: linear-gradient(
+    to right,
+    rgb(228, 228, 228) 0%,
+    rgb(199, 197, 197) 50%,
+    rgb(228, 228, 228) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: 8px;
+  margin: 18.72px 0;
+  animation: shimmer 2s infinite;
+}
+
+.skeleton__text {
+  height: 21px;
+  background-image: linear-gradient(
+    to right,
+    rgb(228, 228, 228) 0%,
+    rgb(199, 197, 197) 50%,
+    rgb(228, 228, 228) 100%
+  );
+  background-size: 200% 100%;
+  border-radius: 8px;
+  margin: 16px 0;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
