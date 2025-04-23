@@ -2,26 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
 import styles from "../styles/layout.module.css";
+import { SearchForm } from "./SearchForm";
+import ListIcon from "@/public/list.svg";
 
 export const Nav = () => {
   const pathname = usePathname();
 
   return (
     <nav className={styles.nav}>
-      <Link className={`${styles.link} ${pathname === "/" ? styles.active : ""}`} href="/">
-        Home
-      </Link>
-      <Link className={`${styles.link} ${pathname === "/verify" ? styles.active : ""}`} href="/verify">
-        Verify
-      </Link>
-      <Link className={`${styles.link} ${pathname === "/quotes" ? styles.active : ""}`} href="/quotes">
-        Quotes
-      </Link>
-      <Link className={`${styles.link} ${pathname === "/users" ? styles.active : ""}`} href="/users">
-        Users
-      </Link>
+      <div className={styles.logoBlock}>
+        <Link className={styles.logo} href="/">
+          My Store
+        </Link>
+        <button className={styles.button}>
+          <ListIcon />
+          Каталог
+        </button>
+      </div>
+
+      <SearchForm />
+
+      <div className={styles.links}>
+        <Link className={styles.link} href="favovites">
+          Избранное
+        </Link>
+        <Link className={styles.link} href="cart">
+          Корзина
+        </Link>
+        <Link className={styles.link} href="login">
+          Войти
+        </Link>
+      </div>
     </nav>
   );
 };

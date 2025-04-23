@@ -1,77 +1,72 @@
 .container {
-  display: grid;
-  grid-template-areas:
-    "nav"
-    "header"
-    "main"
-    "footer";
-  grid-template-rows: auto auto 1fr 36px;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.header {
-  grid-area: header;
-}
-
-.main {
-  grid-area: main;
-}
-
-.header,
-.main {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.footer {
-  grid-area: footer;
-  justify-self: center;
+  min-height: 100vh;
+  padding: 10px;
 }
 
 .nav {
-  grid-area: nav;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.logo {
+  font-family: var(--font-knewave);
+  font-size: 30px;
+  margin-right: 10px;
+}
+
+.searchForm {
+  width: fit-content;
+  display: flex;
+  width: 50%;
+  padding: 10px;
+  background-color: rgba(0, 0, 255, 0.2);
+  border-radius: 10px;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.3);
+}
+.searchForm .input {
+  margin-right: 10px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid grey;
+  flex-grow: 1;
+  font-family: var(--font-play);
+}
+.searchForm .input:focus {
+  outline: none;
+  box-shadow: 0 0 100px 1000px rgba(0, 0, 0, 0.5);
+}
+
+.links {
+  display: flex;
+}
+
+.button {
+  background-color: aliceblue;
+  border-radius: 8px;
+  border: 1px solid gray;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px;
-  font-size: calc(10px + 2vmin);
+  padding: 10px;
 }
 
-.link:hover {
-  text-decoration: underline;
+.button:hover {
+  cursor: pointer;
+  background-color: rgb(133, 162, 187);
+  color: white;
+  box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.1);
 }
 
-.link {
-  color: #704cb6;
+.logoBlock {
+  width: fit-content;
+  display: flex;
+  align-items: center;
 }
 
-.link.active {
-  text-decoration: underline;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .logo {
-    animation: logo-float infinite 3s ease-in-out;
-  }
-}
-
-@keyframes logo-float {
-  0% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
+.main {
+  padding: 10px;
 }
