@@ -7,7 +7,7 @@ import { usersApiSlice } from "./features/users/usersApiSlice";
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(counterSlice, quotesApiSlice, /* usersSlice, */ usersApiSlice);
+const rootReducer = combineSlices(counterSlice, quotesApiSlice, usersApiSlice);
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
 

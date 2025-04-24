@@ -1,0 +1,19 @@
+.container {
+  width: min(100%, 400px);
+  margin: 0 auto;
+  text-align: center;
+  box-shadow: 0 0 5px var(--shadow-color);
+  border-radius: 10px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  gap: 10px;
+}
+
+.input {
+  height: 40px;
+}

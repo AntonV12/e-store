@@ -4,6 +4,13 @@ body {
   padding: 0;
   margin: 0;
   font-family: var(--font-play);
+  --main-color: rgba(0, 0, 255, 0.2);
+  --secondary-color: rgb(133, 162, 187);
+  --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 a {
@@ -13,8 +20,25 @@ a {
 
 button {
   font-family: var(--font-play);
+  background-color: aliceblue;
+  border-radius: 8px;
+  border: 1px solid gray;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 
-* {
-  box-sizing: border-box;
+button:hover {
+  cursor: pointer;
+  background-color: var(--secondary-color);
+  color: white;
+  box-shadow: 0 0 2px 2px var(--shadow-color);
+}
+
+input {
+  border-radius: 8px;
+  border: 1px solid grey;
+  font-family: var(--font-play);
+  padding: 5px;
 }
