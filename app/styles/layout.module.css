@@ -21,6 +21,7 @@
   background-color: var(--main-color);
   border-radius: 10px;
   box-shadow: 0 0 2px 2px var(--shadow-color);
+  margin-right: 10px;
 }
 .searchForm .input {
   margin-right: 10px;
@@ -28,6 +29,7 @@
   flex-grow: 1;
 }
 .searchForm .input:focus {
+  z-index: 100;
   outline: none;
   box-shadow: 0 0 100px 1000px var(--shadow-color);
 }

@@ -5,7 +5,7 @@ import styles from "@/app/components/login/login.module.css";
 export default function UsersPage() {
   return (
     <div className={styles.container}>
-      <LoginForm />
+      {/* <LoginForm /> */}
       <RegisterForm />
     </div>
   );

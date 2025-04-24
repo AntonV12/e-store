@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { fetchUsers } from "./usersController";
+import { fetchUsers, createUser } from "./usersController";
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,6 +13,22 @@ export async function GET(request: NextRequest) {
 
     const data = await fetchUsers(limit);
     return NextResponse.json(data);
+  } catch (err) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body: { name: string; password: string } = await request.json();
+    const { name, password } = body;
+
+    if (!name || !password) {
+      return NextResponse.json({ error: "Name and password are required" }, { status: 400 });
+    }
+
+    await createUser({ id: null, name, password });
+    return NextResponse.json({ name, password });
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

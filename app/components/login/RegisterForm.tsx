@@ -4,7 +4,7 @@ import { useSetUserMutation } from "@/lib/features/users/usersApiSlice";
 import { useState } from "react";
 
 export const RegisterForm = () => {
-  const [setUser, { isLoading, isError }] = useSetUserMutation();
+  const [setUser, { isLoading, isSuccess, isError }] = useSetUserMutation();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,13 +19,17 @@ export const RegisterForm = () => {
     await setUser(user);
   };
 
+  console.log(isSuccess);
+
   return (
     <>
-      <h2>Регистрация</h2>
+      <h2 className={styles.title}>Регистрация</h2>
       <form method="post" className={styles.form} onSubmit={handleRegister}>
         <input type="text" name="name" placeholder="Имя" className={styles.input} />
         <input type="password" name="password" placeholder="Пароль" className={styles.input} />
-        <button type="submit">Зарегистрироваться</button>
+        <button type="submit" disabled={isLoading}>
+          Зарегистрироваться
+        </button>
       </form>
     </>
   );
