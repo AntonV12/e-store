@@ -1,46 +1,49 @@
 "use client";
-import styles from "./login.module.css";
-import { useAuthUserMutation } from "@/lib/features/auth/authApiSlice";
-import Link from "next/link";
+import styles from "./register.module.css";
+import { useSetUserMutation } from "@/lib/features/users/usersApiSlice";
+import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { isFetchBaseQueryError, isSerializedError } from "@/lib/middlewares";
 
-export const LoginForm = () => {
-  const [authUser, { isLoading, isSuccess, isError, error }] = useAuthUserMutation();
+export const RegisterForm = () => {
+  const [setUser, { isLoading, isError, error }] = useSetUserMutation();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(formData.get("password") as string, salt);
 
     const user = {
       id: null,
       name: formData.get("name") as string,
-      password: formData.get("password") as string,
+      password: hashedPassword,
     };
 
     try {
-      await authUser(user).unwrap();
+      await setUser(user).unwrap();
       router.push("/");
     } catch (err) {
-      console.error("Ошибка входа:", err);
+      console.error("Ошибка регистрации:", err);
     }
   };
 
   return (
     <>
-      <h2 className={styles.title}>Вход</h2>
+      <h2 className={styles.title}>Регистрация</h2>
       <p className={styles.text}>
-        Нет учетной записи?{" "}
-        <Link href="/register" className={styles.link}>
-          Зарегистрируйтесь
+        Уже есть учетная запись?{" "}
+        <Link href="/login" className={styles.link}>
+          Войти
         </Link>
       </p>
-      <form method="post" className={styles.form} onSubmit={handleLogin}>
+      <form method="post" className={styles.form} onSubmit={handleRegister}>
         <input type="text" name="name" placeholder="Имя" className={styles.input} />
         <input type="password" name="password" placeholder="Пароль" className={styles.input} />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? "Отправка..." : "Войти"}
+          {isLoading ? "Отправка..." : "Зарегистрироваться"}
         </button>
         {isError && (
           <span className={styles.error}>

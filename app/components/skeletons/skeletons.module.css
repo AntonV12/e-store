@@ -9,12 +9,7 @@
 
 .skeleton__title {
   height: 25px;
-  background-image: linear-gradient(
-    to right,
-    rgb(228, 228, 228) 0%,
-    rgb(199, 197, 197) 50%,
-    rgb(228, 228, 228) 100%
-  );
+  background-image: linear-gradient(to right, rgb(228, 228, 228) 0%, rgb(199, 197, 197) 50%, rgb(228, 228, 228) 100%);
   background-size: 200% 100%;
   border-radius: 8px;
   margin: 18.72px 0;
@@ -23,12 +18,7 @@
 
 .skeleton__text {
   height: 21px;
-  background-image: linear-gradient(
-    to right,
-    rgb(228, 228, 228) 0%,
-    rgb(199, 197, 197) 50%,
-    rgb(228, 228, 228) 100%
-  );
+  background-image: linear-gradient(to right, rgb(228, 228, 228) 0%, rgb(199, 197, 197) 50%, rgb(228, 228, 228) 100%);
   background-size: 200% 100%;
   border-radius: 8px;
   margin: 16px 0;

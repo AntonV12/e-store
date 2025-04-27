@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { ProductsList } from "./components/products/ProductsList";
 
 export default function IndexPage() {
-  return <div>home</div>;
+  return <ProductsList />;
 }
 
 export const metadata: Metadata = {

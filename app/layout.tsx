@@ -25,16 +25,20 @@ const play = Play({
 });
 
 export default function RootLayout({ children }: Props) {
+  const currentYear = new Date().getFullYear();
+
   return (
     <StoreProvider>
-      <html lang="en" className={`${knewave.variable} ${play.variable}`}>
+      <html lang="en" className={`html ${knewave.variable} ${play.variable}`}>
         <body>
           <section className={styles.container}>
-            <Nav />
+            <header className={styles.header}>
+              <Nav />
+            </header>
 
             <main className={styles.main}>{children}</main>
 
-            <footer className={styles.footer}></footer>
+            <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
           </section>
         </body>
       </html>
