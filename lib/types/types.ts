@@ -4,6 +4,13 @@ export type UserType = {
   password: string;
 };
 
+export type CommentType = {
+  id: string;
+  text: string;
+  date: string;
+  author: string;
+};
+
 export type ProductType = {
   id: number | null;
   name: string;
@@ -12,4 +19,6 @@ export type ProductType = {
   rating: number;
   cost: number;
   imageSrc: string;
+  description: string;
+  comments: CommentType[];
 };

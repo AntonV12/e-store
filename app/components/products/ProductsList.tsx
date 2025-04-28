@@ -4,6 +4,7 @@ import { useLogoutUserMutation, useGetCurrentUserQuery } from "@/lib/features/au
 import Link from "next/link";
 import style from "./products.module.css";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export const ProductsList = () => {
   const { data, isError, isLoading, isSuccess } = useGetProductsQuery(10);
@@ -32,7 +33,13 @@ export const ProductsList = () => {
           {data.map((product) => (
             <li key={product.id} className={style.product}>
               <Link href={`/products/${product.id}`}>
-                <img src={product.imageSrc} alt={product.name} className={style.img} />
+                <Image
+                  src={product.imageSrc}
+                  alt={product.name}
+                  className={style.img}
+                  width={230}
+                  height={180}
+                />
                 <h3>{product.name}</h3>
                 <p>{product.cost.toLocaleString("ru-RU")} ₽</p>
               </Link>

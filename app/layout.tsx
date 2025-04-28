@@ -4,7 +4,7 @@ import { StoreProvider } from "./StoreProvider";
 import { Nav } from "./components/Nav";
 import "./styles/globals.css";
 import styles from "./styles/layout.module.css";
-import { Knewave, Play } from "next/font/google";
+import { Knewave, Play, Press_Start_2P } from "next/font/google";
 
 interface Props {
   readonly children: ReactNode;
@@ -24,12 +24,19 @@ const play = Play({
   display: "swap",
 });
 
+const press_Start_2P = Press_Start_2P({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-press_Start_2P",
+  display: "swap",
+});
+
 export default function RootLayout({ children }: Props) {
   const currentYear = new Date().getFullYear();
 
   return (
     <StoreProvider>
-      <html lang="en" className={`html ${knewave.variable} ${play.variable}`}>
+      <html lang="en" className={`html ${knewave.variable} ${play.variable} ${press_Start_2P.variable}`}>
         <body>
           <section className={styles.container}>
             <header className={styles.header}>
