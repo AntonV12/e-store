@@ -16,12 +16,19 @@ export async function GET(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   const session = await verifySession();
-  if (!session.userId) return null;
+  if (!session.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
   try {
     const body: ProductType = await request.json();
-    const result = await updateProduct(body);
-    return NextResponse.json(result);
+    const { success, message } = await updateProduct(body);
+
+    if (!success) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, message });
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

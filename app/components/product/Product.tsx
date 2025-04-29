@@ -49,7 +49,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     return (
       <section className={style.productCard}>
         <div className={style.container}>
-          <Image src={product.imageSrc} alt={product.name} width={280} height={280} priority />
+          <Image src={product.imageSrc} alt={product.name} width={280} height={280} priority className={style.img} />
           <div className={style.info}>
             <div className={style.title}>
               <h1>{product.name}</h1>

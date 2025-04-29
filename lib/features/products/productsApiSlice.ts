@@ -1,17 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { ProductType } from "@/lib/types/types";
-import { url } from "inspector";
-
-/* export interface Product {
-  id: number | null;
-  name: string;
-  category: string;
-  viewed: number;
-  rating: number;
-  cost: number;
-  imageSrc: string;
-} */
 
 // Define a service using a base URL and expected endpoints
 export const productsApiSlice = createApi({

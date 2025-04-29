@@ -4,18 +4,11 @@ import { StoreProvider } from "./StoreProvider";
 import { Nav } from "./components/Nav";
 import "./styles/globals.css";
 import styles from "./styles/layout.module.css";
-import { Knewave, Play, Press_Start_2P } from "next/font/google";
+import { Play, Press_Start_2P } from "next/font/google";
 
 interface Props {
   readonly children: ReactNode;
 }
-
-const knewave = Knewave({
-  weight: "400",
-  subsets: ["latin"],
-  variable: "--font-knewave",
-  display: "swap",
-});
 
 const play = Play({
   weight: "400",
@@ -36,7 +29,7 @@ export default function RootLayout({ children }: Props) {
 
   return (
     <StoreProvider>
-      <html lang="en" className={`html ${knewave.variable} ${play.variable} ${press_Start_2P.variable}`}>
+      <html lang="en" className={`html ${play.variable} ${press_Start_2P.variable}`}>
         <body>
           <section className={styles.container}>
             <header className={styles.header}>

@@ -41,6 +41,10 @@ button:hover {
   /* box-shadow: 0 0 2px 2px var(--shadow-color); */
 }
 
+button:active {
+  background-color: color-mix(in srgb, var(--secondary-color), black 30%);
+}
+
 input {
   border-radius: 8px;
   border: 1px solid grey;

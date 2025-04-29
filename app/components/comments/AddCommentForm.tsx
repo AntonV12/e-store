@@ -1,6 +1,6 @@
 "use client";
 import style from "./comments.module.css";
-import { ProductType, CommentType } from "@/lib/types/types";
+import { ProductType } from "@/lib/types/types";
 import { useUpdateProductMutation } from "@/lib/features/products/productsApiSlice";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import { nanoid } from "@reduxjs/toolkit";
@@ -16,7 +16,8 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
     if (isUserSuccess) {
       if (!currentUser) return;
 
-      const formData = new FormData(e.currentTarget);
+      const form = e.currentTarget;
+      const formData = new FormData(form);
       const now = new Date();
       const year = now.getFullYear();
       const month = +(now.getMonth() + 1) > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1);
@@ -36,7 +37,8 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
       const updatedProduct = { ...product, comments: updatedComments };
 
       try {
-        await updateProduct(updatedProduct);
+        await updateProduct(updatedProduct).unwrap();
+        form.reset();
       } catch (err) {
         console.error(err);
       }
@@ -46,7 +48,9 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
   return (
     <form method="POST" onSubmit={handleAddComment}>
       <textarea className={style.textarea} name="text" placeholder="Оставить комментарий"></textarea>
-      <button type="submit">Отправить</button>
+      <button type="submit" disabled={isLoading}>
+        {isLoading ? "Добавление..." : "Отправить"}
+      </button>
     </form>
   );
 };

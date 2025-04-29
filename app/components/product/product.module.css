@@ -44,6 +44,21 @@
   }
 }
 
+@media screen and (max-width: 805px) {
+  .img {
+    width: 230px;
+    height: 230px;
+  }
+  .title {
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+  }
+  .title h1 {
+    font-size: 30px;
+  }
+}
+
 .amount {
   display: flex;
   height: 30px;

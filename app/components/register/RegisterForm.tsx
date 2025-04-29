@@ -27,6 +27,7 @@ export const RegisterForm = () => {
       id: null,
       name: formData.get("name") as string,
       password: hashedPassword,
+      isAdmin: false,
     };
 
     try {

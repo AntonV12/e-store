@@ -1,13 +1,10 @@
 import { pool } from "@/lib/database";
-import { RowDataPacket } from "mysql2";
+import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { ProductType } from "@/lib/types/types";
 
 export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(
-      "SELECT * FROM products WHERE id = ?",
-      [id]
-    );
+    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [id]);
 
     return rows[0] ?? null;
   } catch (err) {
@@ -16,14 +13,15 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
   }
 };
 
-export const updateProduct = async (product: ProductType): Promise<ProductType | null> => {
+export const updateProduct = async (product: ProductType): Promise<{ success: boolean; message: string }> => {
   try {
-    const { id, category, viewed, rating, cost, imageSrc, description, comments } = product;
+    const { id, name, category, viewed, rating, cost, imageSrc, description, comments } = product;
     const sql =
-      "UPDATE products SET id = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ? WHERE id = ?";
+      "UPDATE products SET id = ?, name = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ? WHERE id = ?";
 
-    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(sql, [
+    const [results] = await pool.execute<ResultSetHeader>(sql, [
       id,
+      name,
       category,
       viewed,
       rating,
@@ -33,9 +31,13 @@ export const updateProduct = async (product: ProductType): Promise<ProductType |
       comments,
       id,
     ]);
-    return rows[0];
+
+    return {
+      success: results.affectedRows > 0,
+      message: results.affectedRows > 0 ? "Продукт успешно обновлен" : "Продукт не получилось обновить",
+    };
   } catch (err) {
     console.error(err);
-    return null;
+    return { success: false, message: "Database error" };
   }
 };

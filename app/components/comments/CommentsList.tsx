@@ -14,6 +14,7 @@ export const CommentsList = ({ comments }: { comments: CommentType[] }) => {
               <strong>
                 [{comment.date}] {comment.author}
               </strong>
+              {": "}
               {comment.text}
             </li>
           ))}
