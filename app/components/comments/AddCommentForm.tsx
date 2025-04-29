@@ -14,22 +14,32 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
     if (isUserLoading) return;
 
     if (isUserSuccess) {
+      if (!currentUser) return;
+
       const formData = new FormData(e.currentTarget);
       const now = new Date();
       const year = now.getFullYear();
       const month = +(now.getMonth() + 1) > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1);
       const day = +now.getDate() > 10 ? now.getDate() : "0" + now.getDate();
 
+      const commentText = formData.get("text") as string;
+      if (!commentText) return;
+
       const newComment = {
         id: nanoid(),
-        text: formData.get("text"),
+        text: commentText,
         date: `${day}.${month}.${year}`,
         author: currentUser?.name,
       };
 
       const updatedComments = [...product.comments, newComment];
       const updatedProduct = { ...product, comments: updatedComments };
-      console.log(updatedProduct);
+
+      try {
+        await updateProduct(updatedProduct);
+      } catch (err) {
+        console.error(err);
+      }
     }
   };
 

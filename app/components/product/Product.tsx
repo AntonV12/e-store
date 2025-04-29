@@ -11,7 +11,7 @@ import { useState } from "react";
 import { CommentsList } from "@/app/components/comments/CommentsList";
 import { AddCommentForm } from "@/app/components/comments/AddCommentForm";
 
-export default function Product({ id }: { id: number }) {
+export default function Product({ id, isAuth }: { id: number; isAuth: boolean }) {
   const router = useRouter();
   const { data: product, isError, isLoading, isSuccess } = useGetProductByIdQuery(id);
   const [amountValue, setAmountValue] = useState<number>(1);
@@ -72,7 +72,11 @@ export default function Product({ id }: { id: number }) {
         </div>
 
         <CommentsList comments={product.comments} />
-        <AddCommentForm product={product} />
+        {isAuth ? (
+          <AddCommentForm product={product} />
+        ) : (
+          <p>Чтобы оставить комментарий, войдите в свою учетную запись</p>
+        )}
       </section>
     );
   }

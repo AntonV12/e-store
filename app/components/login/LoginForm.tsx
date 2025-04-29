@@ -3,7 +3,14 @@ import styles from "./login.module.css";
 import { useAuthUserMutation } from "@/lib/features/auth/authApiSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { isFetchBaseQueryError, isSerializedError } from "@/lib/middlewares";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+
+export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
+  return typeof error === "object" && error != null && "status" in error;
+}
+export function isSerializedError(error: unknown): error is { message?: string } {
+  return typeof error === "object" && error != null && "message" in error;
+}
 
 export const LoginForm = () => {
   const [authUser, { isLoading, isSuccess, isError, error }] = useAuthUserMutation();
@@ -17,6 +24,7 @@ export const LoginForm = () => {
       id: null,
       name: formData.get("name") as string,
       password: formData.get("password") as string,
+      isAdmin: false,
     };
 
     try {

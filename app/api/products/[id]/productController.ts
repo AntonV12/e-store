@@ -4,9 +4,10 @@ import { ProductType } from "@/lib/types/types";
 
 export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.query<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [
-      id,
-    ]);
+    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(
+      "SELECT * FROM products WHERE id = ?",
+      [id]
+    );
 
     return rows[0] ?? null;
   } catch (err) {
@@ -17,25 +18,24 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 
 export const updateProduct = async (product: ProductType): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.query<(ProductType & RowDataPacket)[]>(
-      "UPDATE products SET id, category, viewed, rating, cost, imageSrc, description, comments",
-      [{ ...product }]
-    );
+    const { id, category, viewed, rating, cost, imageSrc, description, comments } = product;
+    const sql =
+      "UPDATE products SET id = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ? WHERE id = ?";
+
+    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(sql, [
+      id,
+      category,
+      viewed,
+      rating,
+      cost,
+      imageSrc,
+      description,
+      comments,
+      id,
+    ]);
     return rows[0];
   } catch (err) {
     console.error(err);
     return null;
   }
 };
-
-/* 
-  id: number | null;
-    name: string;
-    category: string;
-    viewed: number;
-    rating: number;
-    cost: number;
-    imageSrc: string;
-    description: string;
-    comments: CommentType[];
-*/

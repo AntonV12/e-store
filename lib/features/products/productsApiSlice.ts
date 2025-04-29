@@ -35,7 +35,7 @@ export const productsApiSlice = createApi({
     }),
     updateProduct: build.mutation<ProductType, ProductType>({
       query: (product) => ({
-        url: `/update/${product.id}`,
+        url: `/${product.id}`,
         method: "PUT",
         body: product,
       }),

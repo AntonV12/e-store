@@ -1,14 +1,28 @@
+import "server-only";
 import { pool } from "@/lib/database";
 import { UserType } from "@/lib/types/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { createSession } from "@/lib/sessions";
+import { createSession, decrypt } from "@/lib/sessions";
 import bycript from "bcryptjs";
 import { cookies } from "next/headers";
-import { decrypt } from "@/lib/sessions";
+import { cache } from "react";
+
+export const verifySession = cache(async () => {
+  const cookie = (await cookies()).get("session")?.value;
+  const session = await decrypt(cookie);
+
+  if (!session?.userId) {
+    return { isAuth: false, userId: null, isAdmin: false };
+  }
+
+  return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
+});
 
 export const loginUser = async (user: UserType): Promise<{ message: string } | { error: string }> => {
   try {
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [user.name]);
+    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [
+      user.name,
+    ]);
 
     if (!existingUser.length) {
       return { error: "Пользователь с таким именем не зарегистрирован" };
@@ -18,7 +32,7 @@ export const loginUser = async (user: UserType): Promise<{ message: string } | {
       return { error: "Неверный пароль" };
     }
 
-    await createSession(existingUser[0].id);
+    await createSession(existingUser[0].id, existingUser[0].isAdmin);
 
     return { message: "Пользователь успешно авторизован" };
   } catch (err) {
@@ -28,24 +42,23 @@ export const loginUser = async (user: UserType): Promise<{ message: string } | {
 };
 
 export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const session = cookieStore.get("session")?.value;
+  const session = await verifySession();
 
-  if (!session) {
+  if (!session.userId) {
     return null;
   }
 
-  const payload = await decrypt(session);
-
-  if (!payload || !payload.userId) {
-    return null;
-  }
-
-  const [results] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE id = ?", [payload.userId]);
+  const [results] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE id = ?", [session.userId]);
 
   if (!results.length) {
     return null;
   }
 
-  return results[0];
+  const user = results[0];
+
+  return {
+    id: user.id,
+    name: user.name,
+    isAdmin: user.isAdmin,
+  };
 }

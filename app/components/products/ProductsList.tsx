@@ -39,6 +39,7 @@ export const ProductsList = () => {
                   className={style.img}
                   width={230}
                   height={180}
+                  priority={false}
                 />
                 <h3>{product.name}</h3>
                 <p>{product.cost.toLocaleString("ru-RU")} ₽</p>
