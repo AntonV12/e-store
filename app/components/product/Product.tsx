@@ -49,13 +49,23 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     return (
       <section className={style.productCard}>
         <div className={style.container}>
-          <Image src={product.imageSrc} alt={product.name} width={280} height={280} priority className={style.img} />
+          <Image
+            src={product.imageSrc}
+            alt={product.name}
+            width={280}
+            height={280}
+            priority
+            className={style.img}
+          />
           <div className={style.info}>
             <div className={style.title}>
               <h1>{product.name}</h1>
-              <RatingArea />
+              <RatingArea product={product} />
               <p className={style.rating}>
-                Общий рейтинг: {product.rating} <span className={style.star}>&#9733;</span>
+                Общий рейтинг:{" "}
+                {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length ||
+                  0}{" "}
+                <span className={style.star}>&#9733;</span>
               </p>
             </div>
             <div className={style.price}>

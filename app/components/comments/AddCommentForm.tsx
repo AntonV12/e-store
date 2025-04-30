@@ -49,7 +49,7 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
     <form method="POST" onSubmit={handleAddComment}>
       <textarea className={style.textarea} name="text" placeholder="Оставить комментарий"></textarea>
       <button type="submit" disabled={isLoading}>
-        {isLoading ? "Добавление..." : "Отправить"}
+        {isLoading ? "Отправка..." : "Отправить"}
       </button>
     </form>
   );

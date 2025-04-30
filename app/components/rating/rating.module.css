@@ -12,8 +12,11 @@
   opacity: 0;
 }
 
-.rating label {
+.rating label:not(.highlighted) {
   color: lightgrey;
+}
+
+.rating label {
   font-size: 1.5rem;
 }
 
@@ -21,6 +24,6 @@
   cursor: pointer;
 }
 
-.rating input:checked ~ label {
+.highlighted {
   color: gold;
 }
