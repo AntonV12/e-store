@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { UserType } from "@/lib/types/types";
 
 export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
   return typeof error === "object" && error != null && "status" in error;
@@ -23,11 +24,12 @@ export const RegisterForm = () => {
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = bcrypt.hashSync(formData.get("password") as string, salt);
 
-    const user = {
+    const user: UserType = {
       id: null,
       name: formData.get("name") as string,
       password: hashedPassword,
       isAdmin: false,
+      cart: [],
     };
 
     try {

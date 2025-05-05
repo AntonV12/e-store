@@ -1,16 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
+import { UserType } from "@/lib/types/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-interface User {
-  id: number | null;
-  name: string;
-  password: string;
-}
-
-interface UsersApiResponse {
-  users: User[];
-  total: number;
-}
 
 // Define a service using a base URL and expected endpoints
 export const authApiSlice = createApi({
@@ -19,7 +9,7 @@ export const authApiSlice = createApi({
   // Tag types are used for caching and invalidation.
   tagTypes: ["Auth"],
   endpoints: (build) => ({
-    authUser: build.mutation<User, User>({
+    authUser: build.mutation<UserType, UserType>({
       query: (user) => ({
         url: "/",
         method: "POST",
@@ -34,7 +24,7 @@ export const authApiSlice = createApi({
       }),
       invalidatesTags: [],
     }),
-    getCurrentUser: build.query<User | null, void>({
+    getCurrentUser: build.query<UserType | null, void>({
       query: () => ({
         url: "/current",
         method: "GET",

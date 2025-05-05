@@ -20,9 +20,7 @@ export const verifySession = cache(async () => {
 
 export const loginUser = async (user: UserType): Promise<{ message: string } | { error: string }> => {
   try {
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [
-      user.name,
-    ]);
+    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [user.name]);
 
     if (!existingUser.length) {
       return { error: "Пользователь с таким именем не зарегистрирован" };
@@ -60,5 +58,6 @@ export async function getCurrentUser() {
     id: user.id,
     name: user.name,
     isAdmin: user.isAdmin,
+    cart: user.cart,
   };
 }

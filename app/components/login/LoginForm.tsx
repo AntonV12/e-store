@@ -4,6 +4,7 @@ import { useAuthUserMutation } from "@/lib/features/auth/authApiSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import { UserType } from "@/lib/types/types";
 
 export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
   return typeof error === "object" && error != null && "status" in error;
@@ -20,11 +21,12 @@ export const LoginForm = () => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
 
-    const user = {
+    const user: UserType = {
       id: null,
       name: formData.get("name") as string,
       password: formData.get("password") as string,
       isAdmin: false,
+      cart: [],
     };
 
     try {

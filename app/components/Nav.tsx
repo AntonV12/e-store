@@ -47,10 +47,10 @@ export const Nav = () => {
       <SearchForm />
 
       <div className={styles.links}>
-        <Link className={styles.link} href="cart">
+        <Link className={styles.link} href="/cart">
           <CartIcon />
           <p>Корзина</p>
-          <span>2</span>
+          <span>{currentUser?.cart.length}</span>
         </Link>
         {isLoading ? (
           <p>Загрузка...</p>

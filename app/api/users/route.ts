@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { /* fetchUsers, */ createUser } from "./usersController";
+import { CartType } from "@/lib/types/types";
 
 /* export async function GET(request: NextRequest) {
   try {
@@ -20,14 +21,14 @@ import { /* fetchUsers, */ createUser } from "./usersController";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: { name: string; password: string; isAdmin: boolean } = await request.json();
-    const { name, password, isAdmin } = body;
+    const body: { name: string; password: string; isAdmin: boolean; cart: CartType[] } = await request.json();
+    const { name, password, isAdmin, cart } = body;
 
     if (!name || !password) {
       return NextResponse.json({ error: "Необходимо ввести имя и пароль" }, { status: 400 });
     }
 
-    const result = await createUser({ id: null, name, password, isAdmin });
+    const result = await createUser({ id: null, name, password, isAdmin, cart });
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

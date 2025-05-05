@@ -1,0 +1,9 @@
+.amount {
+  display: flex;
+  height: 30px;
+  width: 100px;
+}
+.amount input {
+  width: 100%;
+  text-align: center;
+}

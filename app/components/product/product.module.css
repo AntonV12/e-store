@@ -13,6 +13,7 @@
 .img {
   border-radius: 10px;
   flex-shrink: 0;
+  object-fit: contain;
 }
 
 .productCard h1,
@@ -23,7 +24,7 @@
   font-size: 36px;
   font-weight: 700;
 }
-.price {
+.price form {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -57,16 +58,6 @@
   .title h1 {
     font-size: 30px;
   }
-}
-
-.amount {
-  display: flex;
-  height: 30px;
-  width: 100px;
-}
-.amount input {
-  width: 100%;
-  text-align: center;
 }
 
 .star {

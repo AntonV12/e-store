@@ -6,10 +6,18 @@ import { quotesApiSlice } from "./features/quotes/quotesApiSlice";
 import { usersApiSlice } from "./features/users/usersApiSlice";
 import { productsApiSlice } from "./features/products/productsApiSlice";
 import { authApiSlice } from "./features/auth/authApiSlice";
+import { ordersApiSlice } from "./features/orders/ordersApiSlice";
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(counterSlice, quotesApiSlice, usersApiSlice, productsApiSlice, authApiSlice);
+const rootReducer = combineSlices(
+  counterSlice,
+  quotesApiSlice,
+  usersApiSlice,
+  productsApiSlice,
+  authApiSlice,
+  ordersApiSlice
+);
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -27,7 +35,8 @@ export const makeStore = () => {
         .concat(quotesApiSlice.middleware)
         .concat(usersApiSlice.middleware)
         .concat(productsApiSlice.middleware)
-        .concat(authApiSlice.middleware);
+        .concat(authApiSlice.middleware)
+        .concat(ordersApiSlice.middleware);
     },
   });
 };

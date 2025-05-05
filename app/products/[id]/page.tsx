@@ -11,11 +11,12 @@ export default async function ProductPage(props: { params: { id: number } }) {
   const params = await props.params;
   const id = params.id;
   const session = await verifySession();
-  const isAuth: boolean = session.isAuth as boolean;
+  const isAuth: boolean = session.isAuth;
+  const userId: number = session.userId as number;
 
   return (
     <div>
-      <Product id={id} isAuth={isAuth} />
+      <Product id={id} isAuth={isAuth} userId={userId} />
     </div>
   );
 }

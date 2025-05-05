@@ -1,32 +1,67 @@
 "use client";
 
 import Link from "next/link";
-import { ProductType } from "@/lib/types/types";
+import { CartType, ProductType, UserType } from "@/lib/types/types";
 import { useRouter } from "next/navigation";
 import { useGetProductByIdQuery } from "@/lib/features/products/productsApiSlice";
+import { authApiSlice, useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import style from "./product.module.css";
 import Image from "next/image";
 import { RatingArea } from "@/app/components/rating/Rating";
 import { useState } from "react";
 import { CommentsList } from "@/app/components/comments/CommentsList";
 import { AddCommentForm } from "@/app/components/comments/AddCommentForm";
+import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
+import { useAppDispatch } from "@/lib/hooks";
+import Amount from "@/app/components/amount/Amount";
 
-export default function Product({ id, isAuth }: { id: number; isAuth: boolean }) {
+export default function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: number }) {
   const router = useRouter();
+  const dispatch = useAppDispatch();
   const { data: product, isError, isLoading, isSuccess } = useGetProductByIdQuery(id);
-  const [amountValue, setAmountValue] = useState<number>(1);
+  const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
+  const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
+    useUpdateUserMutation();
+  const [amount, setAmount] = useState<number>(1);
 
-  const handleAmountDecrease = () => {
-    setAmountValue((prev) => (prev > 1 ? prev - 1 : prev));
-  };
+  const handleAddProductToCart = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (isUserLoading) return;
 
-  const handleAmountIncrease = () => {
-    setAmountValue((prev) => prev + 1);
-  };
+    if (isUserSuccess) {
+      if (!currentUser || !product) return;
 
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (+e.target.value < 1) return;
-    setAmountValue(+e.target.value);
+      const formData = new FormData(e.currentTarget);
+      if (product?.id && formData.get("amount")) {
+        const amount = Number(formData.get("amount") as string);
+        if (!amount) return;
+
+        const { cart } = currentUser;
+        const existingItem = cart.find((item) => item.id === product.id);
+
+        const updatedCart: CartType[] = existingItem
+          ? cart.map((item) => (item.id === product.id ? { ...item, amount: Number(item.amount) + amount } : item))
+          : [...cart, { id: product.id, name: product.name, cost: product.cost, imageSrc: product.imageSrc, amount }];
+        const updatedUser: UserType = { ...currentUser, cart: updatedCart };
+
+        dispatch(
+          authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
+            if (draft) draft.cart = updatedCart;
+          })
+        );
+
+        try {
+          await updateUser(updatedUser).unwrap();
+        } catch (err) {
+          dispatch(
+            authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
+              if (draft) draft.cart = currentUser.cart;
+            })
+          );
+          console.error(err);
+        }
+      }
+    }
   };
 
   if (isError) {
@@ -49,33 +84,23 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     return (
       <section className={style.productCard}>
         <div className={style.container}>
-          <Image
-            src={product.imageSrc}
-            alt={product.name}
-            width={280}
-            height={280}
-            priority
-            className={style.img}
-          />
+          <Image src={product.imageSrc} alt={product.name} width={280} height={280} priority className={style.img} />
           <div className={style.info}>
             <div className={style.title}>
               <h1>{product.name}</h1>
               <RatingArea product={product} />
               <p className={style.rating}>
                 Общий рейтинг:{" "}
-                {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length ||
-                  0}{" "}
+                {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length || 0}{" "}
                 <span className={style.star}>&#9733;</span>
               </p>
             </div>
             <div className={style.price}>
-              <h2>{product.cost.toLocaleString("ru-RU")} ₽</h2>
-              <div className={style.amount}>
-                <button onClick={handleAmountDecrease}>-</button>
-                <input type="text" value={amountValue} onChange={handleAmountChange} />
-                <button onClick={handleAmountIncrease}>+</button>
-              </div>
-              <button>Купить</button>
+              <form method="post" onSubmit={handleAddProductToCart}>
+                <h2>{product.cost.toLocaleString("ru-RU")} ₽</h2>
+                <Amount value={amount} setAmount={setAmount} />
+                <button type="submit">В корзину</button>
+              </form>
             </div>
             <p>{product.description}</p>
           </div>
