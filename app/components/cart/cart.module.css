@@ -62,6 +62,12 @@
   width: fit-content;
 }
 
+.order {
+  padding: 0;
+}
+.order a {
+  padding: 10px;
+}
 .order a:hover {
   color: white;
 }

@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { CartType, ProductType, UserType } from "@/lib/types/types";
-import { useRouter } from "next/navigation";
+import { CartType, UserType } from "@/lib/types/types";
 import { useGetProductByIdQuery } from "@/lib/features/products/productsApiSlice";
 import { authApiSlice, useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import style from "./product.module.css";
@@ -14,15 +12,18 @@ import { AddCommentForm } from "@/app/components/comments/AddCommentForm";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import { useAppDispatch } from "@/lib/hooks";
 import Amount from "@/app/components/amount/Amount";
+import { setMessage } from "@/lib/features/message/messageSlice";
+import { useSelector } from "react-redux";
+import Message from "@/app/components/message/Message";
 
 export default function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: number }) {
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { data: product, isError, isLoading, isSuccess } = useGetProductByIdQuery(id);
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
   const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
     useUpdateUserMutation();
   const [amount, setAmount] = useState<number>(1);
+  const message = useSelector((state: { message: { text: string } }) => state.message.text);
 
   const handleAddProductToCart = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,6 +53,7 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
 
         try {
           await updateUser(updatedUser).unwrap();
+          dispatch(setMessage("Товар добавлен в корзину"));
         } catch (err) {
           dispatch(
             authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
@@ -84,7 +86,7 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
     return (
       <section className={style.productCard}>
         <div className={style.container}>
-          <Image src={product.imageSrc} alt={product.name} width={280} height={280} priority className={style.img} />
+          <Image src={product.imageSrc} alt={product.name} width={280} height={280} className={style.img} />
           <div className={style.info}>
             <div className={style.title}>
               <h1>{product.name}</h1>
@@ -112,6 +114,8 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
         ) : (
           <p>Чтобы оставить комментарий, войдите в свою учетную запись</p>
         )}
+
+        {message && <Message text={message} onHide={() => dispatch(setMessage(""))} />}
       </section>
     );
   }

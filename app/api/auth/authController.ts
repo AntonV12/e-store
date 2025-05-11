@@ -22,12 +22,8 @@ export const loginUser = async (user: UserType): Promise<{ message: string } | {
   try {
     const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [user.name]);
 
-    if (!existingUser.length) {
-      return { error: "Пользователь с таким именем не зарегистрирован" };
-    }
-
-    if (!bycript.compareSync(user.password, existingUser[0].password)) {
-      return { error: "Неверный пароль" };
+    if (!bycript.compareSync(user.password, existingUser[0].password) || !existingUser.length) {
+      return { error: "Неверный логин или пароль" };
     }
 
     await createSession(existingUser[0].id, existingUser[0].isAdmin);

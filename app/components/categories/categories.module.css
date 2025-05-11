@@ -1,0 +1,29 @@
+.categories {
+  width: min(300px, 100%);
+  height: fit-content;
+  z-index: 3;
+  box-shadow: 0 0 5px var(--shadow-color);
+  position: absolute;
+  top: 64px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: white;
+}
+.categories h3 {
+  margin: 0;
+}
+
+.list {
+  margin: 0;
+  text-align: start;
+}
+.list li {
+  cursor: pointer;
+  padding: 5px;
+}
+.list li:hover,
+.active {
+  color: var(--secondary-color);
+  background-color: rgba(112, 76, 182, 0.1);
+  border-radius: 5px;
+}

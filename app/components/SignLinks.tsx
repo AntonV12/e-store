@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import styles from "../styles/layout.module.css";
-import { SearchForm } from "./SearchForm";
-import ListIcon from "@/public/list.svg";
+import style from "../styles/layout.module.css";
 import CartIcon from "@/public/cart2.svg";
 import LoginIcon from "@/public/person-circle.svg";
 import XIcon from "@/public/x.svg";
@@ -14,9 +11,8 @@ import { useRouter } from "next/navigation";
 import { Tooltip } from "./Tooltip";
 import { useState } from "react";
 
-export const Nav = () => {
-  const pathname = usePathname();
-  /* const { data: currentUser, isLoading, refetch } = useGetCurrentUserQuery();
+export default function SignLinks() {
+  const { data: currentUser, isLoading, isSuccess, isError, refetch } = useGetCurrentUserQuery();
   const [logoutUser] = useLogoutUserMutation();
   const router = useRouter();
   const [isShowTooltip, setIsShowTooltip] = useState(false);
@@ -29,33 +25,30 @@ export const Nav = () => {
     } catch (err) {
       console.error("Ошибка выхода:", err);
     }
-  }; */
+  };
 
-  return (
-    <nav className={styles.nav}>
-      <Link className={styles.logo} href="/">
-        My Store
-      </Link>
-      {/* <div className={styles.menu}>
-        <button className={styles.button}>
-          <ListIcon />
-          <span>Категории</span>
-        </button>
-      </div> */}
+  if (isLoading) {
+    return <div>Загрузка...</div>;
+  }
 
-      {/* <SearchForm /> */}
+  if (isError) {
+    return <div>Произошла ошибка</div>;
+  }
 
-      {/* <div className={styles.links}>
-        <Link className={styles.link} href="/cart">
+  if (isSuccess) {
+    const cartLength = currentUser?.cart.length;
+
+    return (
+      <div className={style.links}>
+        <Link className={style.link} href="/cart">
           <CartIcon />
           <p>Корзина</p>
-          <span>{currentUser?.cart.length}</span>
+          {cartLength && cartLength > 0 ? <span>{cartLength}</span> : null}
         </Link>
-        {isLoading ? (
-          <p>Загрузка...</p>
-        ) : currentUser ? (
+
+        {currentUser ? (
           <>
-            <div className={styles.link}>
+            <Link className={style.link} href="/profile">
               <LoginIcon />
               <p>{currentUser.name}</p>
               <span
@@ -66,15 +59,15 @@ export const Nav = () => {
                 <XIcon />
               </span>
               {isShowTooltip && <Tooltip children="Выход" />}
-            </div>
+            </Link>
           </>
         ) : (
-          <Link className={styles.link} href="/login">
+          <Link className={style.link} href="/login">
             <LoginIcon />
             <p>Вход</p>
           </Link>
         )}
-      </div> */}
-    </nav>
-  );
-};
+      </div>
+    );
+  }
+}

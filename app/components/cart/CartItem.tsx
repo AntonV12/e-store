@@ -1,11 +1,10 @@
 import { UserType, CartType } from "@/lib/types/types";
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import { authApiSlice } from "@/lib/features/auth/authApiSlice";
-import { debounce } from "@/lib/functions/functions";
 import Image from "next/image";
 import style from "./cart.module.css";
-import { useAppDispatch } from "@/lib/hooks";
+import { useAppDispatch, useDebounce } from "@/lib/hooks";
 
 export default function CartItem({
   product,
@@ -17,19 +16,16 @@ export default function CartItem({
   setTotal: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [amount, setAmount] = useState<number>(product.amount);
+  const debouncedAmount = useDebounce(amount, 500);
   const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
     useUpdateUserMutation();
   const dispatch = useAppDispatch();
 
-  const debouncedUpdateUserRef = useRef(
-    debounce(async (userData: UserType) => {
-      try {
-        await updateUser(userData);
-      } catch (error) {
-        console.error("Failed to update cart:", error);
-      }
-    }, 500)
-  );
+  useEffect(() => {
+    if (debouncedAmount !== product.amount) {
+      updateCart(debouncedAmount);
+    }
+  }, [debouncedAmount]);
 
   const updateCart = (newAmount: number) => {
     setAmount(newAmount);
@@ -39,14 +35,14 @@ export default function CartItem({
     );
     const updatedUser = { ...currentUser, cart: updatedCart };
     setTotal(updatedUser.cart.reduce((acc, item) => acc + item.cost * item.amount, 0));
-    debouncedUpdateUserRef.current(updatedUser);
+    updateUser(updatedUser);
   };
 
-  const handleAmountDecrease = async () => updateCart(amount > 1 ? amount - 1 : amount);
-  const handleAmountIncrease = async () => updateCart(amount + 1);
+  const handleAmountDecrease = async () => setAmount(amount > 1 ? amount - 1 : amount);
+  const handleAmountIncrease = async () => setAmount(amount + 1);
   const handleAmountChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (+e.target.value < 1) return;
-    updateCart(+e.target.value);
+    setAmount(+e.target.value);
   };
 
   const handleDelete = async () => {
@@ -68,7 +64,7 @@ export default function CartItem({
 
   return (
     <li key={product.id} className={style.item}>
-      <Image src={product.imageSrc} alt={product.name} className={style.img} width={100} height={100} priority={true} />
+      <Image src={product.imageSrc} alt={product.name} className={style.img} width={100} height={100} priority />
       <div className={style.info}>
         <h3>{product.name}</h3>
         <div className={style.amount}>

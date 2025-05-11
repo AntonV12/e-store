@@ -1,21 +1,28 @@
 "use client";
 
-import { OrderType } from "@/lib/types/types";
 import style from "./order.module.css";
 import { authApiSlice, useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import { useCreateOrderMutation } from "@/lib/features/orders/ordersApiSlice";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import { useAppDispatch } from "@/lib/hooks";
+import Input from "./Input";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { setMessage } from "@/lib/features/message/messageSlice";
 
 export default function Order() {
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
   const [createOrder, { isLoading, isSuccess, isError }] = useCreateOrderMutation();
   const [updateUser] = useUpdateUserMutation();
   const dispatch = useAppDispatch();
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!currentUser?.id) return;
+
+    setIsSubmit(true);
 
     const formData = new FormData(e.currentTarget);
     const city = formData.get("city");
@@ -34,16 +41,20 @@ export default function Order() {
       products: JSON.stringify(currentUser.cart),
     };
 
-    dispatch(
-      authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
-        if (draft) draft.cart = [];
-      })
-    );
+    if (!newOrder.phone || !newOrder.email || !city || !street || !house || !newOrder.products) return;
 
     try {
       await createOrder(newOrder).unwrap();
       await updateUser({ ...currentUser, cart: [] });
-      alert(newOrder.id);
+      dispatch(setMessage("Заказ успешно создан"));
+
+      dispatch(
+        authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
+          if (draft) draft.cart = [];
+        })
+      );
+
+      router.push("/");
     } catch (err) {
       console.error(err);
     }
@@ -54,14 +65,14 @@ export default function Order() {
       <div className={style.order}>
         <form method="POST" onSubmit={handleSubmit}>
           <h2>Данные покупателя</h2>
-          <input type="tel" name="tel" placeholder="телефон" />
-          <input type="email" name="email" placeholder="email" />
+          <Input type="tel" name="tel" placeholder="телефон" isSubmit={isSubmit} />
+          <Input type="email" name="email" placeholder="email" isSubmit={isSubmit} />
           <div className={style.address}>
             <h2>Адрес доставки</h2>
-            <input type="text" name="city" placeholder="город" />
-            <input type="text" name="street" placeholder="улица" />
-            <input type="text" name="house" placeholder="дом №" />
-            <input type="text" name="apartment" placeholder="квартира" />
+            <Input type="text" name="city" placeholder="город" isSubmit={isSubmit} />
+            <Input type="text" name="street" placeholder="улица" isSubmit={isSubmit} />
+            <Input type="text" name="house" placeholder="дом №" isSubmit={isSubmit} />
+            <Input type="text" name="apartment" placeholder="квартира" isSubmit={isSubmit} />
           </div>
           <button className={style.button}>Подтвердить</button>
         </form>

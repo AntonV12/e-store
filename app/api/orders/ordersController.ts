@@ -13,3 +13,14 @@ export const createOrder = async (
     return { error: "Internal server error" };
   }
 };
+
+export const fetchOrdersByUserId = async (userId: number): Promise<OrderType[] | null> => {
+  try {
+    const sql = "SELECT id, clientId, products FROM orders WHERE clientId = ?";
+    const [results] = await pool.execute<OrderType[] & RowDataPacket[]>(sql, [userId]);
+    return results ?? null;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};

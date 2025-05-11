@@ -34,7 +34,11 @@
   text-decoration: underline;
 }
 
-.error {
+.errorMessage {
   color: red;
   font-size: 14px;
+}
+
+.error {
+  border: 1px solid red;
 }

@@ -1,15 +1,30 @@
 "use client";
 
 import styles from "../styles/layout.module.css";
-import SearchIcon from "@/public/search.svg";
+import ListIcon from "@/public/list.svg";
 
-export const SearchForm = () => {
+export const SearchForm = ({
+  value,
+  setValue,
+  toggleCategories,
+}: {
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
+  toggleCategories: () => void;
+}) => {
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue(e.target.value);
+  };
+
   return (
-    <form className={styles.searchForm}>
-      <input type="search" className={styles.input} />
-      <button type="submit" className={styles.button}>
-        <SearchIcon />
-      </button>
-    </form>
+    <div className={styles.searchForm}>
+      <div className={styles.menu}>
+        <button className={styles.button} onClick={toggleCategories}>
+          <ListIcon />
+          <span>Категории</span>
+        </button>
+      </div>
+      <input type="search" name="search" className={styles.input} value={value} onChange={handleSearch} />
+    </div>
   );
 };

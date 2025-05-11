@@ -35,5 +35,5 @@ export type OrderType = {
   phone: number;
   email: string;
   address: string;
-  products: string;
+  products: CartType[];
 };

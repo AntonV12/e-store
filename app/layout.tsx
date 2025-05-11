@@ -1,10 +1,9 @@
-import Image from "next/image";
+"use client";
 import type { ReactNode } from "react";
 import { StoreProvider } from "./StoreProvider";
-import { Nav } from "./components/Nav";
 import "./styles/globals.css";
-import styles from "./styles/layout.module.css";
 import { Play, Press_Start_2P } from "next/font/google";
+import MainPage from "@/app/components/MainPage";
 
 interface Props {
   readonly children: ReactNode;
@@ -25,21 +24,11 @@ const press_Start_2P = Press_Start_2P({
 });
 
 export default function RootLayout({ children }: Props) {
-  const currentYear = new Date().getFullYear();
-
   return (
     <StoreProvider>
       <html lang="en" className={`html ${play.variable} ${press_Start_2P.variable}`}>
         <body>
-          <section className={styles.container}>
-            <header className={styles.header}>
-              <Nav />
-            </header>
-
-            <main className={styles.main}>{children}</main>
-
-            <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
-          </section>
+          <MainPage children={children} />
         </body>
       </html>
     </StoreProvider>

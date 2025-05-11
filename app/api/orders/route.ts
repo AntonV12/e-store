@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { createOrder } from "./ordersController";
 import { verifySession } from "@/app/api/auth/authController";
+import { fetchOrdersByUserId } from "./ordersController";
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +23,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
     return NextResponse.json(result);
+  } catch (err) {
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  const session = await verifySession();
+  if (!session.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { userId } = session;
+    const data = await fetchOrdersByUserId(userId as number);
+    return NextResponse.json(data);
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

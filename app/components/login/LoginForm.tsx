@@ -47,13 +47,18 @@ export const LoginForm = () => {
         </Link>
       </p>
       <form method="post" className={styles.form} onSubmit={handleLogin}>
-        <input type="text" name="name" placeholder="Имя" className={styles.input} />
-        <input type="password" name="password" placeholder="Пароль" className={styles.input} />
+        <input type="text" name="name" placeholder="Имя" className={`${styles.input} ${isError && styles.error}`} />
+        <input
+          type="password"
+          name="password"
+          placeholder="Пароль"
+          className={`${styles.input} ${isError && styles.error}`}
+        />
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Отправка..." : "Войти"}
         </button>
         {isError && (
-          <span className={styles.error}>
+          <span className={styles.errorMessage}>
             {isError &&
               error &&
               (isFetchBaseQueryError(error)

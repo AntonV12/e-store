@@ -25,3 +25,10 @@
   font-size: 18px;
   margin: 10px auto;
 }
+
+.error {
+  border: 1px solid red;
+}
+.success {
+  border: 1px solid green;
+}

@@ -1,0 +1,40 @@
+.text {
+  color: white;
+  width: fit-content;
+  margin: 0 auto;
+  background-color: black;
+  padding: 10px;
+  border-radius: 8px;
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: appear 0.3s ease-in-out forwards;
+  opacity: 0;
+}
+
+.disappear {
+  animation: disappear 0.3s ease-in-out forwards;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+  to {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes disappear {
+  from {
+    opacity: 0.8;
+    transform: translateX(-50%) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.8);
+  }
+}
