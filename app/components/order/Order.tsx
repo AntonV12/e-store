@@ -38,15 +38,17 @@ export default function Order() {
       phone: Number(formData.get("tel")),
       email: String(formData.get("email")),
       address: userAddress,
-      products: JSON.stringify(currentUser.cart),
+      products: currentUser.cart,
+      isDone: false,
+      date: new Date().toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" }),
     };
 
     if (!newOrder.phone || !newOrder.email || !city || !street || !house || !newOrder.products) return;
 
     try {
-      await createOrder(newOrder).unwrap();
+      let result = await createOrder(newOrder).unwrap();
       await updateUser({ ...currentUser, cart: [] });
-      dispatch(setMessage("Заказ успешно создан"));
+      dispatch(setMessage(result.message));
 
       dispatch(
         authApiSlice.util.updateQueryData("getCurrentUser", undefined, (draft) => {
@@ -54,7 +56,7 @@ export default function Order() {
         })
       );
 
-      router.push("/");
+      router.push("/profile");
     } catch (err) {
       console.error(err);
     }

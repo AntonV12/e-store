@@ -12,13 +12,22 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { clientId, phone, email, address, products } = body;
+    const { clientId, phone, email, address, products, isDone, date } = body;
 
     if (!clientId || !phone || !email || !address || !products.length) {
       return NextResponse.json({ error: "Недостаточно данных для заказа" }, { status: 400 });
     }
 
-    const result = await createOrder(body);
+    const result = await createOrder({
+      id: null,
+      clientId,
+      phone,
+      email,
+      address,
+      products,
+      isDone,
+      date,
+    });
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

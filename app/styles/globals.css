@@ -10,7 +10,7 @@ body {
   /*  font-family: "Play", sans-serif; */
   font-family: var(--font-play);
   --main-color: rgba(0, 0, 255, 0.2);
-  --secondary-color: rgb(133, 162, 187);
+  --secondary-color: rgb(134, 162, 187);
   --shadow-color: rgba(0, 0, 0, 0.3);
 }
 

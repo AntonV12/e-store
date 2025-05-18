@@ -8,6 +8,7 @@ export type UserType = {
   password: string;
   isAdmin: boolean;
   cart: CartType[];
+  avatar: string;
 };
 
 export type CommentType = {
@@ -36,4 +37,6 @@ export type OrderType = {
   email: string;
   address: string;
   products: CartType[];
+  isDone: boolean;
+  date: string;
 };

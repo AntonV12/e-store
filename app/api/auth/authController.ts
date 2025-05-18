@@ -55,5 +55,6 @@ export async function getCurrentUser() {
     name: user.name,
     isAdmin: user.isAdmin,
     cart: user.cart,
+    avatar: user.avatar,
   };
 }

@@ -1,6 +1,6 @@
 .container {
   display: flex;
-  min-height: 100vh;
+  min-height: 95vh;
   padding: 20px;
 }
 
@@ -41,7 +41,7 @@
   background-color: var(--main-color);
   border-radius: 10px;
   box-shadow: 0 0 2px 2px var(--shadow-color);
-  margin-right: 10px;
+  margin-bottom: 16px;
 }
 .searchForm input {
   margin-right: 10px;

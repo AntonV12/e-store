@@ -4,10 +4,10 @@ import { ProductType, UserType } from "@/lib/types/types";
 
 export const updateUser = async (user: UserType): Promise<{ success: boolean; message: string }> => {
   try {
-    const { id, cart } = user;
-    const sql = "UPDATE users SET cart = ? WHERE id = ?";
+    const { id, cart, avatar } = user;
+    const sql = "UPDATE users SET cart = ?, avatar = ? WHERE id = ?";
 
-    const [results] = await pool.execute<ResultSetHeader>(sql, [cart, id]);
+    const [results] = await pool.execute<ResultSetHeader>(sql, [cart, avatar, id]);
 
     return {
       success: results.affectedRows > 0,

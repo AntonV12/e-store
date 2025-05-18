@@ -9,7 +9,7 @@ export const ordersApiSlice = createApi({
   // Tag types are used for caching and invalidation.
   tagTypes: ["Orders"],
   endpoints: (build) => ({
-    createOrder: build.mutation<OrderType, OrderType>({
+    createOrder: build.mutation<{ orderNumber: number; message: string }, OrderType>({
       query: (order) => ({
         url: "/",
         method: "POST",

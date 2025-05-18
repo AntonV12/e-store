@@ -30,6 +30,7 @@ export const RegisterForm = () => {
       password: hashedPassword,
       isAdmin: false,
       cart: [],
+      avatar: "",
     };
 
     try {

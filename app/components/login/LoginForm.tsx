@@ -27,6 +27,7 @@ export const LoginForm = () => {
       password: formData.get("password") as string,
       isAdmin: false,
       cart: [],
+      avatar: "",
     };
 
     try {

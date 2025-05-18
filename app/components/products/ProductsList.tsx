@@ -44,7 +44,6 @@ export const ProductsList = () => {
       <section className={style.products}>
         <SearchForm value={value} setValue={setValue} toggleCategories={toggleCategories} />
 
-        <h2>Популярные товары</h2>
         {data.length === 0 && <p>Товаров не найдено</p>}
 
         <ul className={style.list}>
