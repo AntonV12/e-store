@@ -1,17 +1,16 @@
 "use client";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
-import { useGetOrdersQuery } from "@/lib/features/orders/ordersApiSlice";
 import style from "./profile.module.css";
 import Image from "next/image";
 import LoginIcon from "@/public/person-circle.svg";
 import CameraIcon from "@/public/photo_camera.svg";
 import React from "react";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
-import OrderList from "./OrderList";
+import OrdersList from "./OrdersList";
+import Link from "next/link";
 
 export default function Profile() {
   const { data: currentUser, isLoading, isSuccess, isError, refetch } = useGetCurrentUserQuery();
-  const { data: orders } = useGetOrdersQuery();
   const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
     useUpdateUserMutation();
 
@@ -51,22 +50,9 @@ export default function Profile() {
             </div>
             {currentUser.name}
           </div>
+          <Link href="/add-product">Добавить новый товар</Link>
         </div>
-        <div className={style.profile__orders}>
-          <h2>Мои Заказы</h2>
-          {orders && orders.length > 0 ? (
-            <ul>
-              {[...orders]
-                .sort((a, b) => +a.isDone - +b.isDone)
-                .sort((a, b) => +(b.id ?? 0) - +(a.id ?? 0))
-                .map((order) => (
-                  <OrderList key={order.id} order={order} />
-                ))}
-            </ul>
-          ) : (
-            <div>У вас нет заказов</div>
-          )}
-        </div>
+        <OrdersList />
       </div>
     ) : (
       <div>Пользователь не найден</div>

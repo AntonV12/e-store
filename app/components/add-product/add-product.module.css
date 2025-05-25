@@ -1,0 +1,26 @@
+.container {
+  width: min(100%, 800px);
+}
+.form div {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.form div label {
+  width: 100%;
+}
+.form div input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+.description {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  font-family: var(--font-play);
+}

@@ -104,7 +104,7 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
                 <button type="submit">В корзину</button>
               </form>
             </div>
-            <p>{product.description}</p>
+            <p className={style.description}>{product.description}</p>
           </div>
         </div>
 

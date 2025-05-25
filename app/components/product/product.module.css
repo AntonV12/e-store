@@ -70,3 +70,9 @@
   margin: 0;
   padding-bottom: 6px;
 }
+
+.description {
+  width: 100%;
+  font-family: var(--font-play);
+  white-space: pre-wrap;
+}

@@ -1,5 +1,6 @@
 import { pool } from "@/lib/database";
 import { ProductType } from "@/lib/types/types";
+import { ResultSetHeader } from "mysql2/promise";
 
 export const fetchProducts = async (limit: number, name?: string, category?: string): Promise<ProductType[] | null> => {
   try {
@@ -8,6 +9,23 @@ export const fetchProducts = async (limit: number, name?: string, category?: str
       [`%${name}%`, category || null, category || null, limit]
     );
     return results as ProductType[];
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+};
+
+export const createProduct = async (product: ProductType): Promise<ProductType | null> => {
+  try {
+    const { id, name, category, viewed, rating, cost, imageSrc, description, comments } = product;
+    const [results] = await pool.query<ResultSetHeader>(
+      "INSERT INTO products SET id = ?, name = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ?",
+      [id, name, category, viewed, JSON.stringify(rating), cost, imageSrc, description, JSON.stringify(comments)]
+    );
+    if (results.affectedRows > 0) {
+      return { ...product, id: results.insertId };
+    }
+    return null;
   } catch (err) {
     console.error(err);
     return null;
