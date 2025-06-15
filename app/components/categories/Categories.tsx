@@ -9,7 +9,7 @@ export default function Categories({
   selectedCategory: string;
   setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  const { data: categories, isError, isLoading, isSuccess } = useGetCategoriesQuery();
+  const { data: categories, isError, isSuccess } = useGetCategoriesQuery();
 
   if (isError) {
     return (
@@ -19,19 +19,13 @@ export default function Categories({
     );
   }
 
-  if (isLoading) {
-    return (
-      <div className={style.categories}>
-        <h1>Loading...</h1>
-      </div>
-    );
-  }
-
   const toggleCategory = (category: string) => {
     if (selectedCategory === category) {
       setSelectedCategory("");
+      sessionStorage.removeItem("productSelectedCategory");
     } else {
       setSelectedCategory(category);
+      sessionStorage.setItem("productSelectedCategory", category);
     }
   };
 
@@ -39,6 +33,7 @@ export default function Categories({
     return (
       <div className={style.categories}>
         <h3>Категории</h3>
+
         <ul className={style.list}>
           {categories.map((category) => (
             <li

@@ -16,16 +16,10 @@ export default function CartItem({
   setTotal: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const [amount, setAmount] = useState<number>(product.amount);
-  const debouncedAmount = useDebounce(amount, 500);
+  const debouncedAmount: number = useDebounce(amount, 500);
   const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
     useUpdateUserMutation();
   const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (debouncedAmount !== product.amount) {
-      updateCart(debouncedAmount);
-    }
-  }, [debouncedAmount]);
 
   const updateCart = (newAmount: number) => {
     setAmount(newAmount);
@@ -37,6 +31,10 @@ export default function CartItem({
     setTotal(updatedUser.cart.reduce((acc, item) => acc + item.cost * item.amount, 0));
     updateUser(updatedUser);
   };
+
+  useEffect(() => {
+    updateCart(debouncedAmount);
+  }, [debouncedAmount]);
 
   const handleAmountDecrease = async () => setAmount(amount > 1 ? amount - 1 : amount);
   const handleAmountIncrease = async () => setAmount(amount + 1);

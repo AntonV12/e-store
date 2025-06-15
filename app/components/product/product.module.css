@@ -16,19 +16,28 @@
   object-fit: contain;
 }
 
-.productCard h1,
-.productCard h2 {
+.productCard .productName,
+.productCard .priceInput {
   margin: 0;
 }
-.productCard h1 {
+.priceInput,
+.categoryInput {
+  font-size: 24px;
+  font-weight: 700;
+}
+.productCard .productName {
   font-size: 36px;
   font-weight: 700;
+}
+
+.price,
+.category {
+  margin-bottom: 10px;
 }
 .price form {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 10px;
 }
 
 .title {
@@ -37,15 +46,75 @@
   margin-bottom: 20px;
 }
 
-@media screen and (max-width: 600px) {
+.star {
+  font-size: 1.5rem;
+  color: gold;
+  margin: 0 0 6px 3px;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.description {
+  width: 100%;
+  font-family: var(--font-play);
+  white-space: pre-wrap;
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 3px;
+  column-count: 2;
+  column-gap: 5px;
+}
+
+.editButtons,
+.editButton {
+  display: flex;
+  gap: 5px;
+  margin: 0 0 0 auto;
+}
+
+.imageForm {
+  position: relative;
+  height: fit-content;
+}
+
+.fileInput {
+  display: none;
+}
+
+.fileLabel {
+  cursor: pointer;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.cameraIcon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  visibility: hidden;
+  opacity: 0;
+  fill: rgba(247, 247, 247, 0.5);
+  cursor: pointer;
+}
+
+.imageForm:hover .cameraIcon {
+  visibility: visible;
+  opacity: 1;
+}
+
+@media screen and (max-width: 890px) {
   .container,
   .title {
     flex-direction: column;
     align-items: center;
   }
-}
-
-@media screen and (max-width: 805px) {
   .img {
     width: 230px;
     height: 230px;
@@ -55,24 +124,13 @@
     justify-content: start;
     align-items: start;
   }
-  .title h1 {
+  .title .productName {
     font-size: 30px;
   }
-}
-
-.star {
-  font-size: 1.5rem;
-  color: gold;
-  /* padding-bottom: 5px; */
-}
-
-.rating {
-  margin: 0;
-  padding-bottom: 6px;
-}
-
-.description {
-  width: 100%;
-  font-family: var(--font-play);
-  white-space: pre-wrap;
+  .rating {
+    margin: 0;
+  }
+  .description {
+    column-count: 1;
+  }
 }

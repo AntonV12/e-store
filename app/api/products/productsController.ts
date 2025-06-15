@@ -1,13 +1,21 @@
 import { pool } from "@/lib/database";
-import { ProductType } from "@/lib/types/types";
+import { ProductType, SortType } from "@/lib/types/types";
 import { ResultSetHeader } from "mysql2/promise";
+import { verifySession } from "@/app/api/auth/authController";
 
-export const fetchProducts = async (limit: number, name?: string, category?: string): Promise<ProductType[] | null> => {
+export const fetchProducts = async (
+  limit: number,
+  name?: string,
+  category?: string,
+  sortBy?: SortType,
+  sortByDirection?: "asc" | "desc"
+): Promise<ProductType[] | null> => {
   try {
     const [results] = await pool.query(
-      "SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) LIMIT ?",
+      `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy} ${sortByDirection} LIMIT ?`,
       [`%${name}%`, category || null, category || null, limit]
     );
+
     return results as ProductType[];
   } catch (err) {
     console.error(err);
@@ -17,6 +25,11 @@ export const fetchProducts = async (limit: number, name?: string, category?: str
 
 export const createProduct = async (product: ProductType): Promise<ProductType | null> => {
   try {
+    const session = await verifySession();
+    if (!session.userId) {
+      return null;
+    }
+
     const { id, name, category, viewed, rating, cost, imageSrc, description, comments } = product;
     const [results] = await pool.query<ResultSetHeader>(
       "INSERT INTO products SET id = ?, name = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ?",

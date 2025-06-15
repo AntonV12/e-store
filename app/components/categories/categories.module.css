@@ -10,12 +10,13 @@
   background-color: white;
 }
 .categories h3 {
-  margin: 0;
+  margin: 0 0 5px 0;
 }
 
 .list {
   margin: 0;
   text-align: start;
+  list-style-type: none;
 }
 .list li {
   cursor: pointer;

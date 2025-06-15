@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ProductType } from "@/lib/types/types";
+import { ProductType, SortType } from "@/lib/types/types";
 
 // Define a service using a base URL and expected endpoints
 export const productsApiSlice = createApi({
@@ -12,8 +12,12 @@ export const productsApiSlice = createApi({
     // Supply generics for the return type (in this case `QuotesApiResponse`)
     // and the expected query argument. If there is no argument, use `void`
     // for the argument type instead.
-    getProducts: build.query<ProductType[], { limit: number; name: string; category: string }>({
-      query: ({ limit, name, category }) => `?limit=${limit}&name=${name}&category=${category}`,
+    getProducts: build.query<
+      ProductType[],
+      { limit: number; name: string; category: string; sortBy: SortType; sortByDirection: "asc" | "desc" }
+    >({
+      query: ({ limit, name, category, sortBy, sortByDirection }) =>
+        `?limit=${limit}&name=${name}&category=${category}&sortBy=${sortBy}&sortByDirection=${sortByDirection}`,
       // `providesTags` determines which 'tag' is attached to the
       // cached data returned by the query.
       providesTags: (result, error, id) => [{ type: "Products", id: `${id.limit}-${id.name}` }],
@@ -41,6 +45,21 @@ export const productsApiSlice = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
+    deleteProduct: build.mutation<{ message: string }, number>({
+      query: (id) => ({
+        url: `/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Products"],
+    }),
+    updateViewed: build.mutation<ProductType, { id: number; params: { viewed?: number; rating?: number } }>({
+      query: ({ id, params }) => ({
+        url: `/${id}`,
+        method: "PATCH",
+        body: params,
+      }),
+      invalidatesTags: ["Products"],
+    }),
   }),
 });
 
@@ -52,4 +71,6 @@ export const {
   useUpdateProductMutation,
   useGetCategoriesQuery,
   useCreateProductMutation,
+  useDeleteProductMutation,
+  useUpdateViewedMutation,
 } = productsApiSlice;

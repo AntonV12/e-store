@@ -13,7 +13,11 @@ export const useDebounce = (value: any, delay: number) => {
 
   useEffect(() => {
     const handler = setTimeout(() => {
-      setDebouncedValue(value);
+      if (typeof value === "function") {
+        value = value();
+      } else {
+        setDebouncedValue(value);
+      }
     }, delay);
 
     return () => {

@@ -22,10 +22,12 @@ export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmi
   const handleCheckClick = async () => {
     if (isAdmin) {
       try {
-        const updatedOrder = { ...order, isDone: !order.isDone };
-        const response = await updateOrder(updatedOrder).unwrap();
-        if (response.message) {
-          dispatch(setMessage(response.message));
+        if (order.id) {
+          const response = await updateOrder({ id: order.id, param: "isDone", value: !order.isDone }).unwrap();
+
+          if (response.message) {
+            dispatch(setMessage(response.message));
+          }
         }
       } catch (error) {
         console.error("Ошибка при обновлении статуса заказа:", error);
@@ -63,7 +65,16 @@ export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmi
             </h3>
             <ChevronIcon className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`} />
           </div>
-          {isShow && <OrderListItem products={order.products} />}
+          {isShow && (
+            <>
+              <OrderListItem products={order.products} isDone={order.isDone} clientId={order.clientId} />
+              <p className={style.product__total}>
+                Итого:{" "}
+                {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
+              </p>
+            </>
+          )}
+
           {isAdmin ? (
             <div className={style.order__info}>
               <p>

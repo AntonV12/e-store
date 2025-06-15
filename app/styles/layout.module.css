@@ -2,6 +2,7 @@
   display: flex;
   min-height: 95vh;
   padding: 20px;
+  gap: 20px;
 }
 
 .sidebar {
@@ -20,9 +21,9 @@
   /* margin-right: 10px; */
 }
 
-.menu {
+/* .menu {
   position: relative;
-}
+} */
 
 .menu button {
   height: 40px;
@@ -101,7 +102,7 @@
   cursor: pointer;
 }
 
-@media screen and (max-width: 660px) {
+@media screen and (max-width: 1089px) {
   .html {
     font-size: 12px;
   }
@@ -154,14 +155,18 @@
 
 .tooltip {
   position: absolute;
-  bottom: -100%;
-  right: -12px;
+  bottom: 0;
+  right: 0;
   background-color: rgba(0, 0, 0, 0.8);
   color: white;
   padding: 10px;
   border-radius: 10px;
   z-index: 2;
   font-size: 14px;
+  width: fit-content;
+  height: fit-content;
+  text-align: center;
+  transform: translateX(-50%);
 }
 
 .footer {

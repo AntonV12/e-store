@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { OrderType } from "@/lib/types/types";
+import { OrderType, EncryptedOrderType } from "@/lib/types/types";
 
 // Define a service using a base URL and expected endpoints
 export const ordersApiSlice = createApi({
@@ -9,7 +9,7 @@ export const ordersApiSlice = createApi({
   // Tag types are used for caching and invalidation.
   tagTypes: ["Orders"],
   endpoints: (build) => ({
-    createOrder: build.mutation<{ orderNumber: number; message: string }, OrderType>({
+    createOrder: build.mutation<{ orderNumber: number; message: string }, EncryptedOrderType>({
       query: (order) => ({
         url: "/",
         method: "POST",
@@ -17,15 +17,15 @@ export const ordersApiSlice = createApi({
       }),
       invalidatesTags: ["Orders"],
     }),
-    getOrders: build.query<OrderType[], { limit: number; done: boolean }>({
-      query: ({ limit, done }) => `/?limit=${limit}&done=${done}`,
+    getOrders: build.query<OrderType[], { limit: number; done: boolean; userId: number | undefined }>({
+      query: ({ userId, limit, done }) => `/?userId=${userId ?? ""}&limit=${limit}&done=${done}`,
       providesTags: (result, error, id) => ["Orders"],
     }),
-    updateOrder: build.mutation<{ message: string }, OrderType>({
-      query: (order) => ({
+    updateOrder: build.mutation<{ message: string }, { id: number; param: string; value: string | number | boolean }>({
+      query: ({ id, param, value }) => ({
         url: `/`,
-        method: "PUT",
-        body: order,
+        method: "PATCH",
+        body: { id, param, value },
       }),
       invalidatesTags: ["Orders"],
     }),

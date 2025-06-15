@@ -23,12 +23,14 @@ export type ProductType = {
   name: string;
   category: string;
   viewed: number;
-  rating: { author: string; rating: number }[];
+  rating: { author: number; rating: number }[];
   cost: number;
   imageSrc: string;
   description: string;
   comments: CommentType[];
 };
+
+export type SortType = "name" | "cost" | "rating" | "viewed";
 
 export type OrderType = {
   id: number | null;
@@ -40,3 +42,5 @@ export type OrderType = {
   isDone: boolean;
   date: string;
 };
+
+export type EncryptedOrderType = Pick<OrderType, "id" | "clientId" | "isDone"> & { encryptedOrder: string };

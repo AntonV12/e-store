@@ -1,11 +1,12 @@
 import "server-only";
 import { pool } from "@/lib/database";
 import { UserType } from "@/lib/types/types";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 import { createSession, decrypt } from "@/lib/sessions";
 import bycript from "bcryptjs";
 import { cookies } from "next/headers";
 import { cache } from "react";
+import { updateSession } from "@/lib/sessions";
 
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get("session")?.value;
@@ -40,6 +41,16 @@ export async function getCurrentUser() {
 
   if (!session.userId) {
     return null;
+  }
+
+  const cookie = (await cookies()).get("session")?.value;
+  const payload = await decrypt(cookie);
+  const expiresAt = payload?.expiresAt;
+  if (typeof expiresAt === "string" || typeof expiresAt === "number" || expiresAt instanceof Date) {
+    const expires = new Date(expiresAt);
+    if ((expires.getTime() - Date.now()) / 1000 / 60 / 60 / 24 < 1) {
+      updateSession();
+    }
   }
 
   const [results] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE id = ?", [session.userId]);

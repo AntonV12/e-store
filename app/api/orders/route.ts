@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createOrder } from "./ordersController";
 import { verifySession } from "@/app/api/auth/authController";
 import { fetchOrdersByUserId, fetchOrders, updateOrder } from "./ordersController";
+import CryptoJS from "crypto-js";
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,22 +13,16 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { clientId, phone, email, address, products, isDone, date } = body;
+    const { id, clientId, encryptedOrder, isDone } = body;
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
+    const decryptedBody = JSON.parse(CryptoJS.AES.decrypt(encryptedOrder, secretKey).toString(CryptoJS.enc.Utf8));
+    const { phone, email, address, products } = decryptedBody;
 
     if (!clientId || !phone || !email || !address || !products.length) {
       return NextResponse.json({ error: "Недостаточно данных для заказа" }, { status: 400 });
     }
 
-    const result = await createOrder({
-      id: null,
-      clientId,
-      phone,
-      email,
-      address,
-      products,
-      isDone,
-      date,
-    });
+    const result = await createOrder({ id, encryptedOrder, clientId, isDone });
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
@@ -48,6 +43,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const done = searchParams.get("done") === "true";
     const { userId, isAdmin } = session;
+
     const data = isAdmin ? await fetchOrders(limit, done) : await fetchOrdersByUserId(userId as number, limit, done);
     return NextResponse.json(data);
   } catch (err) {
@@ -55,7 +51,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
+export async function PATCH(request: NextRequest) {
   try {
     const session = await verifySession();
     if (!session.userId) {
@@ -66,25 +62,18 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, clientId, phone, email, address, products, isDone, date } = body;
+    const { id, param, value } = body;
 
-    if (!id || !clientId || !phone || !email || !address || !products.length) {
+    if (!id || !param || value === undefined) {
       return NextResponse.json({ error: "Недостаточно данных для обновления заказа" }, { status: 400 });
     }
 
-    const result = await updateOrder({
-      id,
-      clientId,
-      phone,
-      email,
-      address,
-      products,
-      isDone,
-      date,
-    });
+    const result = await updateOrder({ id, param, value });
+
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
+
     return NextResponse.json(result);
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

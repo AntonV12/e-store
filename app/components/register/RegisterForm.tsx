@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { UserType } from "@/lib/types/types";
+import { setMessage } from "@/lib/features/message/messageSlice";
+import { useAppDispatch } from "@/lib/hooks";
 
 export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
   return typeof error === "object" && error != null && "status" in error;
@@ -17,6 +19,7 @@ export function isSerializedError(error: unknown): error is { message?: string }
 export const RegisterForm = () => {
   const [setUser, { isLoading, isError, error }] = useSetUserMutation();
   const router = useRouter();
+  const dispatch = useAppDispatch();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +38,7 @@ export const RegisterForm = () => {
 
     try {
       await setUser(user).unwrap();
+      await dispatch(setMessage("Пользователь успешно зарегистрирован"));
       router.push("/");
     } catch (err) {
       console.error("Ошибка регистрации:", err);

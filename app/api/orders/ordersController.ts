@@ -1,15 +1,13 @@
 import { pool } from "@/lib/database";
-import { OrderType } from "@/lib/types/types";
+import { OrderType, EncryptedOrderType } from "@/lib/types/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import CryptoJS from "crypto-js";
 
 export const createOrder = async (
-  order: OrderType
+  order: EncryptedOrderType
 ): Promise<{ orderNumber: number; message: string } | { error: string }> => {
   try {
-    const { products } = order;
-    const [results] = await pool.query<ResultSetHeader>("INSERT INTO orders SET ?", [
-      { ...order, products: JSON.stringify(products) },
-    ]);
+    const [results] = await pool.query<ResultSetHeader>("INSERT INTO orders SET ?", [order]);
     return { orderNumber: results.insertId, message: `Заказ № ${results.insertId} успешно создан` };
   } catch (err) {
     console.error(err);
@@ -23,8 +21,28 @@ export const fetchOrdersByUserId = async (
   done: boolean
 ): Promise<OrderType[] | null> => {
   try {
-    const sql = "SELECT id, clientId, products, isDone, date FROM orders WHERE clientId = ? AND isDone = ? LIMIT ?";
-    const [results] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [userId, done, limit]);
+    const sql = "SELECT * FROM orders WHERE clientId = ? AND isDone = ? LIMIT ?";
+    const [rows] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [userId, done, limit]);
+    if (rows.length === 0) return null;
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
+    const decryptedOrders = CryptoJS.AES.decrypt(rows[0].encryptedOrder, secretKey).toString(CryptoJS.enc.Utf8);
+
+    const { id, clientId, isDone } = rows[0];
+    const { phone, email, address, products, date } = JSON.parse(decryptedOrders);
+
+    const results: OrderType[] = [
+      {
+        id,
+        clientId,
+        phone,
+        email,
+        address,
+        products,
+        isDone,
+        date,
+      },
+    ];
+
     return results ?? null;
   } catch (err) {
     console.error(err);
@@ -34,9 +52,32 @@ export const fetchOrdersByUserId = async (
 
 export const fetchOrders = async (limit: number, done: boolean): Promise<OrderType[] | null> => {
   try {
-    const sql =
-      "SELECT id, clientId, phone, email, address, products, isDone, date FROM orders WHERE isDone = ? LIMIT ?";
-    const [results] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [done, limit]);
+    const sql = "SELECT * FROM orders WHERE isDone = ? LIMIT ?";
+    const [rows] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [done, limit]);
+
+    if (rows.length === 0) return null;
+
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
+    const results: OrderType[] = [];
+
+    for (let row of rows) {
+      const decryptedOrders = CryptoJS.AES.decrypt(row.encryptedOrder, secretKey).toString(CryptoJS.enc.Utf8);
+
+      const { id, clientId, isDone } = row;
+      const { phone, email, address, products, date } = JSON.parse(decryptedOrders);
+
+      results.push({
+        id,
+        clientId,
+        phone,
+        email,
+        address,
+        products,
+        isDone,
+        date,
+      });
+    }
+
     return results ?? null;
   } catch (err) {
     console.error(err);
@@ -44,16 +85,23 @@ export const fetchOrders = async (limit: number, done: boolean): Promise<OrderTy
   }
 };
 
-export const updateOrder = async (order: OrderType): Promise<{ message: string } | { error: string }> => {
+export const updateOrder = async (params: {
+  id: number;
+  param: string;
+  value: string | number | boolean;
+}): Promise<{ message: string } | { error: string }> => {
   try {
-    const { id, ...updateData } = order;
-    const [results] = await pool.query<ResultSetHeader>("UPDATE orders SET ? WHERE id = ?", [
-      { ...updateData, products: JSON.stringify(updateData.products) },
+    const { id, param, value } = params;
+
+    const [results] = await pool.execute<ResultSetHeader>(`UPDATE orders SET \`${param}\` = ? WHERE id = ?`, [
+      value,
       id,
     ]);
+
     if (results.affectedRows === 0) {
       return { error: "Order not found" };
     }
+
     return { message: `Заказ № ${id} успешно обновлен` };
   } catch (err) {
     console.error(err);

@@ -9,6 +9,7 @@ import Input from "./Input";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { setMessage } from "@/lib/features/message/messageSlice";
+import CryptoJS from "crypto-js";
 
 export default function Order() {
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
@@ -29,21 +30,35 @@ export default function Order() {
     const street = formData.get("street");
     const house = formData.get("house");
     const apartment = formData.get("apartment");
+    const phone = formData.get("tel");
+    const email = formData.get("email");
 
     const userAddress: string = `г.${city}, ул.${street}, дом ${house}${apartment ? ", " + apartment : ""}`;
+    const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
+    const encryptedOrder = CryptoJS.AES.encrypt(
+      JSON.stringify({
+        phone: Number(phone),
+        email: String(email),
+        address: userAddress,
+        products: currentUser.cart,
+        date: new Date().toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" }),
+      }),
+      secretKey
+    ).toString();
 
     const newOrder = {
       id: null,
       clientId: currentUser?.id,
-      phone: Number(formData.get("tel")),
-      email: String(formData.get("email")),
-      address: userAddress,
-      products: currentUser.cart,
+      encryptedOrder,
+      //phone: Number(formData.get("tel")),
+      //email: String(formData.get("email")),
+      //address: userAddress,
+      //products: currentUser.cart,
       isDone: false,
-      date: new Date().toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" }),
+      //date: new Date().toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" }),
     };
 
-    if (!newOrder.phone || !newOrder.email || !city || !street || !house || !newOrder.products) return;
+    if (!phone || !email || !city || !street || !house || !currentUser.cart) return;
 
     try {
       let result = await createOrder(newOrder).unwrap();

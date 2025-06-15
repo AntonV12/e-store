@@ -4,35 +4,14 @@ import Link from "next/link";
 import style from "../styles/layout.module.css";
 import CartIcon from "@/public/cart2.svg";
 import LoginIcon from "@/public/person-circle.svg";
-import XIcon from "@/public/x.svg";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
-import { useLogoutUserMutation } from "@/lib/features/auth/authApiSlice";
-import { useRouter } from "next/navigation";
-import { Tooltip } from "./Tooltip";
-import { useState } from "react";
+import { SignLinksSkeleton } from "@/app/components/skeletons/skeletons";
 
 export default function SignLinks() {
-  const { data: currentUser, isLoading, isSuccess, isError, refetch } = useGetCurrentUserQuery();
-  const [logoutUser] = useLogoutUserMutation();
-  const router = useRouter();
-  const [isShowTooltip, setIsShowTooltip] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await logoutUser().unwrap();
-      await refetch();
-      router.push("/");
-    } catch (err) {
-      console.error("Ошибка выхода:", err);
-    }
-  };
+  const { data: currentUser, isLoading, isSuccess, isError } = useGetCurrentUserQuery();
 
   if (isLoading) {
-    return <div>Загрузка...</div>;
-  }
-
-  if (isError) {
-    return <div>Произошла ошибка</div>;
+    return <SignLinksSkeleton />;
   }
 
   if (isSuccess) {
@@ -45,20 +24,11 @@ export default function SignLinks() {
           <p>Корзина</p>
           {cartLength && cartLength > 0 ? <span>{cartLength}</span> : null}
         </Link>
-
         {currentUser ? (
           <>
             <Link className={style.link} href="/profile">
               <LoginIcon />
               <p>{currentUser.name}</p>
-              <span
-                onMouseEnter={() => setIsShowTooltip(true)}
-                onMouseLeave={() => setIsShowTooltip(false)}
-                onClick={handleLogout}
-              >
-                <XIcon />
-              </span>
-              {isShowTooltip && <Tooltip children="Выход" />}
             </Link>
           </>
         ) : (

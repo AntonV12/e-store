@@ -1,0 +1,84 @@
+.tiptap {
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 3px;
+  min-height: 260px;
+  height: fit-content;
+}
+
+.tiptap ul,
+.tiptap ol {
+  padding: 0 1rem;
+  margin: 0 1rem;
+}
+.tiptap ul {
+  list-style-type: disc;
+}
+
+.tiptap li p {
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+}
+
+.tiptap h1,
+.tiptap h2,
+.tiptap h3,
+.tiptap h4,
+.tiptap h5,
+.tiptap h6 {
+  margin: 0 0 0.25em 0;
+  font-weight: bold;
+  line-height: 1.1;
+  text-wrap: pretty;
+}
+
+.tiptap h1 {
+  font-size: 1.4rem;
+}
+
+.tiptap h2 {
+  font-size: 1.2rem;
+}
+
+.tiptap h3 {
+  font-size: 1.1rem;
+}
+
+.tiptap h4 {
+  font-size: 1rem;
+}
+
+.tiptap blockquote {
+  border-left: 3px solid var(--gray-3);
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+}
+
+.tiptap hr {
+  border: none;
+  border-top: 1px solid var(--gray-2);
+  margin: 2rem 0;
+}
+
+.tiptap p.is-editor-empty:first-child::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+.tiptap-editor {
+  column-count: 2;
+  column-gap: 5px;
+}
+
+.textEditor_button__Nuom2 > * {
+  pointer-events: none;
+}
+
+@media screen and (max-width: 890px) {
+  .tiptap-editor {
+    column-count: 1;
+  }
+}

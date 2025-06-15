@@ -8,11 +8,23 @@ import React from "react";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import OrdersList from "./OrdersList";
 import Link from "next/link";
+import { useLogoutUserMutation } from "@/lib/features/auth/authApiSlice";
+import { ProfileSkeleton } from "@/app/components/skeletons/skeletons";
 
 export default function Profile() {
   const { data: currentUser, isLoading, isSuccess, isError, refetch } = useGetCurrentUserQuery();
   const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
     useUpdateUserMutation();
+  const [logoutUser] = useLogoutUserMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser().unwrap();
+      await refetch();
+    } catch (error) {
+      console.error("Ошибка при выходе:", error);
+    }
+  };
 
   const handleAddImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.currentTarget.files?.[0];
@@ -31,7 +43,7 @@ export default function Profile() {
   };
 
   if (isError) return <div>Произошла ошибка</div>;
-  if (isLoading) return <div>Загрузка...</div>;
+  if (isLoading) return <ProfileSkeleton />;
   if (isSuccess) {
     return currentUser ? (
       <div className={style.profile}>
@@ -50,7 +62,10 @@ export default function Profile() {
             </div>
             {currentUser.name}
           </div>
-          <Link href="/add-product">Добавить новый товар</Link>
+          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
+          <Link href="/" onClick={handleLogout}>
+            Выйти из системы
+          </Link>
         </div>
         <OrdersList />
       </div>

@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import CartItem from "./CartItem";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CartSkeleton } from "@/app/components/skeletons/skeletons";
 
 export default function Cart() {
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
@@ -21,6 +22,7 @@ export default function Cart() {
     setTotal(currentUser?.cart.reduce((acc, item) => acc + item.cost * item.amount, 0));
   }, [currentUser]);
 
+  if (isUserLoading) return <CartSkeleton />;
   if (isUserSuccess) {
     return (
       <section className={style.cart}>

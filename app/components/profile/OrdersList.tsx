@@ -9,7 +9,7 @@ import { useState } from "react";
 export default function OrdersList() {
   const { data: currentUser, isLoading, isSuccess, isError } = useGetCurrentUserQuery();
   const [done, setDone] = useState(false);
-  const { data: orders } = useGetOrdersQuery({ limit: 10, done });
+  const { data: orders } = useGetOrdersQuery({ userId: currentUser?.id ?? undefined, limit: 10, done });
 
   if (isError) return <div>Произошла ошибка</div>;
   if (isLoading) return <div>Загрузка...</div>;

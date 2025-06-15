@@ -4,7 +4,7 @@
   align-items: flex-start;
   justify-content: center;
   width: 130px;
-  padding-bottom: 5px;
+  margin: 0 0 0 auto;
 }
 
 .rating input[type="radio"] {
@@ -24,6 +24,7 @@
   cursor: pointer;
 }
 
-.highlighted {
+.highlighted,
+.rating input[type="radio"]:checked ~ label {
   color: gold;
 }

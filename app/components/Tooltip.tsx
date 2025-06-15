@@ -1,5 +1,19 @@
 import style from "@/app/styles/layout.module.css";
 
-export const Tooltip = ({ children }: { children: React.ReactNode }) => {
-  return <div className={style.tooltip}>{children}</div>;
+export const Tooltip = ({
+  children,
+  coords,
+  controlGroupRef,
+}: {
+  children: React.ReactNode;
+  coords: { x: number; y: number };
+  controlGroupRef: React.RefObject<HTMLDivElement>;
+}) => {
+  const rect = controlGroupRef.current?.getBoundingClientRect();
+
+  return (
+    <div className={style.tooltip} style={{ left: coords.x - rect!.left, top: -40 }}>
+      {children}
+    </div>
+  );
 };

@@ -21,14 +21,15 @@ import { CartType } from "@/lib/types/types";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: { name: string; password: string; isAdmin: boolean; cart: CartType[] } = await request.json();
-    const { name, password, isAdmin, cart } = body;
+    const body: { name: string; password: string; isAdmin: boolean; cart: CartType[]; avatar: string } =
+      await request.json();
+    const { name, password, isAdmin, cart, avatar } = body;
 
     if (!name || !password) {
       return NextResponse.json({ error: "Необходимо ввести имя и пароль" }, { status: 400 });
     }
 
-    const result = await createUser({ id: null, name, password, isAdmin, cart });
+    const result = await createUser({ id: null, name, password, isAdmin, cart, avatar });
     if ("error" in result) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
