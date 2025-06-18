@@ -1,6 +1,10 @@
 .controlGroup {
-  margin: 0 !important;
-  position: relative;
+  margin: 0 0 5px 0 !important;
+  position: sticky;
+  top: 5px;
+  z-index: 2;
+  background-color: white;
+  box-shadow: 0 0 5px 10px white;
 }
 
 .buttonGroup {
@@ -9,11 +13,16 @@
   flex-wrap: wrap;
   flex-shrink: 0;
   gap: 5px !important;
+  position: relative;
 }
 
 .button {
-  width: 30px;
+  width: 32px;
+  height: 32px;
   padding: 5px;
+}
+.button > * {
+  pointer-events: none;
 }
 
 .active {

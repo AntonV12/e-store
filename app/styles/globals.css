@@ -7,7 +7,6 @@ body {
   min-height: 100vh;
   padding: 0;
   margin: 0;
-  /*  font-family: "Play", sans-serif; */
   font-family: var(--font-play);
   --main-color: rgba(0, 0, 255, 0.2);
   --secondary-color: rgb(134, 162, 187);
@@ -23,7 +22,6 @@ a:hover {
 }
 
 button {
-  /* font-family: "Play", sans-serif; */
   font-family: var(--font-play);
   background-color: aliceblue;
   border-radius: 8px;
@@ -38,7 +36,6 @@ button:hover {
   cursor: pointer;
   background-color: var(--secondary-color);
   color: white;
-  /* box-shadow: 0 0 2px 2px var(--shadow-color); */
 }
 
 button:active {

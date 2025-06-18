@@ -122,8 +122,6 @@ export const ProductsList = () => {
       <section className={style.products}>
         <SearchForm value={value} setValue={setValue} toggleCategories={toggleCategories} />
 
-        {data.length === 0 && <p>Товаров не найдено</p>}
-
         <div className={style.sort}>
           <button
             onClick={() => handleSort("cost")}
@@ -150,6 +148,8 @@ export const ProductsList = () => {
             популярность {sortBy === "viewed" && (sortByDirection === "asc" ? "↑" : "↓")}
           </button>
         </div>
+
+        {data.length === 0 && <p>Товаров не найдено</p>}
 
         <ul className={style.list}>
           {data.map((product, index) => (

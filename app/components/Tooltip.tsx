@@ -12,7 +12,14 @@ export const Tooltip = ({
   const rect = controlGroupRef.current?.getBoundingClientRect();
 
   return (
-    <div className={style.tooltip} style={{ left: coords.x - rect!.left, top: -40 }}>
+    <div
+      className={style.tooltip}
+      style={{
+        left: coords.x - rect!.left,
+        top: -40,
+        transform: `translateY(${coords.y - rect!.top}px)`,
+      }}
+    >
       {children}
     </div>
   );

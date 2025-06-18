@@ -7,4 +7,5 @@ export default function IndexPage() {
 
 export const metadata: Metadata = {
   title: "My Store",
+  description: "Интернет-магазин электронных товаров с доставкой по всей России",
 };

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
+
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 0.54 0.54"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="table-cell-split.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#111111"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="11.313709"
+     inkscape:cx="19.48963"
+     inkscape:cy="11.711456"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     fill="#494c4e"
+     d="M 0.1200037,0.06000568 V 0.48004546 H 0.06000186 V 0.06000568 H 0.1200037 M 0.15000463,0 H 0.03000092 A 0.03000092,0.03000283 0 0 0 0,0.03000283 V 0.5100483 A 0.03000092,0.03000283 0 0 0 0.03000092,0.5400512 H 0.15000463 A 0.03000092,0.03000283 0 0 0 0.18000558,0.5100483 V 0.03000283 A 0.03000092,0.03000283 0 0 0 0.15000463,0 Z M 0.48001482,0.06000568 V 0.48004546 H 0.42001292 V 0.06000568 h 0.0600018 M 0.51001574,0 H 0.39001205 A 0.03000092,0.03000283 0 0 0 0.3600111,0.03000283 V 0.5100483 a 0.03000092,0.03000283 0 0 0 0.030001,0.0300029 H 0.51001574 A 0.03000092,0.03000283 0 0 0 0.54001669,0.5100483 V 0.03000283 A 0.03000092,0.03000283 0 0 0 0.51001574,0 Z M 0.27000833,0.1500142 A 0.03000092,0.03000283 0 0 1 0.24000741,0.12001136 V 0.06000568 a 0.03000093,0.03000285 0 0 1 0.0600018,0 v 0.06000568 a 0.03000092,0.03000283 0 0 1 -0.0300009,0.0300028 z m 0,0.18001704 a 0.03000092,0.03000283 0 0 1 -0.030001,-0.0300028 v -0.0600057 a 0.03000093,0.03000285 0 0 1 0.0600018,0 v 0.0600057 a 0.03000092,0.03000283 0 0 1 -0.0300008,0.0300028 z m 0,0.18001706 A 0.03000092,0.03000283 0 0 1 0.24000733,0.4800454 V 0.4200397 a 0.03000093,0.03000285 0 0 1 0.0600018,0 v 0.0600057 a 0.03000092,0.03000283 0 0 1 -0.0300008,0.0300029 z"
+     id="path1"
+     style="stroke-width:0.0300019;fill:#000000" />
+</svg>

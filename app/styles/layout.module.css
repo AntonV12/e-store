@@ -18,12 +18,7 @@
 .logo {
   font-size: 1.5rem;
   font-family: "Press Start 2P", system-ui;
-  /* margin-right: 10px; */
 }
-
-/* .menu {
-  position: relative;
-} */
 
 .menu button {
   height: 40px;
@@ -57,9 +52,6 @@
 .searchForm button {
   height: 40px;
 }
-/* .searchForm input:focus {
-  box-shadow: 0 0 100px 1000px var(--shadow-color);
-} */
 
 .links {
   display: flex;
@@ -81,7 +73,6 @@
   right: 0;
   background-color: orangered;
   color: white;
-  /*  padding: 5px; */
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -166,7 +157,6 @@
   width: fit-content;
   height: fit-content;
   text-align: center;
-  transform: translateX(-50%);
 }
 
 .footer {

@@ -12,8 +12,8 @@ import { setMessage } from "@/lib/features/message/messageSlice";
 import CryptoJS from "crypto-js";
 
 export default function Order() {
-  const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
-  const [createOrder, { isLoading, isSuccess, isError }] = useCreateOrderMutation();
+  const { data: currentUser, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
+  const [createOrder, { isLoading }] = useCreateOrderMutation();
   const [updateUser] = useUpdateUserMutation();
   const dispatch = useAppDispatch();
   const [isSubmit, setIsSubmit] = useState<boolean>(false);
@@ -50,12 +50,7 @@ export default function Order() {
       id: null,
       clientId: currentUser?.id,
       encryptedOrder,
-      //phone: Number(formData.get("tel")),
-      //email: String(formData.get("email")),
-      //address: userAddress,
-      //products: currentUser.cart,
       isDone: false,
-      //date: new Date().toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" }),
     };
 
     if (!phone || !email || !city || !street || !house || !currentUser.cart) return;
@@ -91,7 +86,9 @@ export default function Order() {
             <Input type="text" name="house" placeholder="дом №" isSubmit={isSubmit} />
             <Input type="text" name="apartment" placeholder="квартира" isSubmit={isSubmit} />
           </div>
-          <button className={style.button}>Подтвердить</button>
+          <button className={style.button} disabled={isLoading}>
+            Подтвердить
+          </button>
         </form>
       </div>
     );

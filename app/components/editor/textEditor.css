@@ -2,22 +2,77 @@
   border: 1px solid #e0e0e0;
   border-radius: 5px;
   padding: 3px;
-  min-height: 260px;
-  height: fit-content;
+  margin-bottom: 5px;
+  min-height: 300px;
+  /* max-height: 1000px;
+  width: 60vw;
+  column-count: 2;
+  overflow: auto;
+  resize: vertical;
+  column-fill: auto; */
 }
 
-.tiptap ul,
-.tiptap ol {
-  padding: 0 1rem;
-  margin: 0 1rem;
+table {
+  border-collapse: collapse;
+  margin: 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: 100%;
 }
-.tiptap ul {
-  list-style-type: disc;
+table tbody td:nth-child(odd) {
+  width: 30%;
+}
+table tbody td:nth-child(even) {
+  width: 70%;
 }
 
-.tiptap li p {
-  margin-top: 0.25em;
-  margin-bottom: 0.25em;
+td,
+th {
+  border: 1px solid #e0e0e0;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 6px 8px;
+  position: relative;
+  vertical-align: top;
+  user-select: text;
+}
+
+th {
+  background-color: #e0e0e0;
+  font-weight: bold;
+  text-align: left;
+}
+
+.selectedCell:after {
+  background: var(--main-color);
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.column-resize-handle {
+  background-color: var(--main-color);
+  bottom: -2px;
+  pointer-events: none;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 4px;
+}
+
+.tableWrapper {
+  margin: 0;
+  overflow-x: auto;
+}
+
+.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
 }
 
 .tiptap h1,
@@ -26,7 +81,7 @@
 .tiptap h4,
 .tiptap h5,
 .tiptap h6 {
-  margin: 0 0 0.25em 0;
+  margin: 0.5em 0;
   font-weight: bold;
   line-height: 1.1;
   text-wrap: pretty;
@@ -48,37 +103,11 @@
   font-size: 1rem;
 }
 
-.tiptap blockquote {
-  border-left: 3px solid var(--gray-3);
-  margin: 1.5rem 0;
-  padding-left: 1rem;
-}
-
-.tiptap hr {
-  border: none;
-  border-top: 1px solid var(--gray-2);
-  margin: 2rem 0;
-}
-
-.tiptap p.is-editor-empty:first-child::before {
-  color: #adb5bd;
-  content: attr(data-placeholder);
-  float: left;
-  height: 0;
-  pointer-events: none;
-}
-
-.tiptap-editor {
-  column-count: 2;
-  column-gap: 5px;
-}
-
-.textEditor_button__Nuom2 > * {
-  pointer-events: none;
-}
-
-@media screen and (max-width: 890px) {
-  .tiptap-editor {
+/* @media screen and (max-width: 1200px) {
+  .tiptap {
+    width: 100%;
     column-count: 1;
+    max-height: none;
+    height: auto;
   }
-}
+} */

@@ -10,16 +10,18 @@ import OrdersList from "./OrdersList";
 import Link from "next/link";
 import { useLogoutUserMutation } from "@/lib/features/auth/authApiSlice";
 import { ProfileSkeleton } from "@/app/components/skeletons/skeletons";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const { data: currentUser, isLoading, isSuccess, isError, refetch } = useGetCurrentUserQuery();
-  const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
-    useUpdateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
   const [logoutUser] = useLogoutUserMutation();
+  const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await logoutUser().unwrap();
+      router.push("/");
       await refetch();
     } catch (error) {
       console.error("Ошибка при выходе:", error);
@@ -63,7 +65,7 @@ export default function Profile() {
             {currentUser.name}
           </div>
           {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
-          <Link href="/" onClick={handleLogout}>
+          <Link href="#" onClick={handleLogout}>
             Выйти из системы
           </Link>
         </div>

@@ -17,8 +17,7 @@ export default function CartItem({
 }) {
   const [amount, setAmount] = useState<number>(product.amount);
   const debouncedAmount: number = useDebounce(amount, 500);
-  const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
-    useUpdateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
   const dispatch = useAppDispatch();
 
   const updateCart = (newAmount: number) => {

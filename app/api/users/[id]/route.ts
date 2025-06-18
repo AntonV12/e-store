@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { updateUser } from "./userController";
-import { ProductType, UserType } from "@/lib/types/types";
+import { UserType } from "@/lib/types/types";
 import { verifySession } from "@/app/api/auth/authController";
 
 export async function PUT(request: NextRequest) {

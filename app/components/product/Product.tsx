@@ -24,23 +24,27 @@ import { useRouter } from "next/navigation";
 import { ProductSkeleton } from "@/app/components/skeletons/skeletons";
 import TextEditor from "@/app/components/editor/TextEditor";
 
-export default function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: number }) {
+export default function Product({ id, isAuth }: { id: number; isAuth: boolean }) {
   const dispatch = useAppDispatch();
   const { data: product, isError, isLoading, isSuccess } = useGetProductByIdQuery(id);
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
-  const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
-    useUpdateUserMutation();
+  const [updateUser, { isLoading: isUpdateUserLoading }] = useUpdateUserMutation();
+  const [image, setImage] = useState<string | null>(null);
   const [amount, setAmount] = useState<number>(1);
   const message = useSelector((state: { message: { text: string } }) => state.message.text);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [updateProduct, { isLoading: isUpdateProductLoading, isError: isUpdateProductError }] =
-    useUpdateProductMutation();
-  const [deleteProduct, { isLoading: isDeleteProductLoading, isError: isDeleteProductError }] =
-    useDeleteProductMutation();
+  const [updateProduct, { isLoading: isUpdateProductLoading }] = useUpdateProductMutation();
+  const [deleteProduct, { isLoading: isDeleteProductLoading }] = useDeleteProductMutation();
   const router = useRouter();
-  const [updateViewed, { isLoading: isUpdateViewedLoading, isError: isUpdateViewedError }] = useUpdateViewedMutation();
+  const [updateViewed] = useUpdateViewedMutation();
   let updateProductViewedTimeoutId: NodeJS.Timeout | null = null;
   const editorRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (isSuccess && product) {
+      setImage(product.imageSrc);
+    }
+  }, [isSuccess, product]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -64,6 +68,15 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
 
   const toggleEdit = () => {
     setIsEdit((prev) => !prev);
+  };
+
+  const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      reader.onload = () => setImage(reader.result as string);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -181,13 +194,20 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
       <section className={style.productCard}>
         <div className={style.container}>
           {isEdit ? (
-            <form method="post" onSubmit={handleEditSubmit}>
+            <form method="post" onSubmit={handleEditSubmit} className={style.editForm}>
               <div className={style.container}>
                 <div className={style.imageForm}>
-                  <input type="file" name="image" id="image" className={style.fileInput} />
+                  <input
+                    type="file"
+                    name="image"
+                    id="image"
+                    className={style.fileInput}
+                    accept="image/*"
+                    onChange={handleEditImage}
+                  />
                   <label htmlFor="image" className={style.fileLabel}></label>
                   <CameraIcon className={style.cameraIcon} />
-                  <Image src={product.imageSrc} alt={product.name} width={280} height={280} className={style.img} />
+                  {image && <Image src={image} alt={product.name} width={280} height={280} className={style.img} />}
                 </div>
                 <div className={style.info}>
                   <div className={style.title}>
@@ -227,7 +247,7 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
             </form>
           ) : (
             <>
-              <Image src={product.imageSrc} alt={product.name} width={280} height={280} className={style.img} />
+              {image && <Image src={image} alt={product.name} width={280} height={280} className={style.img} />}
               <div className={style.info}>
                 <div className={style.title}>
                   <h1 className={style.productName}>{product.name}</h1>
@@ -241,7 +261,9 @@ export default function Product({ id, isAuth, userId }: { id: number; isAuth: bo
                   <form method="post" onSubmit={handleAddProductToCart}>
                     <h2 className={style.priceInput}>{product.cost.toLocaleString("ru-RU")} ₽</h2>
                     <Amount value={amount} setAmount={setAmount} />
-                    <button type="submit">В корзину</button>
+                    <button type="submit" disabled={isUpdateUserLoading}>
+                      В корзину
+                    </button>
                   </form>
                 </div>
                 <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>

@@ -65,8 +65,36 @@
   font-size: 16px;
   border-radius: 10px;
   padding: 3px;
-  column-count: 2;
+  /* column-count: 2;
   column-gap: 5px;
+  column-fill: auto; */
+}
+.description h1,
+.description h2,
+.description h3,
+.description h4,
+.description h5,
+.description h6 {
+  margin: 0.5em 0;
+  font-weight: bold;
+  line-height: 1.1;
+  text-wrap: pretty;
+}
+
+.description h1 {
+  font-size: 1.4rem;
+}
+
+.description h2 {
+  font-size: 1.2rem;
+}
+
+.description h3 {
+  font-size: 1.1rem;
+}
+
+.description h4 {
+  font-size: 1rem;
 }
 
 .editButtons,
@@ -109,6 +137,14 @@
   opacity: 1;
 }
 
+.info {
+  flex-grow: 1;
+}
+
+.editForm {
+  width: 100%;
+}
+
 @media screen and (max-width: 890px) {
   .container,
   .title {
@@ -130,7 +166,12 @@
   .rating {
     margin: 0;
   }
+  .info {
+    width: 100%;
+  }
+}
+/* @media screen and (max-width: 1200px) {
   .description {
     column-count: 1;
   }
-}
+} */

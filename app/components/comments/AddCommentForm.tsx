@@ -6,7 +6,7 @@ import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import { nanoid } from "@reduxjs/toolkit";
 
 export const AddCommentForm = ({ product }: { product: ProductType }) => {
-  const [updateProduct, { isLoading, isSuccess, isError }] = useUpdateProductMutation();
+  const [updateProduct, { isLoading }] = useUpdateProductMutation();
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
 
   const handleAddComment = async (e: React.FormEvent<HTMLFormElement>) => {

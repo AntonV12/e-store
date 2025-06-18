@@ -1,6 +1,6 @@
 import { pool } from "@/lib/database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ProductType, UserType } from "@/lib/types/types";
+import { UserType } from "@/lib/types/types";
 
 export const updateUser = async (user: UserType): Promise<{ success: boolean; message: string }> => {
   try {

@@ -11,7 +11,6 @@ export default async function ProductPage(props: { params: Promise<{ id: number 
   const id = params.id;
   const session = await verifySession();
   const isAuth: boolean = session.isAuth;
-  const userId: number = session.userId as number;
 
-  return <Product id={id} isAuth={isAuth} userId={userId} />;
+  return <Product id={id} isAuth={isAuth} />;
 }

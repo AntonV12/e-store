@@ -11,6 +11,7 @@
   transform: translateX(-50%);
   animation: appear 0.3s ease-in-out forwards;
   opacity: 0;
+  text-align: center;
 }
 
 .disappear {

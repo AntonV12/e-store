@@ -1,5 +1,5 @@
 import { pool } from "@/lib/database";
-import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { RowDataPacket } from "mysql2";
 
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {

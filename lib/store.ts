@@ -1,7 +1,5 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { combineSlices, configureStore } from "@reduxjs/toolkit";
-import { counterSlice } from "./features/counter/counterSlice";
-import { quotesApiSlice } from "./features/quotes/quotesApiSlice";
 import { usersApiSlice } from "./features/users/usersApiSlice";
 import { productsApiSlice } from "./features/products/productsApiSlice";
 import { authApiSlice } from "./features/auth/authApiSlice";
@@ -10,15 +8,7 @@ import { messageSlice } from "./features/message/messageSlice";
 
 // `combineSlices` automatically combines the reducers using
 // their `reducerPath`s, therefore we no longer need to call `combineReducers`.
-const rootReducer = combineSlices(
-  counterSlice,
-  quotesApiSlice,
-  usersApiSlice,
-  productsApiSlice,
-  authApiSlice,
-  ordersApiSlice,
-  messageSlice
-);
+const rootReducer = combineSlices(usersApiSlice, productsApiSlice, authApiSlice, ordersApiSlice, messageSlice);
 // Infer the `RootState` type from the root reducer
 export type RootState = ReturnType<typeof rootReducer>;
 
@@ -33,7 +23,6 @@ export const makeStore = () => {
     // and other useful features of `rtk-query`.
     middleware: (getDefaultMiddleware) => {
       return getDefaultMiddleware()
-        .concat(quotesApiSlice.middleware)
         .concat(usersApiSlice.middleware)
         .concat(productsApiSlice.middleware)
         .concat(authApiSlice.middleware)

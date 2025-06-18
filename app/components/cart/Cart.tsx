@@ -3,8 +3,6 @@
 import style from "./cart.module.css";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import { CartType } from "@/lib/types/types";
-import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
-import { useRouter } from "next/navigation";
 import CartItem from "./CartItem";
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -12,9 +10,6 @@ import { CartSkeleton } from "@/app/components/skeletons/skeletons";
 
 export default function Cart() {
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
-  const [updateUser, { isLoading: isUpdateUserLoading, isError: isUpdateUserError, isSuccess: isUpdateUserSuccess }] =
-    useUpdateUserMutation();
-  const router = useRouter();
   const [total, setTotal] = useState<number>(0);
 
   useEffect(() => {
