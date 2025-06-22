@@ -72,10 +72,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
 
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      const reader = new FileReader();
-      reader.onload = () => setImage(reader.result as string);
-      reader.readAsDataURL(file);
+      setImage(URL.createObjectURL(e.target.files[0]));
     }
   };
 
@@ -83,34 +80,20 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     try {
       if (isEdit && product) {
         e.preventDefault();
-        const form = e.currentTarget as HTMLFormElement;
+        const form = e.target as HTMLFormElement;
         const formData = new FormData(form);
-        const name = formData.get("name") as string;
-        const category = formData.get("category") as string;
-        const cost = formData.get("cost") as string;
-        const imageFile = formData.get("image") as File;
         const description = editorRef.current.getContent() || "";
-
-        let imageSrc: string = product.imageSrc;
-        if (imageFile && imageFile.size > 0) {
-          imageSrc = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(imageFile);
-          });
+        formData.append("description", description);
+        if (product.id) {
+          formData.append("id", product.id.toString());
         }
 
-        const updatedProduct = {
-          ...product,
-          name,
-          category,
-          cost: Number(cost),
-          imageSrc,
-          description,
-        };
+        const responce = await updateProduct(formData);
 
-        await updateProduct(updatedProduct).unwrap();
+        if ("error" in responce) {
+          throw new Error("Ошибка записи");
+        }
+
         setIsEdit(false);
         dispatch(setMessage("Товар успешно обновлен"));
       }
@@ -194,7 +177,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
       <section className={style.productCard}>
         <div className={style.container}>
           {isEdit ? (
-            <form method="post" onSubmit={handleEditSubmit} className={style.editForm}>
+            <form method="POST" onSubmit={handleEditSubmit} className={style.editForm} encType="multipart/form-data">
               <div className={style.container}>
                 <div className={style.imageForm}>
                   <input
@@ -207,7 +190,11 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
                   />
                   <label htmlFor="image" className={style.fileLabel}></label>
                   <CameraIcon className={style.cameraIcon} />
-                  {image && <Image src={image} alt={product.name} width={280} height={280} className={style.img} />}
+                  {image && (
+                    <div className={style.imgContainer}>
+                      <Image src={image} alt={product.name} width={280} height={280} className={style.img} priority />
+                    </div>
+                  )}
                 </div>
                 <div className={style.info}>
                   <div className={style.title}>
@@ -247,7 +234,11 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
             </form>
           ) : (
             <>
-              {image && <Image src={image} alt={product.name} width={280} height={280} className={style.img} />}
+              <div className={style.imgContainer}>
+                {image ? (
+                  <Image src={image} alt={product.name} width={280} height={280} className={style.img} priority />
+                ) : null}
+              </div>
               <div className={style.info}>
                 <div className={style.title}>
                   <h1 className={style.productName}>{product.name}</h1>

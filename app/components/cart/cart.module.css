@@ -30,7 +30,7 @@
   display: grid;
   align-items: center;
   grid-template-rows: 1fr 1fr;
-  grid-template-columns: 3fr 1fr;
+  grid-template-columns: 3fr auto;
 }
 .amount {
   display: flex;

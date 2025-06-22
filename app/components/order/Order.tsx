@@ -37,7 +37,7 @@ export default function Order() {
     const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
     const encryptedOrder = CryptoJS.AES.encrypt(
       JSON.stringify({
-        phone: Number(phone),
+        phone: phone,
         email: String(email),
         address: userAddress,
         products: currentUser.cart,
@@ -53,7 +53,9 @@ export default function Order() {
       isDone: false,
     };
 
-    if (!phone || !email || !city || !street || !house || !currentUser.cart) return;
+    const validatePhoneNumber = (phone: string) => /^\+7 \(\d{3}\) \d{3}-\d{2}\d{2}$/.test(phone);
+    if (!phone || !email || !city || !street || !house || !currentUser.cart || !validatePhoneNumber(String(phone)))
+      return;
 
     try {
       let result = await createOrder(newOrder).unwrap();

@@ -1,7 +1,9 @@
 import { pool } from "@/lib/database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { ProductType } from "@/lib/types/types";
+import { CommentType, ProductType } from "@/lib/types/types";
 import { verifySession } from "@/app/api/auth/authController";
+import path from "path";
+import { writeFile, rm } from "fs/promises";
 
 export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
@@ -14,16 +16,41 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
   }
 };
 
-export const updateProduct = async (product: ProductType): Promise<{ success: boolean; message: string }> => {
+export const updateProduct = async (formData: FormData): Promise<{ success: boolean; message: string }> => {
   try {
     const session = await verifySession();
     if (!session.userId) {
       return { success: false, message: "Unauthorized" };
     }
 
-    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [product.id]);
+    const id = formData.get("id");
+    const name = formData.get("name") as string;
+    const category = formData.get("category") as string;
+    const cost = Number(formData.get("cost"));
+    const imageFile = formData.get("image") as File;
+    const description = formData.get("description") as string;
 
-    const { id, name, category, viewed, rating, cost, imageSrc, description, comments } = product;
+    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
+
+    const { viewed, rating, imageSrc, comments } = existingProduct[0];
+
+    const dir = path.join(process.cwd(), "public", "images");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    const filename = imageFile.name
+      ? uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_")
+      : imageSrc.split("/").pop();
+    const filePath = path.join(dir, filename);
+
+    const bytes = await imageFile.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    if (imageFile.size) {
+      await writeFile(filePath, new Uint8Array(buffer));
+      if (imageSrc) {
+        await rm(path.join(process.cwd(), "public", imageSrc));
+      }
+    }
+
     if (existingProduct[0] as ProductType) {
       if (
         !session.isAdmin &&
@@ -46,7 +73,7 @@ export const updateProduct = async (product: ProductType): Promise<{ success: bo
       viewed,
       rating,
       cost,
-      imageSrc,
+      `/images/${filename}`,
       description,
       comments,
       id,
@@ -56,6 +83,10 @@ export const updateProduct = async (product: ProductType): Promise<{ success: bo
       success: results.affectedRows > 0,
       message: results.affectedRows > 0 ? "Продукт успешно обновлен" : "Продукт не получилось обновить",
     };
+    /* return {
+      success: true,
+      message: "Продукт успешно обновлен",
+    }; */
   } catch (err) {
     console.error(err);
     return { success: false, message: "Database error" };
@@ -81,6 +112,10 @@ export const deleteProduct = async (id: number): Promise<{ success: boolean; mes
 
     const [results] = await pool.execute<ResultSetHeader>("DELETE FROM products WHERE id = ?", [id]);
 
+    if (existingProduct[0].imageSrc) {
+      await rm(path.join(process.cwd(), "public", existingProduct[0].imageSrc));
+    }
+
     return {
       success: results.affectedRows > 0,
       message: results.affectedRows > 0 ? "Продукт успешно удален" : "Продукт не получилось удалить",
@@ -91,7 +126,10 @@ export const deleteProduct = async (id: number): Promise<{ success: boolean; mes
   }
 };
 
-export const updateViewed = async (id: number, params?: { rating?: number; viewed?: number }): Promise<void> => {
+export const updateViewed = async (
+  id: number,
+  params?: { rating?: number; viewed?: number; comments?: CommentType[] }
+): Promise<void> => {
   try {
     const session = await verifySession();
     let sql;
@@ -131,6 +169,11 @@ export const updateViewed = async (id: number, params?: { rating?: number; viewe
         WHERE id = ?
       `;
       await pool.execute(sql, [session.userId, params.rating, session.userId, params.rating, id]);
+    }
+
+    if (params?.comments) {
+      sql = `UPDATE products SET comments = ? WHERE id = ?`;
+      await pool.execute(sql, [JSON.stringify(params.comments), id]);
     }
   } catch (err) {
     console.error(err);

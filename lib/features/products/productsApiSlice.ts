@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import `createApi`
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { ProductType, SortType } from "@/lib/types/types";
+import { ProductType, SortType, CommentType } from "@/lib/types/types";
 
 // Define a service using a base URL and expected endpoints
 export const productsApiSlice = createApi({
@@ -26,9 +26,9 @@ export const productsApiSlice = createApi({
       query: (id) => `/${id}`,
       providesTags: (result, error, id) => [{ type: "Products", id }],
     }),
-    updateProduct: build.mutation<ProductType, ProductType>({
+    updateProduct: build.mutation<ProductType, FormData>({
       query: (product) => ({
-        url: `/${product.id}`,
+        url: `/${product.get("id")}`,
         method: "PUT",
         body: product,
       }),
@@ -37,7 +37,7 @@ export const productsApiSlice = createApi({
     getCategories: build.query<string[], void>({
       query: () => "/categories",
     }),
-    createProduct: build.mutation<ProductType, ProductType>({
+    createProduct: build.mutation<ProductType, FormData>({
       query: (product) => ({
         url: "/",
         method: "POST",
@@ -52,7 +52,10 @@ export const productsApiSlice = createApi({
       }),
       invalidatesTags: ["Products"],
     }),
-    updateViewed: build.mutation<ProductType, { id: number; params: { viewed?: number; rating?: number } }>({
+    updateViewed: build.mutation<
+      ProductType,
+      { id: number; params: { viewed?: number; rating?: number; comments?: CommentType[] } }
+    >({
       query: ({ id, params }) => ({
         url: `/${id}`,
         method: "PATCH",

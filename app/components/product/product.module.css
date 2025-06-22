@@ -10,7 +10,21 @@
   gap: 20px;
 }
 
+.imgContainer {
+  width: 280px;
+  height: 280px;
+  min-width: 280px;
+  min-height: 280px;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 280px;
+  position: relative;
+  background-color: #f6f6f6;
+}
+
 .img {
+  width: 280px;
+  height: 280px;
   border-radius: 10px;
   flex-shrink: 0;
   object-fit: contain;
@@ -139,6 +153,7 @@
 
 .info {
   flex-grow: 1;
+  min-height: 300px;
 }
 
 .editForm {

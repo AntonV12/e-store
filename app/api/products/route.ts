@@ -25,8 +25,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const product = await request.json();
-    const createdProduct = await createProduct(product);
+    const formData = await request.formData();
+
+    const createdProduct = await createProduct(formData);
     return NextResponse.json(createdProduct);
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });

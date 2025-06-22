@@ -17,35 +17,20 @@ export default function AddProduct() {
     event.preventDefault();
 
     try {
-      const formData = new FormData(event.currentTarget);
-      const name = formData.get("name") as string;
-      const category = formData.get("category") as string;
-      const costValue = formData.get("cost");
-      const cost = costValue ? Number(costValue) : 0;
-      const imageFile = formData.get("image") as File;
-      const description = editorRef.current.getContent() || "";
+      const form = event.currentTarget as HTMLFormElement;
+      const formData = new FormData(form);
 
-      if (imageFile) {
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-          const base64String = reader.result as string;
-          const newProduct = {
-            id: null,
-            name,
-            category,
-            viewed: 0,
-            rating: [],
-            cost,
-            imageSrc: base64String,
-            description,
-            comments: [],
-          } as ProductType;
-          await createProduct(newProduct);
-        };
-        reader.readAsDataURL(imageFile);
+      const description = editorRef.current.getContent() || "";
+      formData.append("description", description);
+
+      const responce = await createProduct(formData);
+
+      if ("error" in responce) {
+        throw new Error("Ошибка записи");
       }
-      dispatch(setMessage(`Товар ${name} успешно добавлен`));
-      event.currentTarget.reset();
+
+      dispatch(setMessage(`Товар ${formData.get("name")} успешно добавлен`));
+      form.reset();
       if (editorRef.current) {
         editorRef.current.clearContent();
       }
@@ -58,7 +43,7 @@ export default function AddProduct() {
   return (
     <div className={style.container}>
       <h2>Добавить новый товар</h2>
-      <form className={style.form} method="POST" onSubmit={handleSubmit}>
+      <form className={style.form} method="POST" onSubmit={handleSubmit} encType="multipart/form-data">
         <div>
           <label htmlFor="name">Название товара:</label>
           <input type="text" id="name" name="name" required />

@@ -19,10 +19,29 @@ export default function Input({
 
     switch (type) {
       case "tel":
-        setValue(value.replace(/[^0-9]/g, ""));
+        function formatPhoneNumber(value: string) {
+          const phoneNumber = value.replace(/[^\d]/g, "");
+          const match = phoneNumber.match(/^(\d{1})(\d{0,3})(\d{0,3})(\d{0,4})$/);
+
+          if (!match) {
+            return phoneNumber;
+          } else {
+            if (phoneNumber.length === 1) {
+              return phoneNumber === "8" || phoneNumber === "7" ? "+7" : `+7 (${match[1]})`;
+            } else {
+              return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
+            }
+          }
+        }
+
+        setValue((prev) => {
+          if (prev.length >= value.length) return value;
+          if (value.length > 17) return prev;
+          return formatPhoneNumber(value);
+        });
         break;
       case "email":
-        setValue(value.replace(/[^a-zA-Z0-9@.]/g, ""));
+        setValue(value.replace(/[^a-zA-Z0-9@.-]/g, ""));
         break;
       default:
         setValue(value);
@@ -33,7 +52,7 @@ export default function Input({
   const validation = () => {
     switch (type) {
       case "tel":
-        return /\d+/.test(value);
+        return /^[+]?[0-9]{1} \([0-9]{3}\) [0-9]{3}-[0-9]{4}$/.test(value);
 
       case "email":
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -44,13 +63,15 @@ export default function Input({
   };
 
   return (
-    <input
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      value={value}
-      onChange={handleChange}
-      className={`${isSubmit && !validation() ? style.error : isSubmit && style.success}`}
-    />
+    <>
+      <input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={handleChange}
+        className={`${isSubmit && !validation() ? style.error : isSubmit && style.success}`}
+      />
+    </>
   );
 }

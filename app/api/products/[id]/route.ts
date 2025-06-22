@@ -21,14 +21,20 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const body: ProductType = await request.json();
-    const { success, message } = await updateProduct(body);
+    /* const body: ProductType = await request.json();
+    const { success, message } = await updateProduct(body); */
+    const formData = await request.formData();
+    const updatedProduct = await updateProduct(formData);
 
-    if (!success) {
-      return NextResponse.json({ error: message }, { status: 400 });
+    if (!updatedProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, message });
+    /* if (!success) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    } */
+
+    return NextResponse.json({ success: true, message: updatedProduct });
   } catch (err) {
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }

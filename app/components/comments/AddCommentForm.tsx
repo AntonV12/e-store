@@ -1,12 +1,13 @@
 "use client";
 import style from "./comments.module.css";
 import { ProductType } from "@/lib/types/types";
-import { useUpdateProductMutation } from "@/lib/features/products/productsApiSlice";
+import { useUpdateProductMutation, useUpdateViewedMutation } from "@/lib/features/products/productsApiSlice";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import { nanoid } from "@reduxjs/toolkit";
 
 export const AddCommentForm = ({ product }: { product: ProductType }) => {
   const [updateProduct, { isLoading }] = useUpdateProductMutation();
+  const [updateViewed] = useUpdateViewedMutation();
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
 
   const handleAddComment = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -18,6 +19,9 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
 
       const form = e.currentTarget;
       const formData = new FormData(form);
+      if (product.id) {
+        formData.append("id", product.id.toString());
+      }
       const now = new Date();
       const year = now.getFullYear();
       const month = +(now.getMonth() + 1) > 10 ? now.getMonth() + 1 : "0" + (now.getMonth() + 1);
@@ -34,10 +38,13 @@ export const AddCommentForm = ({ product }: { product: ProductType }) => {
       };
 
       const updatedComments = [...product.comments, newComment];
-      const updatedProduct = { ...product, comments: updatedComments };
+      //const updatedProduct = { ...product, comments: updatedComments };
 
       try {
-        await updateProduct(updatedProduct).unwrap();
+        //await updateProduct(formData).unwrap();
+        if (product.id) {
+          await updateViewed({ id: product.id, params: { comments: updatedComments } });
+        }
         form.reset();
       } catch (err) {
         console.error(err);

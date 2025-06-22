@@ -35,7 +35,7 @@ export type SortType = "name" | "cost" | "rating" | "viewed";
 export type OrderType = {
   id: number | null;
   clientId: number;
-  phone: number;
+  phone: string;
   email: string;
   address: string;
   products: CartType[];
