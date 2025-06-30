@@ -1,5 +1,5 @@
-import { RegisterForm } from "@/app/components/register/RegisterForm";
-import styles from "@/app/components/login/login.module.css";
+import { RegisterForm } from "@/components/register/RegisterForm";
+import styles from "@/components/login/login.module.css";
 
 export default function RegisterPage() {
   return (

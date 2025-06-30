@@ -6,14 +6,14 @@ import { authApiSlice, useGetCurrentUserQuery } from "@/lib/features/auth/authAp
 import style from "./product.module.css";
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
-import { CommentsList } from "@/app/components/comments/CommentsList";
-import { AddCommentForm } from "@/app/components/comments/AddCommentForm";
+import { CommentsList } from "@/components/comments/CommentsList";
+import { AddCommentForm } from "@/components/comments/AddCommentForm";
 import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import { useAppDispatch } from "@/lib/hooks";
-import Amount from "@/app/components/amount/Amount";
+import Amount from "@/components/amount/Amount";
 import { setMessage } from "@/lib/features/message/messageSlice";
 import { useSelector } from "react-redux";
-import Message from "@/app/components/message/Message";
+import Message from "@/components/message/Message";
 import CameraIcon from "@/public/photo_camera.svg";
 import {
   useUpdateProductMutation,
@@ -21,8 +21,8 @@ import {
   useUpdateViewedMutation,
 } from "@/lib/features/products/productsApiSlice";
 import { useRouter } from "next/navigation";
-import { ProductSkeleton } from "@/app/components/skeletons/skeletons";
-import TextEditor from "@/app/components/editor/TextEditor";
+import { ProductSkeleton } from "@/components/skeletons/skeletons";
+import TextEditor from "@/components/editor/TextEditor";
 
 export default function Product({ id, isAuth }: { id: number; isAuth: boolean }) {
   const dispatch = useAppDispatch();
@@ -107,7 +107,11 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     if (isUserLoading) return;
 
     if (isUserSuccess) {
-      if (!currentUser || !product) return;
+      if (!currentUser) {
+        dispatch(setMessage("Пожалуйста, авторизуйтесь"));
+        return;
+      }
+      if (!product) return;
 
       const formData = new FormData(e.currentTarget);
       if (product?.id && formData.get("amount")) {

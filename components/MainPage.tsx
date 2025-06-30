@@ -1,8 +1,8 @@
 "use client";
-import styles from "@/app/styles/layout.module.css";
-import { Nav } from "@/app/components/Nav";
-import SignLinks from "@/app/components/SignLinks";
-import Message from "@/app/components/message/Message";
+import styles from "@/styles/layout.module.css";
+import { Nav } from "@/components/Nav";
+import SignLinks from "@/components/SignLinks";
+import Message from "@/components/message/Message";
 import { useSelector } from "react-redux";
 import { useAppDispatch } from "@/lib/hooks";
 import { setMessage } from "@/lib/features/message/messageSlice";

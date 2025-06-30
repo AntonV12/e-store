@@ -9,7 +9,7 @@ import { useUpdateUserMutation } from "@/lib/features/users/usersApiSlice";
 import OrdersList from "./OrdersList";
 import Link from "next/link";
 import { useLogoutUserMutation } from "@/lib/features/auth/authApiSlice";
-import { ProfileSkeleton } from "@/app/components/skeletons/skeletons";
+import { ProfileSkeleton } from "@/components/skeletons/skeletons";
 import { useRouter } from "next/navigation";
 
 export default function Profile() {

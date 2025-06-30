@@ -1,6 +1,6 @@
 "use client";
 
-import styles from "../styles/layout.module.css";
+import styles from "@/styles/layout.module.css";
 import ListIcon from "@/public/list.svg";
 
 export const SearchForm = ({

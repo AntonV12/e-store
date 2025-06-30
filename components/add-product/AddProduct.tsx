@@ -2,10 +2,9 @@
 
 import style from "./add-product.module.css";
 import { useCreateProductMutation } from "@/lib/features/products/productsApiSlice";
-import { ProductType } from "@/lib/types/types";
 import { setMessage } from "@/lib/features/message/messageSlice";
 import { useAppDispatch } from "@/lib/hooks";
-import TextEditor from "@/app/components/editor/TextEditor";
+import TextEditor from "@/components/editor/TextEditor";
 import { useRef } from "react";
 
 export default function AddProduct() {

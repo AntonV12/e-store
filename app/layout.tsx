@@ -1,9 +1,9 @@
 "use client";
 import type { ReactNode } from "react";
 import { StoreProvider } from "./StoreProvider";
-import "./styles/globals.css";
+import "@/styles/globals.css";
 import { Play, Press_Start_2P } from "next/font/google";
-import MainPage from "@/app/components/MainPage";
+import MainPage from "@/components/MainPage";
 
 interface Props {
   readonly children: ReactNode;

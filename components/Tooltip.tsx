@@ -1,4 +1,4 @@
-import style from "@/app/styles/layout.module.css";
+import style from "@/styles/layout.module.css";
 
 export const Tooltip = ({
   children,

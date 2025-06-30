@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import style from "../styles/layout.module.css";
+import style from "@/styles/layout.module.css";
 import CartIcon from "@/public/cart2.svg";
 import LoginIcon from "@/public/person-circle.svg";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
-import { SignLinksSkeleton } from "@/app/components/skeletons/skeletons";
+import { SignLinksSkeleton } from "@/components/skeletons/skeletons";
 
 export default function SignLinks() {
   const { data: currentUser, isLoading, isSuccess, isError } = useGetCurrentUserQuery();

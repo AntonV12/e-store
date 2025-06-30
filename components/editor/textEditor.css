@@ -4,12 +4,6 @@
   padding: 3px;
   margin-bottom: 5px;
   min-height: 300px;
-  /* max-height: 1000px;
-  width: 60vw;
-  column-count: 2;
-  overflow: auto;
-  resize: vertical;
-  column-fill: auto; */
 }
 
 table {
@@ -102,12 +96,3 @@ th {
 .tiptap h4 {
   font-size: 1rem;
 }
-
-/* @media screen and (max-width: 1200px) {
-  .tiptap {
-    width: 100%;
-    column-count: 1;
-    max-height: none;
-    height: auto;
-  }
-} */

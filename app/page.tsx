@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ProductsList } from "@/app/components/products/ProductsList";
+import { ProductsList } from "@/components/products/ProductsList";
 
 export default function IndexPage() {
   return <ProductsList />;

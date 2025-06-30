@@ -1,7 +1,7 @@
 import { CartType } from "@/lib/types/types";
 import style from "./order.module.css";
 import Image from "next/image";
-import { RatingArea } from "@/app/components/rating/Rating";
+import { RatingArea } from "@/components/rating/Rating";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 
 export default function OrderListItem({

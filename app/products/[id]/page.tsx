@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Product from "@/app/components/product/Product";
+import Product from "@/components/product/Product";
 import { verifySession } from "@/app/api/auth/authController";
 
 export const metadata: Metadata = {

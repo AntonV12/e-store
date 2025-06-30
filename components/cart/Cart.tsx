@@ -6,7 +6,7 @@ import { CartType } from "@/lib/types/types";
 import CartItem from "./CartItem";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CartSkeleton } from "@/app/components/skeletons/skeletons";
+import { CartSkeleton } from "@/components/skeletons/skeletons";
 
 export default function Cart() {
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();

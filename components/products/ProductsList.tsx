@@ -4,9 +4,9 @@ import style from "./products.module.css";
 import { SearchForm } from "../SearchForm";
 import { useState, useRef, useEffect } from "react";
 import { useDebounce } from "@/lib/hooks";
-import Categories from "@/app/components/categories/Categories";
+import Categories from "@/components/categories/Categories";
 import ProductItem from "./ProductItem";
-import { ProductsListSkeleton } from "@/app/components/skeletons/skeletons";
+import { ProductsListSkeleton } from "@/components/skeletons/skeletons";
 import { SortType } from "@/lib/types/types";
 
 export const ProductsList = () => {
