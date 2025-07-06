@@ -64,10 +64,12 @@ export default function Profile() {
             </div>
             {currentUser.name}
           </div>
-          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
-          <Link href="#" onClick={handleLogout}>
-            Выйти из системы
-          </Link>
+          <div className={style.profile__links}>
+            {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
+            <Link href="#" onClick={handleLogout}>
+              Выйти из системы
+            </Link>
+          </div>
         </div>
         <OrdersList />
       </div>

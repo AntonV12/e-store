@@ -61,7 +61,14 @@ export default function CartItem({
 
   return (
     <li key={product.id} className={style.item}>
-      <Image src={product.imageSrc} alt={product.name} className={style.img} width={100} height={100} priority />
+      <Image
+        src={`/images/${product.imageSrc[0]}`}
+        alt={product.name}
+        className={style.img}
+        width={100}
+        height={100}
+        priority
+      />
       <div className={style.info}>
         <h3>{product.name}</h3>
         <div className={style.amount}>

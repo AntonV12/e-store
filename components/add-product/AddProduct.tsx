@@ -18,7 +18,6 @@ export default function AddProduct() {
     try {
       const form = event.currentTarget as HTMLFormElement;
       const formData = new FormData(form);
-
       const description = editorRef.current.getContent() || "";
       formData.append("description", description);
 
@@ -52,8 +51,8 @@ export default function AddProduct() {
           <input type="text" id="category" name="category" required />
         </div>
         <div>
-          <label htmlFor="image">Изображение:</label>
-          <input type="file" id="image" name="image" accept="image/*" required />
+          <label htmlFor="images">Изображения:</label>
+          <input type="file" id="images" name="images" accept="image/*" required multiple />
         </div>
         <div>
           <label htmlFor="cost">Цена:</label>

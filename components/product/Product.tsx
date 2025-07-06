@@ -4,7 +4,6 @@ import { CartType, UserType } from "@/lib/types/types";
 import { useGetProductByIdQuery } from "@/lib/features/products/productsApiSlice";
 import { authApiSlice, useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";
 import style from "./product.module.css";
-import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import { CommentsList } from "@/components/comments/CommentsList";
 import { AddCommentForm } from "@/components/comments/AddCommentForm";
@@ -23,16 +22,18 @@ import {
 import { useRouter } from "next/navigation";
 import { ProductSkeleton } from "@/components/skeletons/skeletons";
 import TextEditor from "@/components/editor/TextEditor";
+import Slider from "@/components/slider/Slider";
 
 export default function Product({ id, isAuth }: { id: number; isAuth: boolean }) {
   const dispatch = useAppDispatch();
   const { data: product, isError, isLoading, isSuccess } = useGetProductByIdQuery(id);
   const { data: currentUser, isLoading: isUserLoading, isSuccess: isUserSuccess } = useGetCurrentUserQuery();
   const [updateUser, { isLoading: isUpdateUserLoading }] = useUpdateUserMutation();
-  const [image, setImage] = useState<string | null>(null);
+  const [images, setImages] = useState<string[]>([]);
   const [amount, setAmount] = useState<number>(1);
   const message = useSelector((state: { message: { text: string } }) => state.message.text);
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [isImagesChanged, setIsImagesChanged] = useState<boolean>(false);
   const [updateProduct, { isLoading: isUpdateProductLoading }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleteProductLoading }] = useDeleteProductMutation();
   const router = useRouter();
@@ -42,7 +43,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
 
   useEffect(() => {
     if (isSuccess && product) {
-      setImage(product.imageSrc);
+      setImages(product.imageSrc);
     }
   }, [isSuccess, product]);
 
@@ -72,7 +73,14 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
 
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setImage(URL.createObjectURL(e.target.files[0]));
+      const files = Array.from(e.target.files);
+      const newImages: string[] = [];
+
+      files.forEach((file) => {
+        newImages.push(URL.createObjectURL(file));
+      });
+      setImages(newImages);
+      setIsImagesChanged(true);
     }
   };
 
@@ -80,7 +88,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
     try {
       if (isEdit && product) {
         e.preventDefault();
-        const form = e.target as HTMLFormElement;
+        const form = e.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
         const description = editorRef.current.getContent() || "";
         formData.append("description", description);
@@ -95,6 +103,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
         }
 
         setIsEdit(false);
+        setIsImagesChanged(false);
         dispatch(setMessage("Товар успешно обновлен"));
       }
     } catch (error) {
@@ -186,19 +195,18 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
                 <div className={style.imageForm}>
                   <input
                     type="file"
-                    name="image"
-                    id="image"
+                    name="images"
+                    id="images"
                     className={style.fileInput}
                     accept="image/*"
                     onChange={handleEditImage}
+                    multiple
                   />
-                  <label htmlFor="image" className={style.fileLabel}></label>
+                  <label htmlFor="images" className={style.fileLabel}></label>
                   <CameraIcon className={style.cameraIcon} />
-                  {image && (
-                    <div className={style.imgContainer}>
-                      <Image src={image} alt={product.name} width={280} height={280} className={style.img} priority />
-                    </div>
-                  )}
+                  <div className={style.imgContainer} style={{ width: "100%" }}>
+                    <Slider images={images} isImagesChanged={isImagesChanged} />
+                  </div>
                 </div>
                 <div className={style.info}>
                   <div className={style.title}>
@@ -239,9 +247,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
           ) : (
             <>
               <div className={style.imgContainer}>
-                {image ? (
-                  <Image src={image} alt={product.name} width={280} height={280} className={style.img} priority />
-                ) : null}
+                <Slider images={images} isImagesChanged={isImagesChanged} />
               </div>
               <div className={style.info}>
                 <div className={style.title}>

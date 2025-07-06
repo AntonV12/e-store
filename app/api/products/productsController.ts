@@ -36,16 +36,20 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
     const category = formData.get("category") as string;
     const cost = Number(formData.get("cost"));
     const description = formData.get("description") as string;
-    const imageFile = formData.get("image") as File;
-
+    const imageFiles = formData.getAll("images") as File[];
     const dir = path.join(process.cwd(), "public", "images");
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = uniqueSuffix + "-" + imageFile.name;
-    const filePath = path.join(dir, filename);
+    const fileNames = [];
 
-    const bytes = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filePath, new Uint8Array(buffer));
+    for (let imageFile of imageFiles) {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      const filename = uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_");
+      const filePath = path.join(dir, filename);
+      fileNames.push(filename);
+
+      const bytes = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      await writeFile(filePath, new Uint8Array(buffer));
+    }
 
     const newProduct = {
       id: null,
@@ -54,15 +58,17 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
       viewed: 0,
       rating: [],
       cost,
-      imageSrc: `/images/${filename}`,
+      imageSrc: fileNames,
       description,
       comments: [],
     };
 
-    const [result] = await pool.query<ResultSetHeader>(
-      `INSERT INTO products (name, category, viewed, rating, cost, imageSrc, description, comments) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [name, category, 0, "[]", cost, `/images/${filename}`, description, "[]"]
-    );
+    const [result] = await pool.query<ResultSetHeader>(`INSERT INTO products SET ?`, {
+      ...newProduct,
+      rating: JSON.stringify(newProduct.rating),
+      imageSrc: JSON.stringify(newProduct.imageSrc),
+      comments: JSON.stringify(newProduct.comments),
+    });
 
     if (result.affectedRows > 0) {
       return newProduct;

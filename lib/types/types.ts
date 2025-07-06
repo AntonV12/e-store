@@ -25,7 +25,7 @@ export type ProductType = {
   viewed: number;
   rating: { author: number; rating: number }[];
   cost: number;
-  imageSrc: string;
+  imageSrc: string[];
   description: string;
   comments: CommentType[];
 };

@@ -24,30 +24,42 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
     }
 
     const id = formData.get("id");
+
+    if (!id) {
+      return { success: false, message: "Product ID not found" };
+    }
+
+    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
+    const { viewed, rating, imageSrc, comments } = existingProduct[0];
+
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const cost = Number(formData.get("cost"));
-    const imageFile = formData.get("image") as File;
+    const imageFiles = formData.getAll("images") as File[];
     const description = formData.get("description") as string;
 
-    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
-
-    const { viewed, rating, imageSrc, comments } = existingProduct[0];
-
     const dir = path.join(process.cwd(), "public", "images");
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const filename = imageFile.name
-      ? uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_")
-      : imageSrc.split("/").pop();
-    const filePath = path.join(dir, filename);
+    const fileNames = [];
 
-    const bytes = await imageFile.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    if (imageFiles.length > 0 && imageFiles[0].size > 0) {
+      for (let imageFile of imageFiles) {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        const filename = uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_");
+        const filePath = path.join(dir, filename);
+        fileNames.push(filename);
 
-    if (imageFile.size) {
-      await writeFile(filePath, new Uint8Array(buffer));
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+
+        if (imageFile.size) {
+          await writeFile(filePath, new Uint8Array(buffer));
+        }
+      }
+
       if (imageSrc) {
-        await rm(path.join(process.cwd(), "public", imageSrc));
+        for (let image of imageSrc) {
+          await rm(path.join(process.cwd(), "public", "images", image));
+        }
       }
     }
 
@@ -63,19 +75,28 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
         return { success: false, message: "Forbidden" };
       }
     }
-    const sql =
-      "UPDATE products SET id = ?, name = ?, category = ?, viewed = ?, rating = ?, cost = ?, imageSrc = ?, description = ?, comments = ? WHERE id = ?";
 
-    const [results] = await pool.execute<ResultSetHeader>(sql, [
-      id,
+    const updatedProduct: ProductType = {
+      id: +id,
       name,
       category,
       viewed,
       rating,
       cost,
-      `/images/${filename}`,
+      imageSrc: fileNames.length ? fileNames : imageSrc,
       description,
       comments,
+    };
+
+    const sql = `UPDATE products SET ? WHERE id = ?`;
+
+    const [results] = await pool.query<ResultSetHeader>(sql, [
+      {
+        ...updatedProduct,
+        rating: JSON.stringify(updatedProduct.rating),
+        imageSrc: JSON.stringify(updatedProduct.imageSrc),
+        comments: JSON.stringify(updatedProduct.comments),
+      },
       id,
     ]);
 
@@ -83,10 +104,6 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
       success: results.affectedRows > 0,
       message: results.affectedRows > 0 ? "Продукт успешно обновлен" : "Продукт не получилось обновить",
     };
-    /* return {
-      success: true,
-      message: "Продукт успешно обновлен",
-    }; */
   } catch (err) {
     console.error(err);
     return { success: false, message: "Database error" };
@@ -113,7 +130,9 @@ export const deleteProduct = async (id: number): Promise<{ success: boolean; mes
     const [results] = await pool.execute<ResultSetHeader>("DELETE FROM products WHERE id = ?", [id]);
 
     if (existingProduct[0].imageSrc) {
-      await rm(path.join(process.cwd(), "public", existingProduct[0].imageSrc));
+      for (let image of existingProduct[0].imageSrc) {
+        await rm(path.join(process.cwd(), "public", "images", image));
+      }
     }
 
     return {

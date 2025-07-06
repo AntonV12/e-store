@@ -25,13 +25,15 @@ export const fetchOrdersByUserId = async (
     const [rows] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [userId, done, limit]);
     if (rows.length === 0) return null;
     const secretKey = process.env.NEXT_PUBLIC_SECRET_KEY as string;
-    const decryptedOrders = CryptoJS.AES.decrypt(rows[0].encryptedOrder, secretKey).toString(CryptoJS.enc.Utf8);
+    const results: OrderType[] = [];
 
-    const { id, clientId, isDone } = rows[0];
-    const { phone, email, address, products, date } = JSON.parse(decryptedOrders);
+    for (let row of rows) {
+      const decryptedOrders = CryptoJS.AES.decrypt(row.encryptedOrder, secretKey).toString(CryptoJS.enc.Utf8);
 
-    const results: OrderType[] = [
-      {
+      const { id, clientId, isDone } = row;
+      const { phone, email, address, products, date } = JSON.parse(decryptedOrders);
+
+      results.push({
         id,
         clientId,
         phone,
@@ -40,8 +42,8 @@ export const fetchOrdersByUserId = async (
         products,
         isDone,
         date,
-      },
-    ];
+      });
+    }
 
     return results ?? null;
   } catch (err) {
