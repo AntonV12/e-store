@@ -1,4 +1,3 @@
-"use client";
 import type { ReactNode } from "react";
 import { StoreProvider } from "./StoreProvider";
 import "@/styles/globals.css";
@@ -8,6 +7,12 @@ import MainPage from "@/components/MainPage";
 interface Props {
   readonly children: ReactNode;
 }
+
+export const metadata = {
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
 
 const play = Play({
   weight: "400",
