@@ -192,4 +192,7 @@
     width: 100%;
     flex-direction: column-reverse;
   }
+  .imageForm {
+    width: 100%;
+  }
 }
