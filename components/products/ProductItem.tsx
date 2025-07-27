@@ -15,7 +15,7 @@ const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(({ produ
     <li ref={ref} className={`${style.product}`} onClick={handleSaveScrollPosition}>
       <Link href={`/products/${product.id}`}>
         <Image
-          src={`/images/${product.imageSrc[0]}`}
+          src={`/api/image?name=${product.imageSrc[0]}`}
           alt={product.name}
           className={style.img}
           width={230}

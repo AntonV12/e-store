@@ -33,13 +33,13 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
   const [amount, setAmount] = useState<number>(1);
   const message = useSelector((state: { message: { text: string } }) => state.message.text);
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [isImagesChanged, setIsImagesChanged] = useState<boolean>(false);
   const [updateProduct, { isLoading: isUpdateProductLoading }] = useUpdateProductMutation();
   const [deleteProduct, { isLoading: isDeleteProductLoading }] = useDeleteProductMutation();
   const router = useRouter();
   const [updateViewed] = useUpdateViewedMutation();
   let updateProductViewedTimeoutId: NodeJS.Timeout | null = null;
   const editorRef = useRef<any>(null);
+  const [isImagesChanged, setIsImagesChanged] = useState<boolean>(false);
 
   useEffect(() => {
     if (isSuccess && product) {
@@ -72,12 +72,10 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
   };
 
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
+    if (e.target.files && e.target.files.length > 0 && !isImagesChanged) {
       const files = Array.from(e.target.files);
-      const newImages: string[] = [];
-
-      files.forEach((file) => {
-        newImages.push(URL.createObjectURL(file));
+      const newImages: string[] = files.map((file) => {
+        return URL.createObjectURL(file);
       });
       setImages(newImages);
       setIsImagesChanged(true);
@@ -102,8 +100,9 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
           throw new Error("Ошибка записи");
         }
 
-        setIsEdit(false);
         setIsImagesChanged(false);
+        setIsEdit(false);
+        setImages(product.imageSrc);
         dispatch(setMessage("Товар успешно обновлен"));
       }
     } catch (error) {

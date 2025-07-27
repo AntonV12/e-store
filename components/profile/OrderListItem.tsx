@@ -20,7 +20,7 @@ export default function OrderListItem({
       {products.map((product) => (
         <li key={product.id}>
           <div className={style.product__container}>
-            <Image src={`/images/${product.imageSrc[0]}`} alt={product.name} width={30} height={30} />
+            <Image src={`/api/image?name=${product.imageSrc[0]}`} alt={product.name} width={30} height={30} />
             <h3>{product.name}</h3>
             <p className={style.product__total}>
               {product.amount} x {product.cost.toLocaleString()} ₽

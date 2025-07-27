@@ -38,7 +38,7 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
     const imageFiles = formData.getAll("images") as File[];
     const description = formData.get("description") as string;
 
-    const dir = path.join(process.cwd(), "public", "images");
+    const dir = path.join(process.cwd(), "uploads");
     const fileNames = [];
 
     if (imageFiles.length > 0 && imageFiles[0].size > 0) {
@@ -58,7 +58,7 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
 
       if (imageSrc) {
         for (let image of imageSrc) {
-          await rm(path.join(process.cwd(), "public", "images", image));
+          await rm(path.join(process.cwd(), "uploads", image));
         }
       }
     }
@@ -131,7 +131,7 @@ export const deleteProduct = async (id: number): Promise<{ success: boolean; mes
 
     if (existingProduct[0].imageSrc) {
       for (let image of existingProduct[0].imageSrc) {
-        await rm(path.join(process.cwd(), "public", "images", image));
+        await rm(path.join(process.cwd(), "uploads", image));
       }
     }
 

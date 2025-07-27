@@ -37,8 +37,8 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
     const cost = Number(formData.get("cost"));
     const description = formData.get("description") as string;
     const imageFiles = formData.getAll("images") as File[];
-    const dir = path.join(process.cwd(), "public", "images");
-    const fileNames = [];
+    const dir = path.join(process.cwd(), "uploads");
+    const fileNames: string[] = [];
 
     for (let imageFile of imageFiles) {
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);

@@ -62,7 +62,7 @@ export default function CartItem({
   return (
     <li key={product.id} className={style.item}>
       <Image
-        src={`/images/${product.imageSrc[0]}`}
+        src={`/api/image?name=${product.imageSrc[0]}`}
         alt={product.name}
         className={style.img}
         width={100}
