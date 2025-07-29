@@ -3,11 +3,15 @@ import { ResultSetHeader, RowDataPacket } from "mysql2";
 import { CommentType, ProductType } from "@/lib/types/types";
 import { verifySession } from "@/app/api/auth/authController";
 import path from "path";
-import { writeFile, rm } from "fs/promises";
+import { rm } from "fs/promises";
+import { optimizeImage } from "@/lib/scripts";
 
 export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [id]);
+    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(
+      "SELECT * FROM products WHERE id = ?",
+      [id]
+    );
 
     return rows[0] ?? null;
   } catch (err) {
@@ -29,7 +33,9 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
       return { success: false, message: "Product ID not found" };
     }
 
-    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
+    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [
+      id,
+    ]);
     const { viewed, rating, imageSrc, comments } = existingProduct[0];
 
     const name = formData.get("name") as string;
@@ -42,7 +48,7 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
     const fileNames = [];
 
     if (imageFiles.length > 0 && imageFiles[0].size > 0) {
-      for (let imageFile of imageFiles) {
+      for (let imageFile of imageFiles.sort((a, b) => a.name.localeCompare(b.name))) {
         const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
         const filename = uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_");
         const filePath = path.join(dir, filename);
@@ -52,7 +58,7 @@ export const updateProduct = async (formData: FormData): Promise<{ success: bool
         const buffer = Buffer.from(bytes);
 
         if (imageFile.size) {
-          await writeFile(filePath, new Uint8Array(buffer));
+          await optimizeImage(buffer, filePath);
         }
       }
 
@@ -121,7 +127,9 @@ export const deleteProduct = async (id: number): Promise<{ success: boolean; mes
       return { success: false, message: "Forbidden" };
     }
 
-    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
+    const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [
+      id,
+    ]);
 
     if (existingProduct.length === 0) {
       return { success: false, message: "Product not found" };

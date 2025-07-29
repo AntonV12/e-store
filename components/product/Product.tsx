@@ -73,7 +73,7 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
 
   const handleEditImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0 && !isImagesChanged) {
-      const files = Array.from(e.target.files);
+      const files = Array.from(e.target.files).sort((a, b) => a.name.localeCompare(b.name));
       const newImages: string[] = files.map((file) => {
         return URL.createObjectURL(file);
       });
@@ -130,8 +130,13 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
         const existingItem = cart.find((item) => item.id === product.id);
 
         const updatedCart: CartType[] = existingItem
-          ? cart.map((item) => (item.id === product.id ? { ...item, amount: Number(item.amount) + amount } : item))
-          : [...cart, { id: product.id, name: product.name, cost: product.cost, imageSrc: product.imageSrc, amount }];
+          ? cart.map((item) =>
+              item.id === product.id ? { ...item, amount: Number(item.amount) + amount } : item
+            )
+          : [
+              ...cart,
+              { id: product.id, name: product.name, cost: product.cost, imageSrc: product.imageSrc, amount },
+            ];
         const updatedUser: UserType = { ...currentUser, cart: updatedCart };
 
         dispatch(
@@ -189,7 +194,12 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
       <section className={style.productCard}>
         <div className={style.container}>
           {isEdit ? (
-            <form method="POST" onSubmit={handleEditSubmit} className={style.editForm} encType="multipart/form-data">
+            <form
+              method="POST"
+              onSubmit={handleEditSubmit}
+              className={style.editForm}
+              encType="multipart/form-data"
+            >
               <div className={style.container}>
                 <div className={style.imageForm}>
                   <input
@@ -253,7 +263,8 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
                   <h1 className={style.productName}>{product.name}</h1>
                   <p className={style.rating}>
                     Общий рейтинг:{" "}
-                    {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length || 0}{" "}
+                    {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) /
+                      product?.rating.length || 0}{" "}
                     <span className={style.star}>&#9733;</span>
                   </p>
                 </div>
@@ -266,7 +277,10 @@ export default function Product({ id, isAuth }: { id: number; isAuth: boolean })
                     </button>
                   </form>
                 </div>
-                <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>
+                <div
+                  dangerouslySetInnerHTML={{ __html: product.description }}
+                  className={style.description}
+                ></div>
               </div>
             </>
           )}

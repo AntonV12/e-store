@@ -2,8 +2,8 @@ import { pool } from "@/lib/database";
 import { ProductType, SortType } from "@/lib/types/types";
 import { ResultSetHeader } from "mysql2/promise";
 import { verifySession } from "@/app/api/auth/authController";
-import { writeFile } from "fs/promises";
 import path from "path";
+import { optimizeImage } from "@/lib/scripts";
 
 export const fetchProducts = async (
   limit: number,
@@ -40,7 +40,7 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
     const dir = path.join(process.cwd(), "uploads");
     const fileNames: string[] = [];
 
-    for (let imageFile of imageFiles) {
+    for (let imageFile of imageFiles.sort((a, b) => a.name.localeCompare(b.name))) {
       const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
       const filename = uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_");
       const filePath = path.join(dir, filename);
@@ -48,7 +48,7 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
 
       const bytes = await imageFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      await writeFile(filePath, new Uint8Array(buffer));
+      optimizeImage(buffer, filePath);
     }
 
     const newProduct = {
