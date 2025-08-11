@@ -14,8 +14,10 @@ export const fetchProducts = async (
 ): Promise<ProductType[] | null> => {
   try {
     const [results] = await pool.query(
-      `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy} ${sortByDirection} LIMIT ?`,
-      [`%${name}%`, category || null, category || null, limit]
+      `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy || "viewed"} ${
+        sortByDirection || "desc"
+      } LIMIT ?`,
+      [`%${name || ""}%`, category || null, category || null, limit || 10]
     );
 
     return results as ProductType[];

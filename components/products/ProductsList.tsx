@@ -1,4 +1,23 @@
-"use client";
+import { ProductType } from "@/lib/types/types";
+import { fetchProducts } from "@/app/api/products/productsController";
+import ProductItem from "./ProductItem";
+import style from "./products.module.css";
+
+export default async function ProductList({ searchQuery }: { searchQuery?: string }) {
+  const products: ProductType[] | null = await fetchProducts(10, searchQuery);
+
+  return (
+    <section className={style.products}>
+      <ul className={style.list}>
+        {products?.map((product, index) => (
+          <ProductItem key={product.id} product={product} /* ref={index === data.length - 1 ? lastItemRef : null} */ />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+/* "use client";
 import { useGetProductsQuery } from "@/lib/features/products/productsApiSlice";
 import style from "./products.module.css";
 import { SearchForm } from "../SearchForm";
@@ -165,3 +184,4 @@ export const ProductsList = () => {
 
   return null;
 };
+ */
