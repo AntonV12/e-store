@@ -2,6 +2,11 @@ export type CartType = Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & 
   amount: number;
 };
 
+// export type CartType = {
+//   productId: number | null;
+//   amount: number;
+// };
+
 export type UserType = {
   id: number | null;
   name: string;
@@ -19,13 +24,13 @@ export type CommentType = {
 };
 
 export type ProductType = {
-  id: number | null;
+  id: number;
   name: string;
   category: string;
   viewed: number;
   rating: { author: number; rating: number }[];
   cost: number;
-  imageSrc: string[];
+  imageSrc: string[] | string;
   description: string;
   comments: CommentType[];
 };
@@ -44,3 +49,39 @@ export type OrderType = {
 };
 
 export type EncryptedOrderType = Pick<OrderType, "id" | "clientId" | "isDone"> & { encryptedOrder: string };
+
+export type SearchParamsType = {
+  name?: string;
+  limit?: number;
+  category?: string;
+  sortBy?: SortType;
+  sortByDirection?: "asc" | "desc";
+};
+
+export type LoginState = {
+  error?: string;
+  message?: string;
+  formData?: {
+    name: string;
+    password: string;
+  };
+};
+
+export type UpdateUserState = {
+  id: number | null;
+  message: string | null;
+  errors: { [key: string]: string };
+  formData: {
+    product?: Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & { amount: number };
+    avatar?: string;
+  };
+  isCart?: boolean;
+};
+
+export type UpdateCommentsState = {
+  error?: string;
+  message?: string;
+  formData?: {
+    text: string;
+  };
+};

@@ -1,29 +1,20 @@
-import type { Metadata } from "next";
 import ProductsList from "@/components/products/ProductsList";
-import SearchForm from "@/components/SearchForm";
-import Categories from "@/components/categories/Categories";
+import SearchForm from "@/components/search/SearchForm";
+import { Suspense } from "react";
+import { fetchCategories } from "@/lib/productsActions";
+import { SearchParamsType } from "@/lib/types";
 
-interface PageProps {
-  searchParams: Promise<{
-    search?: string;
-  }>;
-}
-
-export const dynamic = "force-dynamic";
-
-export default async function IndexPage({ searchParams }: PageProps) {
-  const params = await searchParams;
-  const searchQuery = params.search;
+export default async function Home(props: { searchParams?: Promise<SearchParamsType> }) {
+  const searchParams = await props.searchParams;
+  const currentYear = new Date().getFullYear();
+  const categories = (await fetchCategories()) ?? [];
 
   return (
     <>
-      <SearchForm initialValue={searchQuery || ""} />
-      <ProductsList searchQuery={searchQuery} />
+      <SearchForm categories={categories} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductsList searchParams={searchParams} />
+      </Suspense>
     </>
   );
 }
-
-export const metadata: Metadata = {
-  title: "My Store",
-  description: "Интернет-магазин электронных товаров с доставкой по всей России",
-};

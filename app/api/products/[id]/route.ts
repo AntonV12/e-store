@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { fetchProductById, updateProduct, deleteProduct, updateViewed } from "./productController";
-import { ProductType } from "@/lib/types/types";
+import { ProductType } from "@/lib/types";
 import { verifySession } from "@/app/api/auth/authController";
 
 export async function GET(request: NextRequest) {

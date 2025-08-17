@@ -1,22 +1,16 @@
-"use client";
-import styles from "@/styles/layout.module.css";
-import { Nav } from "@/components/Nav";
-import SignLinks from "@/components/SignLinks";
-import Message from "@/components/message/Message";
-import { useSelector } from "react-redux";
-import { useAppDispatch } from "@/lib/hooks";
-import { setMessage } from "@/lib/features/message/messageSlice";
+import styles from "@/app/page.module.css";
+import Logo from "@/components/logo/Logo";
+import SignLinks from "@/components/signLinks/SignLinks";
+// import Message from "@/components/message/Message";
 
 export default function MainPage({ children }: { children: React.ReactNode }) {
   const currentYear = new Date().getFullYear();
-  const dispatch = useAppDispatch();
-  const message = useSelector((state: { message: { text: string } }) => state.message.text);
 
   return (
     <>
       <section className={styles.container}>
         <aside className={styles.sidebar}>
-          <Nav />
+          <Logo />
         </aside>
 
         <main className={styles.main}>{children}</main>
@@ -25,7 +19,9 @@ export default function MainPage({ children }: { children: React.ReactNode }) {
         </aside>
       </section>
       <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
-      {message && <Message text={message} onHide={() => dispatch(setMessage(""))} />}
+      {/*{message && (
+        <Message text={message} onHide={() => dispatch(setMessage(""))} />
+      )}*/}
     </>
   );
 }

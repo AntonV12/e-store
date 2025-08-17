@@ -1,42 +1,21 @@
 "use client";
+
+import { useActionState } from "react";
 import styles from "./login.module.css";
-import { useAuthUserMutation } from "@/lib/features/auth/authApiSlice";
+import { loginUser } from "@/lib/authActions";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { UserType } from "@/lib/types/types";
+import { LoginState } from "@/lib/types";
 
-export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
-  return typeof error === "object" && error != null && "status" in error;
-}
-export function isSerializedError(error: unknown): error is { message?: string } {
-  return typeof error === "object" && error != null && "message" in error;
-}
-
-export const LoginForm = () => {
-  const [authUser, { isLoading, isSuccess, isError, error }] = useAuthUserMutation();
-  const router = useRouter();
-
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-
-    const user: UserType = {
-      id: null,
-      name: formData.get("name") as string,
-      password: formData.get("password") as string,
-      isAdmin: false,
-      cart: [],
-      avatar: "",
-    };
-
-    try {
-      await authUser(user).unwrap();
-      router.push("/");
-    } catch (err) {
-      console.error("Ошибка входа:", err);
-    }
+export default function LoginForm() {
+  const initialState: LoginState = {
+    error: "",
+    message: "",
+    formData: {
+      name: "",
+      password: "",
+    },
   };
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(loginUser, initialState);
 
   return (
     <>
@@ -47,29 +26,27 @@ export const LoginForm = () => {
           Зарегистрируйтесь
         </Link>
       </p>
-      <form method="post" className={styles.form} onSubmit={handleLogin}>
-        <input type="text" name="name" placeholder="Имя" className={`${styles.input} ${isError && styles.error}`} />
+
+      <form action={formAction} className={styles.form}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Имя"
+          className={`${styles.input}`}
+          defaultValue={state.formData?.name}
+        />
         <input
           type="password"
           name="password"
           placeholder="Пароль"
-          className={`${styles.input} ${isError && styles.error}`}
+          className={`${styles.input}`}
+          defaultValue={state.formData?.password}
         />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Отправка..." : "Войти"}
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Отправка..." : "Войти"}
         </button>
-        {isError && (
-          <span className={styles.errorMessage}>
-            {isError &&
-              error &&
-              (isFetchBaseQueryError(error)
-                ? (error.data as { error?: string })?.error || "Ошибка сервера"
-                : isSerializedError(error)
-                ? error.message || "Неизвестная ошибка"
-                : "Ошибка при регистрации")}
-          </span>
-        )}
+        {state.error && <span className={styles.errorMessage}>{state.error}</span>}
       </form>
     </>
   );
-};
+}

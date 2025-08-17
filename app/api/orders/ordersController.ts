@@ -1,5 +1,5 @@
 import { pool } from "@/lib/database";
-import { OrderType, EncryptedOrderType } from "@/lib/types/types";
+import { OrderType, EncryptedOrderType } from "@/lib/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 import CryptoJS from "crypto-js";
 

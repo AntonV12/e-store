@@ -1,51 +1,39 @@
-import React from "react";
 import style from "./categories.module.css";
-import { useGetCategoriesQuery } from "@/lib/features/products/productsApiSlice";
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
-export default function Categories({
-  selectedCategory,
-  setSelectedCategory,
-}: {
-  selectedCategory: string;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
-}) {
-  const { data: categories, isError, isSuccess } = useGetCategoriesQuery();
+export default function Categories({ categories }: { categories: string[] }) {
+  const searchParams = useSearchParams();
+  const params = new URLSearchParams(searchParams);
+  const pathname = usePathname();
+  const { replace } = useRouter();
 
-  if (isError) {
-    return (
-      <div className={style.categories}>
-        <h1>There was an error!!!</h1>
-      </div>
-    );
-  }
+  const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    const term = (e.target as HTMLLIElement).textContent.trim();
 
-  const toggleCategory = (category: string) => {
-    if (selectedCategory === category) {
-      setSelectedCategory("");
-      sessionStorage.removeItem("productSelectedCategory");
+    if (params.size) {
+      if (params.get("category") === term) {
+        params.delete("category");
+      } else {
+        params.set("category", term);
+      }
     } else {
-      setSelectedCategory(category);
-      sessionStorage.setItem("productSelectedCategory", category);
+      params.set("category", term);
     }
+
+    replace(`${pathname}?${params.toString()}`);
   };
 
-  if (isSuccess) {
-    return (
-      <div className={style.categories}>
-        <h3>Категории</h3>
+  return (
+    <div className={style.categories}>
+      <h3>Категории</h3>
 
-        <ul className={style.list}>
-          {categories.map((category) => (
-            <li
-              key={category}
-              onClick={() => toggleCategory(category)}
-              className={selectedCategory === category ? style.active : ""}
-            >
-              {category}
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  }
+      <ul className={style.list}>
+        {categories.map((category) => (
+          <li key={category} onClick={handleClick} className={params.get("category") === category ? style.active : ""}>
+            {category}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }

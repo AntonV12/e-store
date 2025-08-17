@@ -1,5 +1,5 @@
 import { pool } from "@/lib/database";
-import { UserType } from "@/lib/types/types";
+import { UserType } from "@/lib/types";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
 
 export const createUser = async (user: UserType): Promise<{ message: string } | { error: string }> => {

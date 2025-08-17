@@ -1,6 +1,6 @@
 import { pool } from "@/lib/database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
-import { CommentType, ProductType } from "@/lib/types/types";
+import { CommentType, ProductType } from "@/lib/types";
 import { verifySession } from "@/app/api/auth/authController";
 import path from "path";
 import { writeFile, rm } from "fs/promises";

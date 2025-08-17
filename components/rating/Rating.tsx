@@ -1,4 +1,4 @@
-import { CartType } from "@/lib/types/types";
+import { CartType } from "@/lib/types";
 import style from "./rating.module.css";
 import { useUpdateViewedMutation, useGetProductByIdQuery } from "@/lib/features/products/productsApiSlice";
 import { useGetCurrentUserQuery } from "@/lib/features/auth/authApiSlice";

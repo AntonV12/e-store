@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { loginUser } from "./authController";
-import { CartType } from "@/lib/types/types";
+import { CartType } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
   try {

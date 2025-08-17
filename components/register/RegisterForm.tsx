@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { UserType } from "@/lib/types/types";
+import { UserType } from "@/lib/types";
 import { setMessage } from "@/lib/features/message/messageSlice";
 import { useAppDispatch } from "@/lib/hooks";
 

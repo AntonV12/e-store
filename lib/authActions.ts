@@ -1,12 +1,14 @@
-import "server-only";
+// import "server-only";
+"use server";
 import { pool } from "@/lib/database";
-import { UserType } from "@/lib/types";
+import { LoginState, UserType } from "@/lib/types";
 import { RowDataPacket } from "mysql2";
 import { createSession, decrypt } from "@/lib/sessions";
 import bycript from "bcryptjs";
 import { cookies } from "next/headers";
 import { cache } from "react";
 import { updateSession } from "@/lib/sessions";
+import { redirect } from "next/navigation";
 
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get("session")?.value;
@@ -19,21 +21,28 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
 });
 
-export const loginUser = async (user: UserType): Promise<{ message: string } | { error: string }> => {
+export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
   try {
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [user.name]);
+    const name = formData.get("name");
+    const password = formData.get("password")?.toString();
+    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
-    if (!bycript.compareSync(user.password, existingUser[0].password) || !existingUser.length) {
-      return { error: "Неверный логин или пароль" };
+    if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
+      return {
+        error: "Неверный логин или пароль",
+        formData: {
+          name: formData.get("name") as string,
+          password: formData.get("password") as string,
+        },
+      };
     }
 
     await createSession(existingUser[0].id, existingUser[0].isAdmin);
-
-    return { message: "Пользователь успешно авторизован" };
-  } catch (err) {
-    console.error(err);
+  } catch (error) {
     return { error: "Internal server error" };
   }
+
+  redirect("/");
 };
 
 export async function getCurrentUser() {
@@ -53,19 +62,23 @@ export async function getCurrentUser() {
     }
   }
 
-  const [results] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE id = ?", [session.userId]);
+  const [results] = await pool.execute<RowDataPacket[]>(
+    "SELECT id, name, isAdmin, cart, avatar FROM users WHERE id = ?",
+    [session.userId]
+  );
 
   if (!results.length) {
     return null;
   }
 
-  const user = results[0];
+  const user = results[0] as Omit<UserType, "password">;
+  const { id, name, isAdmin, cart, avatar } = user;
 
   return {
-    id: user.id,
-    name: user.name,
-    isAdmin: user.isAdmin,
-    cart: user.cart,
-    avatar: user.avatar,
+    id,
+    name,
+    isAdmin,
+    cart,
+    avatar,
   };
 }

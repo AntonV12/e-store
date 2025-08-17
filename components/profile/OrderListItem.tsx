@@ -1,4 +1,4 @@
-import { CartType } from "@/lib/types/types";
+import { CartType } from "@/lib/types";
 import style from "./order.module.css";
 import Image from "next/image";
 import { RatingArea } from "@/components/rating/Rating";

@@ -12,26 +12,14 @@
 
 .imgContainer {
   width: 40%;
-  /* height: 300px;
-  min-width: 40%;
-  min-height: 300px; */
   flex-shrink: 0;
   flex-grow: 0;
   flex-basis: 280px;
   position: relative;
   display: flex;
-  align-items: center;
   justify-content: center;
   gap: 14px;
 }
-
-/* .img {
-  width: 280px;
-  height: 280px;
-  border-radius: 10px;
-  flex-shrink: 0;
-  object-fit: contain;
-} */
 
 .productCard .productName,
 .productCard .priceInput {
@@ -82,9 +70,6 @@
   font-size: 16px;
   border-radius: 10px;
   padding: 3px;
-  /* column-count: 2;
-  column-gap: 5px;
-  column-fill: auto; */
 }
 .description h1,
 .description h2,

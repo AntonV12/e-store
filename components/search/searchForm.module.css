@@ -1,0 +1,47 @@
+.searchForm {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background-color: var(--main-color);
+  border-radius: 10px;
+  box-shadow: 0 0 2px 2px var(--shadow-color);
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.inputBlock {
+  height: 40px;
+  flex-grow: 1;
+  position: relative;
+}
+
+.inputBlock input {
+  height: 100%;
+  width: 100%;
+  z-index: 2;
+  background-color: white;
+  background-size: 1.5em;
+  padding-left: 2.5em;
+}
+.searchForm button {
+  height: 40px;
+}
+
+.menu button {
+  height: 40px;
+  margin-right: 10px;
+}
+.menu button svg {
+  margin-right: 5px;
+}
+
+.searchIcon {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+}

@@ -5,6 +5,7 @@
   box-shadow: 0 0 5px var(--shadow-color);
   position: absolute;
   top: 64px;
+  left: 0;
   padding: 10px;
   border-radius: 10px;
   background-color: white;

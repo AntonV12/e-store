@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
@@ -14,10 +15,10 @@ import { FreeMode, Navigation, Thumbs, Mousewheel, Scrollbar } from "swiper/modu
 
 interface SliderProps {
   images: string[];
-  isImagesChanged: boolean;
+  // isImagesChanged: boolean;
 }
 
-export default function Slider({ images, isImagesChanged }: SliderProps) {
+export default function Slider({ images }: SliderProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
   const [direction, setDirection] = useState<"horizontal" | "vertical">("vertical");
 
@@ -53,13 +54,7 @@ export default function Slider({ images, isImagesChanged }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image
-              src={`${isImagesChanged ? image : `/api/image?name=${image}`}`}
-              alt="image"
-              fill
-              priority
-              sizes="100%"
-            />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority sizes="100%" />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -74,13 +69,7 @@ export default function Slider({ images, isImagesChanged }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image
-              src={`${isImagesChanged ? image : `/api/image?name=${image}`}`}
-              alt="image"
-              fill
-              priority
-              sizes="100%"
-            />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority sizes="100%" />
           </SwiperSlide>
         ))}
       </Swiper>

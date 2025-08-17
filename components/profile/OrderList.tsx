@@ -1,5 +1,5 @@
 import style from "./order.module.css";
-import { OrderType } from "@/lib/types/types";
+import { OrderType } from "@/lib/types";
 import CheckIcon from "@/public/check.svg";
 import ChevronIcon from "@/public/chevron.svg";
 import { useState } from "react";

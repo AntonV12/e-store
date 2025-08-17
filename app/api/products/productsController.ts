@@ -1,5 +1,5 @@
 import { pool } from "@/lib/database";
-import { ProductType, SortType } from "@/lib/types/types";
+import { ProductType, SortType } from "@/lib/types";
 import { ResultSetHeader } from "mysql2/promise";
 import { verifySession } from "@/app/api/auth/authController";
 import { writeFile } from "fs/promises";
