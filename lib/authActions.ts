@@ -21,13 +21,22 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
 });
 
-export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
+export const loginUser = async (
+  prevState: LoginState | undefined,
+  formData: FormData,
+) => {
   try {
     const name = formData.get("name");
     const password = formData.get("password")?.toString();
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
+    const [existingUser] = await pool.execute<RowDataPacket[]>(
+      "SELECT * FROM users WHERE name = ?",
+      [name],
+    );
 
-    if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
+    if (
+      (password && !bycript.compareSync(password, existingUser[0].password)) ||
+      !existingUser.length
+    ) {
       return {
         error: "Неверный логин или пароль",
         formData: {
@@ -55,30 +64,63 @@ export async function getCurrentUser() {
   const cookie = (await cookies()).get("session")?.value;
   const payload = await decrypt(cookie);
   const expiresAt = payload?.expiresAt;
-  if (typeof expiresAt === "string" || typeof expiresAt === "number" || expiresAt instanceof Date) {
+  if (
+    typeof expiresAt === "string" ||
+    typeof expiresAt === "number" ||
+    expiresAt instanceof Date
+  ) {
     const expires = new Date(expiresAt);
     if ((expires.getTime() - Date.now()) / 1000 / 60 / 60 / 24 < 1) {
       updateSession();
     }
   }
 
-  const [results] = await pool.execute<RowDataPacket[]>(
-    "SELECT id, name, isAdmin, cart, avatar FROM users WHERE id = ?",
-    [session.userId]
-  );
+  // const [results] = await pool.execute<RowDataPacket[]>(
+  //   "SELECT id, name, isAdmin, avatar FROM users LEFT JOIN carts ON users.id = carts.userId WHERE id = ?",
+  //   [session.userId],
+  // );
+
+  const sql = `SELECT 
+                  u.id,
+                  u.name,
+                  u.isAdmin,
+                  u.avatar,
+                  COALESCE(
+                      (
+                          SELECT JSON_ARRAYAGG(
+                              JSON_OBJECT(
+                                  'id', c.id,
+                                  'userId', c.userId,
+                                  'productId', c.productId,
+                                  'name', c.name,
+                                  'cost', c.cost,
+                                  'imageSrc', c.imageSrc,
+                                  'amount', c.amount
+                              )
+                          )
+                          FROM carts c
+                          WHERE c.userId = u.id
+                      ),
+                      JSON_ARRAY()
+                  ) AS cart
+              FROM users u
+              WHERE u.id = ?;
+            `;
+
+  const [results] = await pool.execute<RowDataPacket[]>(sql, [session.userId]);
 
   if (!results.length) {
     return null;
   }
 
   const user = results[0] as Omit<UserType, "password">;
-  const { id, name, isAdmin, cart, avatar } = user;
+  const { id, name, isAdmin, avatar, cart } = user;
 
   return {
     id,
     name,
     isAdmin,
-    cart,
     avatar,
+    cart,
   };
 }

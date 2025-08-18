@@ -32,6 +32,7 @@ export default function ProductsClient({
       ...searchParams,
       limit: String(newLimit),
     });
+    console.log('params', `/api/products?${params.toString()}`)
 
     const res = await fetch(`/api/products?${params.toString()}`);
     const data: ProductType[] = await res.json();

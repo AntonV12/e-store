@@ -93,8 +93,15 @@ import { CartType, UserType } from "@/lib/types";
 import Image from "next/image";
 import style from "./cart.module.css";
 import CartItemForm from "./CartItemForm";
+import DeleteForm from "./DeleteForm";
 
-export default function CartItem({ product, userId }: { product: CartType; userId: number }) {
+export default function CartItem({
+  product,
+  userId,
+}: {
+  product: CartType;
+  userId: number;
+}) {
   return (
     <li key={product.id} className={style.item}>
       <Image
@@ -108,8 +115,10 @@ export default function CartItem({ product, userId }: { product: CartType; userI
       <div className={style.info}>
         <h3>{product.name}</h3>
         <CartItemForm product={product} userId={userId} />
-        <h3 className={style.cost}>{(product.cost * product.amount).toLocaleString()} ₽</h3>
-        <button className={style.deleteBtn}>Удалить</button>
+        <h3 className={style.cost}>
+          {(product.cost * product.amount).toLocaleString()} ₽
+        </h3>
+        <DeleteForm id={product.id} />
       </div>
     </li>
   );

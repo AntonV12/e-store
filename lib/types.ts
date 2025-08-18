@@ -1,4 +1,7 @@
-export type CartType = Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & {
+export type CartType = Pick<
+  ProductType,
+  "id" | "name" | "cost" | "imageSrc"
+> & {
   amount: number;
 };
 
@@ -48,7 +51,10 @@ export type OrderType = {
   date: string;
 };
 
-export type EncryptedOrderType = Pick<OrderType, "id" | "clientId" | "isDone"> & { encryptedOrder: string };
+export type EncryptedOrderType = Pick<
+  OrderType,
+  "id" | "clientId" | "isDone"
+> & { encryptedOrder: string };
 
 export type SearchParamsType = {
   name?: string;
@@ -72,7 +78,9 @@ export type UpdateUserState = {
   message: string | null;
   errors: { [key: string]: string };
   formData: {
-    product?: Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & { amount: number };
+    product?: Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & {
+      amount: number;
+    };
     avatar?: string;
   };
   isCart?: boolean;
@@ -83,5 +91,13 @@ export type UpdateCommentsState = {
   message?: string;
   formData?: {
     text: string;
+  };
+};
+
+export type UpdateCartState = {
+  error?: string;
+  message?: string;
+  formData?: {
+    cart: CartType;
   };
 };

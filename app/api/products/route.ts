@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { fetchProducts, createProduct } from "./productsController";
+// import { fetchProducts, createProduct } from "./productsController";
+import { fetchProducts } from "@/lib/productsActions";
 import { SortType } from "@/lib/types";
 
 export async function GET(request: NextRequest) {
