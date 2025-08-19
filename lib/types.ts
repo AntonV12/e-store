@@ -15,7 +15,7 @@ export type UserType = {
   name: string;
   password: string;
   isAdmin: boolean;
-  cart: CartType[];
+  // cart: CartType[];
   avatar: string;
 };
 
@@ -70,6 +70,7 @@ export type LoginState = {
   formData?: {
     name: string;
     password: string;
+    confirmPassword?: string;
   };
 };
 
@@ -100,4 +101,5 @@ export type UpdateCartState = {
   formData?: {
     cart: CartType;
   };
+  fromCart?: boolean;
 };

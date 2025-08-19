@@ -1,10 +1,10 @@
 "use client";
 
-import { updateUser, updateUserCart } from "@/lib/usersActions";
+import { updateUserCart } from "@/lib/usersActions";
 import { useActionState, useState, useEffect } from "react";
 import Amount from "@/components/amount/Amount";
 import style from "./product.module.css";
-import { ProductType, UpdateUserState, UpdateCartState } from "@/lib/types";
+import { ProductType, UpdateCartState } from "@/lib/types";
 import Message from "@/components/message/Message";
 
 export default function Form({
@@ -14,17 +14,18 @@ export default function Form({
   product: ProductType;
   userId: number;
 }) {
+  const [amount, setAmount] = useState<number>(1);
+
   const initialState: UpdateCartState = {
     userId: userId,
     message: null,
     errors: {},
     formData: {
       cart: {
-        productId: product.id,
+        id: product.id,
         name: product.name,
         cost: product.cost,
         imageSrc: product.imageSrc[0],
-        amount: 1,
       },
     },
   };
@@ -33,7 +34,6 @@ export default function Form({
     updateUserCartWithId,
     initialState,
   );
-  const [amount, setAmount] = useState<number>(1);
 
   useEffect(() => {
     if (state.message) {
@@ -52,11 +52,10 @@ export default function Form({
         name="cart"
         hidden
         defaultValue={JSON.stringify({
-          productId: product.id,
+          id: product.id,
           name: product.name,
           cost: product.cost,
           imageSrc: product.imageSrc[0],
-          amount: amount,
         })}
       />
       <button type="submit">В корзину</button>

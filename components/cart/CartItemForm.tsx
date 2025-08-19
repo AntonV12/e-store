@@ -24,9 +24,9 @@ export default function CartItemForm({
         name: product.name,
         cost: product.cost,
         imageSrc: product.imageSrc,
-        amount: 1,
       },
     },
+    fromCart: true,
   };
 
   const [amount, setAmount] = useState<number>(product.amount);

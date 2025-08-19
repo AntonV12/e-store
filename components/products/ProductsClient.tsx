@@ -32,7 +32,6 @@ export default function ProductsClient({
       ...searchParams,
       limit: String(newLimit),
     });
-    console.log('params', `/api/products?${params.toString()}`)
 
     const res = await fetch(`/api/products?${params.toString()}`);
     const data: ProductType[] = await res.json();
@@ -54,7 +53,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore]
+    [handleLoadMore],
   );
 
   useEffect(() => {
@@ -87,7 +86,11 @@ export default function ProductsClient({
     <section className={style.products}>
       <ul className={style.list}>
         {products.map((p, index) => (
-          <ProductItem key={p.id} product={p} ref={index === products.length - 1 ? lastItemRef : null} />
+          <ProductItem
+            key={p.id}
+            product={p}
+            ref={index === products.length - 1 ? lastItemRef : null}
+          />
         ))}
       </ul>
       {isLoading && <p>Загрузка...</p>}

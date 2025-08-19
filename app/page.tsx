@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { fetchCategories } from "@/lib/productsActions";
 import { SearchParamsType } from "@/lib/types";
 import { Metadata } from "next";
+import { ProductsListSkeleton } from "@/components/skeletons/skeletons";
 
 export const metadata: Metadata = {
   title: "My Store",
@@ -19,7 +20,7 @@ export default async function Home(props: {
   return (
     <>
       <SearchForm categories={categories} />
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<ProductsListSkeleton />}>
         <ProductsList searchParams={searchParams} />
       </Suspense>
     </>

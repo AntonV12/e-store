@@ -27,7 +27,12 @@ export default function Amount({
       <button type="button" onClick={handleAmountDecrease}>
         -
       </button>
-      <input type="text" name="amount" value={value} onChange={handleAmountChange} />
+      <input
+        type="text"
+        name="amount"
+        value={value}
+        onChange={handleAmountChange}
+      />
       <button type="button" onClick={handleAmountIncrease}>
         +
       </button>
