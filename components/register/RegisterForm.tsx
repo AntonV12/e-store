@@ -95,11 +95,12 @@
 
 import styles from "./register.module.css";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { LoginState } from "@/lib/types";
 import { createUser } from "@/lib/usersActions";
-import { useContext, useEffect } from "react";
-import { MessageContext } from "@/lib/messageContext";
+// import Message from "@/components/message/Message";
+import { useMessage } from "@/lib/messageContext";
+import { useRouter } from "next/navigation";
 
 export default function RegisterForm() {
   const initialState: LoginState = {
@@ -115,15 +116,15 @@ export default function RegisterForm() {
     createUser,
     initialState,
   );
-  const { message, setMessage } = useContext(MessageContext);
+  const { setMessage } = useMessage();
+  const router = useRouter();
 
   useEffect(() => {
     if (state.message) {
-      setMessage(`${state.message}`);
+      setMessage(state.message);
+      router.push("/");
     }
   }, [state.message, setMessage]);
-
-  console.log("message:", message);
 
   return (
     <div className={styles.container}>

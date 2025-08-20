@@ -33,6 +33,16 @@ export const loginUser = async (
       [name],
     );
 
+    if (!existingUser.length) {
+      return {
+        error: "Пользователь не найден",
+        formData: {
+          name: formData.get("name") as string,
+          password: formData.get("password") as string,
+        },
+      };
+    }
+
     if (
       (password && !bycript.compareSync(password, existingUser[0].password)) ||
       !existingUser.length
@@ -47,11 +57,19 @@ export const loginUser = async (
     }
 
     await createSession(existingUser[0].id, existingUser[0].isAdmin);
+
+    return {
+      message: `Здравствуй, ${name}`,
+      formData: {
+        name: formData.get("name") as string,
+        password: formData.get("password") as string,
+      },
+    };
   } catch (error) {
     return { error: "Internal server error" };
   }
 
-  redirect("/");
+  // redirect("/");
 };
 
 export async function getCurrentUser() {

@@ -12,6 +12,7 @@
   animation: appear 0.3s ease-in-out forwards;
   opacity: 0;
   text-align: center;
+  z-index: 1000;
 }
 
 .disappear {

@@ -1,10 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import styles from "./login.module.css";
 import { loginUser } from "@/lib/authActions";
 import Link from "next/link";
 import { LoginState } from "@/lib/types";
+import { useMessage } from "@/lib/messageContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
   const initialState: LoginState = {
@@ -15,7 +17,19 @@ export default function LoginForm() {
       password: "",
     },
   };
-  const [state, formAction, isPending] = useActionState<LoginState, FormData>(loginUser, initialState);
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(
+    loginUser,
+    initialState,
+  );
+  const { setMessage } = useMessage();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.message) {
+      setMessage(state.message);
+      router.push("/");
+    }
+  }, [state.message, setMessage]);
 
   return (
     <>
@@ -45,7 +59,9 @@ export default function LoginForm() {
         <button type="submit" disabled={isPending}>
           {isPending ? "Отправка..." : "Войти"}
         </button>
-        {state.error && <span className={styles.errorMessage}>{state.error}</span>}
+        {state.error && (
+          <span className={styles.errorMessage}>{state.error}</span>
+        )}
       </form>
     </>
   );

@@ -12,6 +12,8 @@ import {
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
+import { loginUser } from "@/lib/authActions";
+import { cookies } from "next/headers";
 
 // export const updateUser = async (
 //   id: number,
@@ -141,16 +143,34 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
       VALUES (?, ?, ?)
     `;
 
-    await pool.execute<ResultSetHeader>(sql, [name, hashedPassword, false]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [
+      name,
+      hashedPassword,
+      false,
+    ]);
 
-    return {
-      error: null,
-      message: "Пользователь успешно зарегистрирован",
-      formData: {
-        name: "",
-        password: "",
-      },
-    };
+    if (result.affectedRows > 0) {
+      const prevState = {
+        formData: {
+          name: name,
+          password: password,
+        },
+      };
+      const formData = new FormData();
+      formData.append("name", name as string);
+      formData.append("password", password as string);
+
+      await loginUser(prevState, formData);
+
+      return {
+        error: null,
+        message: "Пользователь успешно зарегистрирован",
+        formData: {
+          name: "",
+          password: "",
+        },
+      };
+    }
   } catch (err) {
     console.error(err);
     return {
@@ -199,7 +219,7 @@ export const updateUserCart = async (
     revalidatePath("/cart");
     return {
       error: null,
-      message: "Товар успешно добавлен в корзину",
+      message: `${name} добавлен в корзину`,
       formData: {
         cart,
       },

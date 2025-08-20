@@ -4,7 +4,8 @@ import { Play, Press_Start_2P } from "next/font/google";
 import styles from "@/app/page.module.css";
 import Logo from "@/components/logo/Logo";
 import SignLinks from "@/components/signLinks/SignLinks";
-import { MessageProvider } from "@/components/providers/MessageProvider";
+import { MessageProvider } from "@/lib/messageContext";
+import Message from "@/components/message/Message";
 
 const play = Play({
   weight: "400",
@@ -36,9 +37,9 @@ export default function RootLayout({
   return (
     <html lang="ru-ru">
       <body className={`html ${play.variable} ${press_Start_2P.variable}`}>
-        {/*<MainPage children={children} />*/}
         <>
           <MessageProvider>
+            <Message />
             <section className={styles.container}>
               <aside className={styles.sidebar}>
                 <Logo />
@@ -49,11 +50,10 @@ export default function RootLayout({
                 <SignLinks />
               </aside>
             </section>
+            <footer className={styles.footer}>
+              &copy; AntonV {currentYear}
+            </footer>
           </MessageProvider>
-          <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
-          {/*{message && (
-        <Message text={message} onHide={() => dispatch(setMessage(""))} />
-      )}*/}
         </>
       </body>
     </html>

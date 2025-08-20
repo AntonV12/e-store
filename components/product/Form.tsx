@@ -5,7 +5,7 @@ import { useActionState, useState, useEffect } from "react";
 import Amount from "@/components/amount/Amount";
 import style from "./product.module.css";
 import { ProductType, UpdateCartState } from "@/lib/types";
-import Message from "@/components/message/Message";
+import { useMessage } from "@/lib/messageContext";
 
 export default function Form({
   product,
@@ -34,34 +34,35 @@ export default function Form({
     updateUserCartWithId,
     initialState,
   );
+  const { setMessage } = useMessage();
 
   useEffect(() => {
-    if (state.message) {
+    if (state?.message) {
       setAmount(1);
+      setMessage(state.message);
     }
-  }, [state.message]);
+  }, [state, setMessage]);
 
   return (
-    <form action={formAction}>
-      <h2 className={style.priceInput}>
-        {product.cost.toLocaleString("ru-RU")} ₽
-      </h2>
-      <Amount value={amount} setAmount={setAmount} />
-      <input
-        type="text"
-        name="cart"
-        hidden
-        defaultValue={JSON.stringify({
-          id: product.id,
-          name: product.name,
-          cost: product.cost,
-          imageSrc: product.imageSrc[0],
-        })}
-      />
-      <button type="submit">В корзину</button>
-      {state.message && (
-        <Message text={state.message} onHide={() => (state.message = "")} />
-      )}
-    </form>
+    <>
+      <form action={formAction}>
+        <h2 className={style.priceInput}>
+          {product.cost.toLocaleString("ru-RU")} ₽
+        </h2>
+        <Amount value={amount} setAmount={setAmount} />
+        <input
+          type="text"
+          name="cart"
+          hidden
+          defaultValue={JSON.stringify({
+            id: product.id,
+            name: product.name,
+            cost: product.cost,
+            imageSrc: product.imageSrc[0],
+          })}
+        />
+        <button type="submit">В корзину</button>
+      </form>
+    </>
   );
 }
