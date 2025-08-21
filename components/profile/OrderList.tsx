@@ -1,79 +1,50 @@
 import style from "./order.module.css";
 import { OrderType } from "@/lib/types";
-import CheckIcon from "@/public/check.svg";
-import ChevronIcon from "@/public/chevron.svg";
-import { useState } from "react";
+import { CheckIcon, Chevron } from "@/app/Icons";
 import OrderListItem from "./OrderListItem";
-import { useUpdateOrderMutation } from "@/lib/features/orders/ordersApiSlice";
-import { useAppDispatch } from "@/lib/hooks";
-import { setMessage } from "@/lib/features/message/messageSlice";
 
-export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmin: boolean }) {
-  const [isShow, setIsShow] = useState(isAdmin ? true : false);
-  const [showCheckIcon, setShowCheckIcon] = useState(false);
-  const [updateOrder] = useUpdateOrderMutation();
-  const dispatch = useAppDispatch();
-
-  const handleShow = (e: React.MouseEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).classList.contains(style.checkIcon)) return;
-    setIsShow(!isShow);
-  };
-
-  const handleCheckClick = async () => {
-    if (isAdmin) {
-      try {
-        if (order.id) {
-          const response = await updateOrder({ id: order.id, param: "isDone", value: !order.isDone }).unwrap();
-
-          if (response.message) {
-            dispatch(setMessage(response.message));
-          }
-        }
-      } catch (error) {
-        console.error("Ошибка при обновлении статуса заказа:", error);
-      }
-    }
-  };
-
-  const onMouseEnter = () => {
-    if (!isAdmin) return;
-    setShowCheckIcon(true);
-  };
-  const onMouseLeave = () => {
-    if (!isAdmin) return;
-    setShowCheckIcon(false);
-  };
-
+export default function OrderList({
+  order,
+  isAdmin,
+}: {
+  order: OrderType;
+  isAdmin: boolean;
+}) {
   return (
     <div className={style.orderList}>
       <li key={order.id}>
         <article
           className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
         >
-          <div className={style.title} onClick={handleShow}>
-            {order.isDone || showCheckIcon ? (
+          <div className={style.title}>
+            {order.isDone ? (
               <CheckIcon
                 className={style.checkIcon}
                 style={{ fill: order.isDone ? "green" : "grey" }}
-                onClick={handleCheckClick}
               />
             ) : null}
             <h3>
               Заказ #{order.id} от {order.date}
             </h3>
-            <ChevronIcon className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`} />
+            <Chevron className={`${style.chevronIcon}`} />
           </div>
-          {isShow && (
-            <>
-              <OrderListItem products={order.products} isDone={order.isDone} clientId={order.clientId} />
-              <p className={style.product__total}>
-                Итого:{" "}
-                {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
-              </p>
-            </>
-          )}
+          <>
+            <OrderListItem
+              products={order.products}
+              isDone={order.isDone}
+              clientId={order.clientId}
+            />
+            <p className={style.product__total}>
+              Итого:{" "}
+              {order.products
+                .reduce(
+                  (total, product) => total + product.cost * product.amount,
+                  0,
+                )
+                .toLocaleString()}{" "}
+              ₽
+            </p>
+          </>
 
           {isAdmin ? (
             <div className={style.order__info}>
@@ -96,3 +67,102 @@ export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmi
     </div>
   );
 }
+
+// import style from "./order.module.css";
+// import { OrderType } from "@/lib/types";
+// import CheckIcon from "@/public/check.svg";
+// import ChevronIcon from "@/public/chevron.svg";
+// import { useState } from "react";
+// import OrderListItem from "./OrderListItem";
+// import { useUpdateOrderMutation } from "@/lib/features/orders/ordersApiSlice";
+// import { useAppDispatch } from "@/lib/hooks";
+// import { setMessage } from "@/lib/features/message/messageSlice";
+
+// export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmin: boolean }) {
+//   const [isShow, setIsShow] = useState(isAdmin ? true : false);
+//   const [showCheckIcon, setShowCheckIcon] = useState(false);
+//   const [updateOrder] = useUpdateOrderMutation();
+//   const dispatch = useAppDispatch();
+
+//   const handleShow = (e: React.MouseEvent<HTMLDivElement>) => {
+//     if ((e.target as HTMLElement).classList.contains(style.checkIcon)) return;
+//     setIsShow(!isShow);
+//   };
+
+//   const handleCheckClick = async () => {
+//     if (isAdmin) {
+//       try {
+//         if (order.id) {
+//           const response = await updateOrder({ id: order.id, param: "isDone", value: !order.isDone }).unwrap();
+
+//           if (response.message) {
+//             dispatch(setMessage(response.message));
+//           }
+//         }
+//       } catch (error) {
+//         console.error("Ошибка при обновлении статуса заказа:", error);
+//       }
+//     }
+//   };
+
+//   const onMouseEnter = () => {
+//     if (!isAdmin) return;
+//     setShowCheckIcon(true);
+//   };
+//   const onMouseLeave = () => {
+//     if (!isAdmin) return;
+//     setShowCheckIcon(false);
+//   };
+
+//   return (
+//     <div className={style.orderList}>
+//       <li key={order.id}>
+//         <article
+//           className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}
+//           onMouseEnter={onMouseEnter}
+//           onMouseLeave={onMouseLeave}
+//         >
+//           <div className={style.title} onClick={handleShow}>
+//             {order.isDone || showCheckIcon ? (
+//               <CheckIcon
+//                 className={style.checkIcon}
+//                 style={{ fill: order.isDone ? "green" : "grey" }}
+//                 onClick={handleCheckClick}
+//               />
+//             ) : null}
+//             <h3>
+//               Заказ #{order.id} от {order.date}
+//             </h3>
+//             <ChevronIcon className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`} />
+//           </div>
+//           {isShow && (
+//             <>
+//               <OrderListItem products={order.products} isDone={order.isDone} clientId={order.clientId} />
+//               <p className={style.product__total}>
+//                 Итого:{" "}
+//                 {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
+//               </p>
+//             </>
+//           )}
+
+//           {isAdmin ? (
+//             <div className={style.order__info}>
+//               <p>
+//                 <span>Клиент id:</span> {order.clientId}
+//               </p>
+//               <p>
+//                 <span>Телефон:</span> {order.phone}
+//               </p>
+//               <p>
+//                 <span>Email:</span> {order.email}
+//               </p>
+//               <p>
+//                 <span>Адрес:</span> {order.address}
+//               </p>
+//             </div>
+//           ) : null}
+//         </article>
+//       </li>
+//     </div>
+//   );
+// }
