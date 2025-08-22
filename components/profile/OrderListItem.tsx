@@ -1,4 +1,4 @@
-import { CartType } from "@/lib/types";
+import { CartType, UserType } from "@/lib/types";
 import { RatingArea } from "@/components/rating/Rating";
 import style from "./order.module.css";
 import Image from "next/image";
@@ -7,10 +7,12 @@ export default function OrderListItem({
   products,
   isDone,
   clientId,
+  currentUser,
 }: {
   products: CartType[];
   isDone: boolean;
   clientId: number;
+  currentUser: UserType;
 }) {
   return (
     <ul className={style.order__itemList}>

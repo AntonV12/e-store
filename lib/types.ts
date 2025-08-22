@@ -103,3 +103,9 @@ export type UpdateCartState = {
   };
   fromCart?: boolean;
 };
+
+export type OrdersListParamsType = {
+  limit: number;
+  done: boolean;
+  isAdmin: boolean;
+};

@@ -2,20 +2,24 @@ import style from "./profile.module.css";
 import { UserType } from "@/lib/types";
 import { fetchOrders } from "@/lib/ordersActions";
 import OrderList from "./OrderList";
-import Link from "next/link";
+import { OrdersListParamsType } from "@/lib/types";
+import ToggleButton from "./ToggleButton";
 
 export default async function OrdersList({
   currentUser,
+  params,
 }: {
   currentUser: UserType;
+  params: OrdersListParamsType;
 }) {
-  // const orders = await fetchOrders(10, false, currentUser.isAdmin);
+  const { limit, done } = params;
+  const orders = await fetchOrders(limit, done, currentUser.isAdmin);
 
   return (
     <div className={style.profile__orders}>
       <div className={style.profile__orders__header}>
         <h2>{!currentUser.isAdmin ? "Мои " : ""} Заказы</h2>
-        <button>Показать активные / Показать завершенные</button>
+        <ToggleButton />
       </div>
 
       {orders && orders.length > 0 ? (
@@ -27,7 +31,7 @@ export default async function OrdersList({
               <OrderList
                 key={order.id}
                 order={order}
-                isAdmin={currentUser.isAdmin}
+                currentUser={currentUser}
               />
             ))}
         </ul>

@@ -2,51 +2,26 @@ import { CartType } from "@/lib/types";
 import style from "./rating.module.css";
 
 export function RatingArea({ product }: { product: CartType }) {
-  const shouldHighlight = (starValue: number) => {
-    if (!userRating) return false;
-    return userRating?.rating >= starValue;
-  };
-
   return (
-    <div className={style.rating} onClick={handleClick}>
-      <input type="radio" name="star" disabled={userRating ? true : false} />
-      <label
-        htmlFor="5"
-        title="5"
-        className={shouldHighlight(5) ? style.highlighted : ""}
-      >
+    <div className={style.rating}>
+      <input type="radio" name="star" />
+      <label htmlFor="5" title="5">
         &#9733;
       </label>
-      <input type="radio" name="star" disabled={userRating ? true : false} />
-      <label
-        htmlFor="4"
-        title="4"
-        className={shouldHighlight(4) ? style.highlighted : ""}
-      >
+      <input type="radio" name="star" />
+      <label htmlFor="4" title="4">
         &#9733;
       </label>
-      <input type="radio" name="star" disabled={userRating ? true : false} />
-      <label
-        htmlFor="3"
-        title="3"
-        className={shouldHighlight(3) ? style.highlighted : ""}
-      >
+      <input type="radio" name="star" />
+      <label htmlFor="3" title="3">
         &#9733;
       </label>
-      <input type="radio" name="star" disabled={userRating ? true : false} />
-      <label
-        htmlFor="2"
-        title="2"
-        className={shouldHighlight(2) ? style.highlighted : ""}
-      >
+      <input type="radio" name="star" />
+      <label htmlFor="2" title="2">
         &#9733;
       </label>
-      <input type="radio" name="star" disabled={userRating ? true : false} />
-      <label
-        htmlFor="1"
-        title="1"
-        className={shouldHighlight(1) ? style.highlighted : ""}
-      >
+      <input type="radio" name="star" />
+      <label htmlFor="1" title="1">
         &#9733;
       </label>
     </div>

@@ -14,14 +14,16 @@
   align-items: center;
   user-select: none;
   padding-top: 10px;
-  justify-content: space-between;
 }
 .title h3 {
   margin: 0;
 }
+.title svg:last-child {
+  margin-left: auto;
+}
 
 .checkIcon {
-  transform: scale(2);
+  transform: scale(20);
   fill: grey;
   margin-right: 10px;
 }

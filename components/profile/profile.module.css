@@ -65,6 +65,10 @@
   height: 100%;
 }
 
+.profile__orders {
+  width: 100%;
+}
+
 .profile__orders__header {
   display: flex;
   align-items: center;

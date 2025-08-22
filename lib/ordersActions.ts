@@ -13,8 +13,8 @@ export const fetchOrders = async (
       ? "SELECT * FROM orders WHERE isDone = ? LIMIT ?"
       : "SELECT * FROM orders WHERE clientId = ? AND isDone = ? LIMIT ?";
     const [rows] = await pool.query<OrderType[] & RowDataPacket[]>(sql, [
-      done || false,
-      limit || 10,
+      done === "true" ? true : false,
+      Number(limit) || 10,
     ]);
 
     if (rows.length === 0) return null;

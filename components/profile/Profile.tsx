@@ -1,9 +1,7 @@
-import { getCurrentUser } from "@/lib/authActions";
 import style from "./profile.module.css";
 import Link from "next/link";
 import Image from "next/image";
 import { PhotoCamera, LoginIcon } from "@/app/Icons";
-import OrdersList from "./OrdersList";
 import { UserType } from "@/lib/types";
 
 export default async function Profile({
@@ -11,8 +9,6 @@ export default async function Profile({
 }: {
   currentUser: UserType;
 }) {
-  // const currentUser = await getCurrentUser();
-
   return (
     <div className={style.profile}>
       <h2>Мои Данные</h2>

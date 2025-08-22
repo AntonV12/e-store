@@ -1,14 +1,16 @@
 import style from "./order.module.css";
-import { OrderType } from "@/lib/types";
-import { CheckIcon, Chevron } from "@/app/Icons";
+import { OrderType, UserType } from "@/lib/types";
+import { CheckIcon } from "@/app/Icons";
 import OrderListItem from "./OrderListItem";
+// import CheckIcon from '@/public/check.svg'
+import Chevron from "@/public/chevron.svg";
 
 export default function OrderList({
   order,
-  isAdmin,
+  currentUser,
 }: {
   order: OrderType;
-  isAdmin: boolean;
+  currentUser: UserType;
 }) {
   return (
     <div className={style.orderList}>
@@ -19,8 +21,8 @@ export default function OrderList({
           <div className={style.title}>
             {order.isDone ? (
               <CheckIcon
-                className={style.checkIcon}
-                style={{ fill: order.isDone ? "green" : "grey" }}
+              // className={style.checkIcon}
+              // style={{ fill: order.isDone ? "green" : "grey" }}
               />
             ) : null}
             <h3>
@@ -33,6 +35,7 @@ export default function OrderList({
               products={order.products}
               isDone={order.isDone}
               clientId={order.clientId}
+              currentUser={currentUser}
             />
             <p className={style.product__total}>
               Итого:{" "}
@@ -46,7 +49,7 @@ export default function OrderList({
             </p>
           </>
 
-          {isAdmin ? (
+          {currentUser.isAdmin ? (
             <div className={style.order__info}>
               <p>
                 <span>Клиент id:</span> {order.clientId}
