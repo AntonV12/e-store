@@ -13,7 +13,7 @@ export default async function OrdersList({
   params: OrdersListParamsType;
 }) {
   const { limit, done } = params;
-  const orders = await fetchOrders(limit, done, currentUser.isAdmin);
+  const orders = await fetchOrders(limit, done === "true", currentUser.isAdmin);
 
   return (
     <div className={style.profile__orders}>
@@ -28,11 +28,7 @@ export default async function OrdersList({
             .sort((a, b) => +(b.id ?? 0) - +(a.id ?? 0))
             .sort((a, b) => +a.isDone - +b.isDone)
             .map((order) => (
-              <OrderList
-                key={order.id}
-                order={order}
-                currentUser={currentUser}
-              />
+              <OrderList key={order.id} order={order} currentUser={currentUser} />
             ))}
         </ul>
       ) : (

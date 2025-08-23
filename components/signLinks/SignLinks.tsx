@@ -1,14 +1,14 @@
 import Link from "next/link";
 import style from "./SignLinks.module.css";
-import { CartIcon, LoginIcon } from "@/app/Icons";
-// import CartIcon from "@/public/cart2.svg";
-// import LoginIcon from "@/public/person-circle.svg";
+import CartIcon from "@/public/cart2.svg";
+import LoginIcon from "@/public/person-circle.svg";
 // import { SignLinksSkeleton } from "@/components/skeletons/skeletons";
 import { getCurrentUser } from "@/lib/authActions";
+import SignLinksClient from "@/components/signLinks/SignLinksClient";
+import { UserType } from "@/lib/types";
 
 export default async function SignLinks() {
-  const currentUser = await getCurrentUser();
-
+  const currentUser: Omit<UserType, "password"> | null = await getCurrentUser();
   const cartLength = currentUser?.cart.length;
 
   return (
@@ -19,12 +19,7 @@ export default async function SignLinks() {
         {cartLength && cartLength > 0 ? <span>{cartLength}</span> : null}
       </Link>
       {currentUser ? (
-        <>
-          <Link className={style.link} href="/profile">
-            <LoginIcon />
-            <p>{currentUser.name}</p>
-          </Link>
-        </>
+        <SignLinksClient currentUser={currentUser} />
       ) : (
         <Link className={style.link} href="/login">
           <LoginIcon />

@@ -1,7 +1,16 @@
-export type CartType = Pick<
-  ProductType,
-  "id" | "name" | "cost" | "imageSrc"
-> & {
+// export type CartType = Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & {
+//   amount: number;
+//   productId: number | null;
+//   userId: number | null;
+// };
+
+export type CartType = {
+  id: number | null;
+  userId: number | null;
+  productId: number | null;
+  name: string;
+  cost: number;
+  imageSrc: string;
   amount: number;
 };
 
@@ -15,8 +24,9 @@ export type UserType = {
   name: string;
   password: string;
   isAdmin: boolean;
-  // cart: CartType[];
+  cart: CartType[];
   avatar: string;
+  needRefresh: boolean;
 };
 
 export type CommentType = {
@@ -45,16 +55,17 @@ export type OrderType = {
   clientId: number;
   phone: string;
   email: string;
-  address: string;
+  address?: string;
+  city?: string;
+  street?: string;
+  house?: string;
+  apartment?: string;
   products: CartType[];
-  isDone: boolean;
+  isDone: "0" | "1";
   date: string;
 };
 
-export type EncryptedOrderType = Pick<
-  OrderType,
-  "id" | "clientId" | "isDone"
-> & { encryptedOrder: string };
+export type EncryptedOrderType = Pick<OrderType, "id" | "isDone"> & { clientId: number; encryptedOrder: string };
 
 export type SearchParamsType = {
   name?: string;
@@ -96,16 +107,31 @@ export type UpdateCommentsState = {
 };
 
 export type UpdateCartState = {
-  error?: string;
+  error?: string | null;
   message?: string;
   formData?: {
-    cart: CartType;
+    cart: CartType | null;
   };
   fromCart?: boolean;
 };
 
 export type OrdersListParamsType = {
   limit: number;
-  done: boolean;
+  done: string;
   isAdmin: boolean;
+};
+
+export type CreateOrderState = {
+  error?: string | null;
+  message?: string;
+  formData?: OrderType;
+};
+
+export type UpdateOrderState = {
+  error?: string | null;
+  message?: string;
+  formData?: {
+    isDone: "0" | "1";
+    id: number;
+  };
 };

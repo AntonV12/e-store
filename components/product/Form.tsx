@@ -7,33 +7,26 @@ import style from "./product.module.css";
 import { ProductType, UpdateCartState } from "@/lib/types";
 import { useMessage } from "@/lib/messageContext";
 
-export default function Form({
-  product,
-  userId,
-}: {
-  product: ProductType;
-  userId: number;
-}) {
+export default function Form({ product, userId }: { product: ProductType; userId: number }) {
   const [amount, setAmount] = useState<number>(1);
 
   const initialState: UpdateCartState = {
-    userId: userId,
-    message: null,
-    errors: {},
+    message: "",
+    error: null,
     formData: {
       cart: {
-        id: product.id,
+        id: null,
+        userId: userId,
+        productId: product.id,
         name: product.name,
         cost: product.cost,
         imageSrc: product.imageSrc[0],
+        amount: 1,
       },
     },
   };
   const updateUserCartWithId = updateUserCart.bind(null, userId);
-  const [state, formAction] = useActionState<UpdateCartState, FormData>(
-    updateUserCartWithId,
-    initialState,
-  );
+  const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
   const { setMessage } = useMessage();
 
   useEffect(() => {
@@ -46,16 +39,16 @@ export default function Form({
   return (
     <>
       <form action={formAction}>
-        <h2 className={style.priceInput}>
-          {product.cost.toLocaleString("ru-RU")} ₽
-        </h2>
+        <h2 className={style.priceInput}>{product.cost.toLocaleString("ru-RU")} ₽</h2>
         <Amount value={amount} setAmount={setAmount} />
         <input
           type="text"
           name="cart"
           hidden
           defaultValue={JSON.stringify({
-            id: product.id,
+            id: null,
+            userId: userId,
+            productId: product.id,
             name: product.name,
             cost: product.cost,
             imageSrc: product.imageSrc[0],

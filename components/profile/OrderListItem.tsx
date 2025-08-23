@@ -10,7 +10,7 @@ export default function OrderListItem({
   currentUser,
 }: {
   products: CartType[];
-  isDone: boolean;
+  isDone: "0" | "1";
   clientId: number;
   currentUser: UserType;
 }) {
@@ -19,22 +19,13 @@ export default function OrderListItem({
       {products.map((product) => (
         <li key={product.id}>
           <div className={style.product__container}>
-            <Image
-              src={`/api/image?name=${product.imageSrc}`}
-              alt={product.name}
-              width={30}
-              height={30}
-            />
+            <Image src={`/api/image?name=${product.imageSrc}`} alt={product.name} width={30} height={30} />
             <h3>{product.name}</h3>
             <p className={style.product__total}>
               {product.amount} x {product.cost.toLocaleString()} ₽
             </p>
-            <strong>
-              {(product.cost * product.amount).toLocaleString()} ₽
-            </strong>
-            {isDone && currentUser?.id === clientId ? (
-              <RatingArea product={product} />
-            ) : null}
+            <strong>{(product.cost * product.amount).toLocaleString()} ₽</strong>
+            {isDone && currentUser?.id === clientId ? <RatingArea product={product} /> : null}
           </div>
         </li>
       ))}

@@ -1,4 +1,5 @@
-import "server-only";
+"use server";
+
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
@@ -25,7 +26,7 @@ export async function decrypt(session: string | undefined = "") {
 }
 
 export async function createSession(userId: string, isAdmin: boolean) {
-  const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 7 * 23 * 60 * 60 * 1000);
   const session = await encrypt({ userId, isAdmin, expiresAt });
   const cookieStore = await cookies();
 

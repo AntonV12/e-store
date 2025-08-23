@@ -7,23 +7,19 @@ import { updateUserCart } from "@/lib/usersActions";
 import { UpdateCartState, CartType } from "@/lib/types";
 import { useDebouncedCallback } from "use-debounce";
 
-export default function CartItemForm({
-  product,
-  userId,
-}: {
-  product: CartType;
-  userId: number;
-}) {
+export default function CartItemForm({ product, userId }: { product: CartType; userId: number }) {
   const initialState: UpdateCartState = {
-    id: userId,
-    message: null,
-    errors: {},
+    message: "",
+    error: "",
     formData: {
       cart: {
-        id: product.productId,
+        id: null,
+        userId: userId,
+        productId: product.productId,
         name: product.name,
         cost: product.cost,
         imageSrc: product.imageSrc,
+        amount: 1,
       },
     },
     fromCart: true,
@@ -31,15 +27,13 @@ export default function CartItemForm({
 
   const [amount, setAmount] = useState<number>(product.amount);
   const updateUserCartWithId = updateUserCart.bind(null, userId);
-  const [state, formAction] = useActionState<UpdateCartState, FormData>(
-    updateUserCartWithId,
-    initialState,
-  );
+  const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
 
   const debouncedSubmit = useDebouncedCallback(() => {
     startTransition(() => {
       const formData = new FormData();
-      formData.set("amount", amount);
+      formData.set("amount", amount.toString());
+      formData.set("fromCart", "true");
       formAction(formData);
     });
   }, 500);
@@ -72,7 +66,7 @@ export default function CartItemForm({
       <button type="button" onClick={handleAmountDecrease}>
         -
       </button>
-      <input type="text" value={amount} onChange={handleAmountChange} />
+      <input type="text" name="amount" value={amount} onChange={handleAmountChange} />
       <button type="button" onClick={handleAmountIncrease}>
         +
       </button>

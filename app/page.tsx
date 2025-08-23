@@ -10,11 +10,8 @@ export const metadata: Metadata = {
   title: "My Store",
 };
 
-export default async function Home(props: {
-  searchParams?: Promise<SearchParamsType>;
-}) {
+export default async function Home(props: { searchParams?: Promise<SearchParamsType> }) {
   const searchParams = await props.searchParams;
-  const currentYear = new Date().getFullYear();
   const categories = (await fetchCategories()) ?? [];
 
   return (

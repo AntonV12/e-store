@@ -1,5 +1,5 @@
-// import "server-only";
 "use server";
+
 import { pool } from "@/lib/database";
 import { LoginState, UserType } from "@/lib/types";
 import { RowDataPacket } from "mysql2";
@@ -21,17 +21,11 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
 });
 
-export const loginUser = async (
-  prevState: LoginState | undefined,
-  formData: FormData,
-) => {
+export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
   try {
     const name = formData.get("name");
     const password = formData.get("password")?.toString();
-    const [existingUser] = await pool.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE name = ?",
-      [name],
-    );
+    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
     if (!existingUser.length) {
       return {
@@ -43,10 +37,7 @@ export const loginUser = async (
       };
     }
 
-    if (
-      (password && !bycript.compareSync(password, existingUser[0].password)) ||
-      !existingUser.length
-    ) {
+    if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
       return {
         error: "Неверный логин или пароль",
         formData: {
@@ -79,24 +70,18 @@ export async function getCurrentUser() {
     return null;
   }
 
+  let needRefresh = false;
+
   const cookie = (await cookies()).get("session")?.value;
   const payload = await decrypt(cookie);
-  const expiresAt = payload?.expiresAt;
-  if (
-    typeof expiresAt === "string" ||
-    typeof expiresAt === "number" ||
-    expiresAt instanceof Date
-  ) {
+  const expiresAt = payload?.expiresAt as string;
+
+  if (expiresAt) {
     const expires = new Date(expiresAt);
     if ((expires.getTime() - Date.now()) / 1000 / 60 / 60 / 24 < 1) {
-      updateSession();
+      needRefresh = true;
     }
   }
-
-  // const [results] = await pool.execute<RowDataPacket[]>(
-  //   "SELECT id, name, isAdmin, avatar FROM users LEFT JOIN carts ON users.id = carts.userId WHERE id = ?",
-  //   [session.userId],
-  // );
 
   const sql = `SELECT 
                   u.id,
@@ -140,5 +125,6 @@ export async function getCurrentUser() {
     isAdmin,
     avatar,
     cart,
+    needRefresh,
   };
 }

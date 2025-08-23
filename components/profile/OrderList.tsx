@@ -1,73 +1,55 @@
+"use client";
+
 import style from "./order.module.css";
 import { OrderType, UserType } from "@/lib/types";
-import { CheckIcon } from "@/app/Icons";
 import OrderListItem from "./OrderListItem";
-// import CheckIcon from '@/public/check.svg'
 import Chevron from "@/public/chevron.svg";
+import Form from "./Form";
 
-export default function OrderList({
-  order,
-  currentUser,
-}: {
-  order: OrderType;
-  currentUser: UserType;
-}) {
+export default function OrderList({ order, currentUser }: { order: OrderType; currentUser: UserType }) {
+  const date = new Date(order.date).toLocaleString("ru-RU", { year: "numeric", month: "2-digit", day: "2-digit" });
+
   return (
-    <div className={style.orderList}>
-      <li key={order.id}>
-        <article
-          className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}
-        >
-          <div className={style.title}>
-            {order.isDone ? (
-              <CheckIcon
-              // className={style.checkIcon}
-              // style={{ fill: order.isDone ? "green" : "grey" }}
-              />
-            ) : null}
-            <h3>
-              Заказ #{order.id} от {order.date}
-            </h3>
-            <Chevron className={`${style.chevronIcon}`} />
-          </div>
-          <>
-            <OrderListItem
-              products={order.products}
-              isDone={order.isDone}
-              clientId={order.clientId}
-              currentUser={currentUser}
-            />
-            <p className={style.product__total}>
-              Итого:{" "}
-              {order.products
-                .reduce(
-                  (total, product) => total + product.cost * product.amount,
-                  0,
-                )
-                .toLocaleString()}{" "}
-              ₽
-            </p>
-          </>
+    <li key={order.id}>
+      <article className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}>
+        <div className={style.title}>
+          <Form isDone={order.isDone} id={order.id!} />
+          <h3>
+            Заказ #{order.id} от {date}
+          </h3>
+          <Chevron className={`${style.chevronIcon}`} />
+        </div>
+        <>
+          <OrderListItem
+            products={order.products}
+            isDone={order.isDone}
+            clientId={order.clientId}
+            currentUser={currentUser}
+          />
+          <p className={style.product__total}>
+            Итого:{" "}
+            {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
+          </p>
+        </>
 
-          {currentUser.isAdmin ? (
-            <div className={style.order__info}>
-              <p>
-                <span>Клиент id:</span> {order.clientId}
-              </p>
-              <p>
-                <span>Телефон:</span> {order.phone}
-              </p>
-              <p>
-                <span>Email:</span> {order.email}
-              </p>
-              <p>
-                <span>Адрес:</span> {order.address}
-              </p>
-            </div>
-          ) : null}
-        </article>
-      </li>
-    </div>
+        {currentUser.isAdmin ? (
+          <div className={style.order__info}>
+            <p>
+              <span>Клиент id:</span> {order.clientId}
+            </p>
+            <p>
+              <span>Телефон:</span> {order.phone}
+            </p>
+            <p>
+              <span>Email:</span> {order.email}
+            </p>
+            <p>
+              <span>Адрес:</span> {order.address}
+            </p>
+          </div>
+        ) : null}
+      </article>
+    </li>
   );
 }
 

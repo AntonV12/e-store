@@ -17,10 +17,7 @@ export default function LoginForm() {
       password: "",
     },
   };
-  const [state, formAction, isPending] = useActionState<LoginState, FormData>(
-    loginUser,
-    initialState,
-  );
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(loginUser, initialState);
   const { setMessage } = useMessage();
   const router = useRouter();
 
@@ -55,13 +52,12 @@ export default function LoginForm() {
           placeholder="Пароль"
           className={`${styles.input}`}
           defaultValue={state.formData?.password}
+          autoComplete="off"
         />
         <button type="submit" disabled={isPending}>
           {isPending ? "Отправка..." : "Войти"}
         </button>
-        {state.error && (
-          <span className={styles.errorMessage}>{state.error}</span>
-        )}
+        {state.error && <span className={styles.errorMessage}>{state.error}</span>}
       </form>
     </>
   );

@@ -5,12 +5,12 @@ export default function Input({
   type,
   name,
   placeholder,
-  isSubmit,
+  isError,
 }: {
   type: string;
   name: string;
   placeholder: string;
-  isSubmit: boolean;
+  isError: boolean;
 }) {
   const [value, setValue] = useState<string>("");
 
@@ -70,7 +70,7 @@ export default function Input({
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
-        className={`${isSubmit && !validation() ? style.error : isSubmit && style.success}`}
+        className={`${isError && !validation() ? style.error : isError && style.success}`}
       />
     </>
   );

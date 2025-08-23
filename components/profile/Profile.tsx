@@ -1,36 +1,22 @@
 import style from "./profile.module.css";
 import Link from "next/link";
 import Image from "next/image";
-import { PhotoCamera, LoginIcon } from "@/app/Icons";
+import PhotoCamera from "@/public/photo_camera.svg";
+import LoginIcon from "@/public/person-circle.svg";
 import { UserType } from "@/lib/types";
 
-export default async function Profile({
-  currentUser,
-}: {
-  currentUser: UserType;
-}) {
+export default async function Profile({ currentUser }: { currentUser: UserType }) {
   return (
     <div className={style.profile}>
       <h2>Мои Данные</h2>
       <div className={style.profile__data}>
         <div className={style.avatar__container}>
           <div className={style.avatar}>
-            <input
-              type="file"
-              name="avatar"
-              id="avatar"
-              className={style.avatar__input}
-            />
+            <input type="file" name="avatar" id="avatar" className={style.avatar__input} />
             <label htmlFor="avatar" className={style.avatar__label}></label>
             <PhotoCamera />
             {currentUser.avatar ? (
-              <Image
-                src={currentUser.avatar}
-                alt="avatar"
-                width={72}
-                height={72}
-                className={style.avatar__img}
-              />
+              <Image src={currentUser.avatar} alt="avatar" width={72} height={72} className={style.avatar__img} />
             ) : (
               <LoginIcon />
             )}
@@ -38,9 +24,7 @@ export default async function Profile({
           {currentUser.name}
         </div>
         <div className={style.profile__links}>
-          {currentUser.isAdmin ? (
-            <Link href="/add-product">Добавить новый товар</Link>
-          ) : null}
+          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
           <Link href="#">Выйти из системы</Link>
         </div>
       </div>

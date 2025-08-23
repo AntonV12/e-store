@@ -2,13 +2,7 @@
 
 import { pool } from "./database";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import {
-  CartType,
-  UpdateUserState,
-  UpdateCartState,
-  UserType,
-  LoginState,
-} from "@/lib/types";
+import { CartType, UpdateUserState, UpdateCartState, UserType, LoginState } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
@@ -89,9 +83,21 @@ import { cookies } from "next/headers";
 // };
 
 export const createUser = async (prevState: LoginState, formData: FormData) => {
-  const name = formData.get("name");
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirmPassword");
+  const name = formData.get("name")?.toString();
+  const password = formData.get("password")?.toString();
+  const confirmPassword = formData.get("confirmPassword")?.toString();
+
+  if (!name || !password || !confirmPassword) {
+    return {
+      error: "Заполните все поля",
+      message: null,
+      formData: {
+        name: name,
+        password: password,
+        confirmPassword: confirmPassword,
+      },
+    };
+  }
 
   if (password !== confirmPassword) {
     return {
@@ -117,10 +123,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
     };
   }
 
-  const [existingUser] = await pool.execute<RowDataPacket[]>(
-    "SELECT * FROM users WHERE name = ?",
-    [name],
-  );
+  const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
   if (existingUser.length > 0) {
     return {
@@ -143,11 +146,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
       VALUES (?, ?, ?)
     `;
 
-    const [result] = await pool.execute<ResultSetHeader>(sql, [
-      name,
-      hashedPassword,
-      false,
-    ]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [name, hashedPassword, false]);
 
     if (result.affectedRows > 0) {
       const prevState = {
@@ -184,18 +183,15 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
 export const updateUserCart = async (
   userId: number,
   prevState: UpdateCartState,
-  formData: FormData,
-) => {
+  formData: FormData
+): Promise<UpdateCartState> => {
   try {
-    const cart =
-      JSON.parse(formData.get("cart") as string) || prevState.formData.cart;
-    const { id, name, cost, imageSrc } = cart;
+    const cart: CartType = JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
+    const { userId, productId, name, cost, imageSrc } = cart;
     const amount = Number(formData.get("amount"));
-    const fromCart = prevState.fromCart;
+    const fromCart = formData.get("fromCart") === "true" || prevState.fromCart;
 
-    const amountUpdate = fromCart
-      ? "amount = VALUES(amount)"
-      : "amount = amount + VALUES(amount)";
+    const amountUpdate = fromCart ? "amount = VALUES(amount)" : "amount = amount + VALUES(amount)";
 
     const sql = `
       INSERT INTO carts (userId, productId, name, cost, imageSrc, amount)
@@ -207,14 +203,7 @@ export const updateUserCart = async (
         imageSrc = VALUES(imageSrc)
     `;
 
-    await pool.execute<ResultSetHeader>(sql, [
-      userId,
-      id,
-      name,
-      cost,
-      imageSrc,
-      amount,
-    ]);
+    await pool.execute<ResultSetHeader>(sql, [userId, productId, name, cost, imageSrc, amount]);
 
     revalidatePath("/cart");
     return {
@@ -228,8 +217,10 @@ export const updateUserCart = async (
     console.error(err);
     return {
       error: "Ошибка при добавлении товара в корзину",
-      message: null,
-      formData: {},
+      message: "",
+      formData: {
+        cart: prevState.formData?.cart ?? null,
+      },
     };
   }
 };
