@@ -20,7 +20,7 @@ export default function Categories({ categories }: { categories: string[] }) {
       params.set("category", term);
     }
 
-    replace(`${pathname}?${params.toString()}`);
+    replace(`${pathname}?${params.toString()}`, { scroll: false });
   };
 
   return (
@@ -29,7 +29,11 @@ export default function Categories({ categories }: { categories: string[] }) {
 
       <ul className={style.list}>
         {categories.map((category) => (
-          <li key={category} onClick={handleClick} className={params.get("category") === category ? style.active : ""}>
+          <li
+            key={category}
+            onClick={handleClick}
+            className={params.get("category") === category ? style.active : ""}
+          >
             {category}
           </li>
         ))}

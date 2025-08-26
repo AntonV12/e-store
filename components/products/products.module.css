@@ -53,24 +53,3 @@
   transform: scale(1.05);
   transition: all 0.3s ease-in-out;
 }
-
-.sort {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.sortButton {
-  border-radius: 5px;
-  padding: 5px;
-  background-color: transparent;
-  border: 2px solid var(--secondary-color);
-  color: var(--secondary-color);
-  cursor: pointer;
-}
-
-.active {
-  font-weight: bold;
-  background-color: var(--secondary-color);
-  color: white;
-}
