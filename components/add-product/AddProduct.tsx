@@ -41,7 +41,12 @@ export default function AddProduct() {
   return (
     <div className={style.container}>
       <h2>Добавить новый товар</h2>
-      <form className={style.form} method="POST" onSubmit={handleSubmit} encType="multipart/form-data">
+      <form
+        className={style.form}
+        method="POST"
+        onSubmit={handleSubmit}
+        encType="multipart/form-data"
+      >
         <div>
           <label htmlFor="name">Название товара:</label>
           <input type="text" id="name" name="name" required />
@@ -52,7 +57,14 @@ export default function AddProduct() {
         </div>
         <div>
           <label htmlFor="images">Изображения:</label>
-          <input type="file" id="images" name="images" accept="image/*" required multiple />
+          <input
+            type="file"
+            id="images"
+            name="images"
+            accept="image/*"
+            required
+            multiple
+          />
         </div>
         <div>
           <label htmlFor="cost">Цена:</label>

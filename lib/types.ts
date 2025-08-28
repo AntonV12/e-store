@@ -1,9 +1,3 @@
-// export type CartType = Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & {
-//   amount: number;
-//   productId: number | null;
-//   userId: number | null;
-// };
-
 export type CartType = {
   id: number | null;
   userId: number | null;
@@ -13,11 +7,6 @@ export type CartType = {
   imageSrc: string;
   amount: number;
 };
-
-// export type CartType = {
-//   productId: number | null;
-//   amount: number;
-// };
 
 export type UserType = {
   id: number | null;
@@ -65,7 +54,10 @@ export type OrderType = {
   date: string;
 };
 
-export type EncryptedOrderType = Pick<OrderType, "id" | "isDone"> & { clientId: number; encryptedOrder: string };
+export type EncryptedOrderType = Pick<OrderType, "id" | "isDone"> & {
+  clientId: number;
+  encryptedOrder: string;
+};
 
 export type SearchParamsType = {
   name?: string;
@@ -87,15 +79,11 @@ export type LoginState = {
 
 export type UpdateUserState = {
   id: number | null;
-  message: string | null;
-  errors: { [key: string]: string };
+  message?: string;
+  error?: string;
   formData: {
-    product?: Pick<ProductType, "id" | "name" | "cost" | "imageSrc"> & {
-      amount: number;
-    };
     avatar?: string;
   };
-  isCart?: boolean;
 };
 
 export type UpdateCommentsState = {

@@ -5,6 +5,7 @@ import PhotoCamera from "@/public/photo_camera.svg";
 import LoginIcon from "@/public/person-circle.svg";
 import { UserType } from "@/lib/types";
 import LogoutForm from "./LogoutForm";
+import AvatarForm from "./AvatarForm";
 
 export default async function Profile({
   currentUser,
@@ -17,24 +18,19 @@ export default async function Profile({
       <div className={style.profile__data}>
         <div className={style.avatar__container}>
           <div className={style.avatar}>
-            <input
-              type="file"
-              name="avatar"
-              id="avatar"
-              className={style.avatar__input}
-            />
-            <label htmlFor="avatar" className={style.avatar__label}></label>
-            <PhotoCamera />
+            <AvatarForm currentUser={currentUser} />
+
+            <PhotoCamera className={style.camera} />
             {currentUser.avatar ? (
               <Image
-                src={currentUser.avatar}
+                src={`/api/image?name=${currentUser.avatar}`}
                 alt="avatar"
                 width={72}
                 height={72}
                 className={style.avatar__img}
               />
             ) : (
-              <LoginIcon />
+              <LoginIcon className={style.loginIcon} />
             )}
           </div>
           {currentUser.name}
