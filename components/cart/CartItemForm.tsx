@@ -1,13 +1,23 @@
 "use client";
 
 import style from "./cart.module.css";
-import { useState, startTransition } from "react";
+import React, { useState, startTransition } from "react";
 import { useActionState } from "react";
 import { updateUserCart } from "@/lib/usersActions";
 import { UpdateCartState, CartType } from "@/lib/types";
 import { useDebouncedCallback } from "use-debounce";
 
-export default function CartItemForm({ product, userId }: { product: CartType; userId: number }) {
+export default function CartItemForm({
+  product,
+  userId,
+  amount,
+  setAmount,
+}: {
+  product: CartType;
+  userId: number;
+  amount: number;
+  setAmount: React.Dispatch<React.SetStateAction<number>>;
+}) {
   const initialState: UpdateCartState = {
     message: "",
     error: "",
@@ -25,7 +35,7 @@ export default function CartItemForm({ product, userId }: { product: CartType; u
     fromCart: true,
   };
 
-  const [amount, setAmount] = useState<number>(product.amount);
+  // const [amount, setAmount] = useState<number>(product.amount);
   const updateUserCartWithId = updateUserCart.bind(null, userId);
   const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
 
@@ -34,7 +44,23 @@ export default function CartItemForm({ product, userId }: { product: CartType; u
       const formData = new FormData();
       formData.set("amount", amount.toString());
       formData.set("fromCart", "true");
-      formAction(formData);
+
+      if (userId) {
+        formAction(formData);
+      } else {
+        const savedCart = localStorage.getItem("cart");
+        if (savedCart) {
+          const parsedCart: CartType[] = JSON.parse(savedCart);
+          const existingCart = parsedCart.find((item) => item.productId === product.productId);
+          if (existingCart) {
+            existingCart.amount = amount;
+            localStorage.setItem("cart", JSON.stringify(parsedCart));
+          } else {
+            parsedCart.push({ ...product, amount });
+            localStorage.setItem("cart", JSON.stringify(parsedCart));
+          }
+        }
+      }
     });
   }, 500);
 

@@ -1,9 +1,7 @@
 import styles from "./skeletons.module.css";
 
 export function SignLinksSkeleton() {
-  return (
-    <div className={`${styles.skeleton} ${styles.skeleton__signLinks}`}></div>
-  );
+  return <div className={`${styles.skeleton} ${styles.skeleton__signLinks}`}></div>;
 }
 
 export function ProductsListSkeleton() {
@@ -11,12 +9,7 @@ export function ProductsListSkeleton() {
     const skeletons: React.ReactNode[] = [];
 
     for (let i = 0; i < 20; i++) {
-      skeletons.push(
-        <div
-          key={i}
-          className={`${styles.skeleton} ${styles.skeleton__productsList}`}
-        ></div>,
-      );
+      skeletons.push(<div key={i} className={`${styles.skeleton} ${styles.skeleton__productsList}`}></div>);
     }
     return skeletons;
   }
@@ -34,19 +27,11 @@ export function ProductsListSkeleton() {
 export function ProductSkeleton() {
   return (
     <div className={`${styles.skeleton} ${styles.skeleton__product}`}>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__product__container}`}
-      >
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__product__image}`}
-        ></div>
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__product__info}`}
-        ></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__product__container}`}>
+        <div className={`${styles.skeleton} ${styles.skeleton__product__image}`}></div>
+        <div className={`${styles.skeleton} ${styles.skeleton__product__info}`}></div>
       </div>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__product__comments}`}
-      ></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__product__comments}`}></div>
     </div>
   );
 }
@@ -54,18 +39,10 @@ export function ProductSkeleton() {
 export function ProfileSkeleton() {
   return (
     <div className={`${styles.skeleton} ${styles.skeleton_profile}`}>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__profile__title}`}
-      ></div>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__profile__data}`}
-      ></div>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__profile__title}`}
-      ></div>
-      <div
-        className={`${styles.skeleton} ${styles.skeleton__profile__list}`}
-      ></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__profile__title}`}></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__profile__data}`}></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__profile__title}`}></div>
+      <div className={`${styles.skeleton} ${styles.skeleton__profile__list}`}></div>
     </div>
   );
 }
@@ -74,18 +51,10 @@ export function CartSkeleton() {
   return (
     <div className={`${styles.skeleton} ${styles.skeleton__cart}`}>
       <div className={`${styles.skeleton} ${styles.skeleton__cart__list}`}>
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__cart__item}`}
-        ></div>
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__cart__item}`}
-        ></div>
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__cart__item}`}
-        ></div>
-        <div
-          className={`${styles.skeleton} ${styles.skeleton__cart__total}`}
-        ></div>
+        <div className={`${styles.skeleton} ${styles.skeleton__cart__item}`}></div>
+        <div className={`${styles.skeleton} ${styles.skeleton__cart__item}`}></div>
+        <div className={`${styles.skeleton} ${styles.skeleton__cart__item}`}></div>
+        <div className={`${styles.skeleton} ${styles.skeleton__cart__total}`}></div>
       </div>
     </div>
   );

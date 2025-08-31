@@ -2,20 +2,14 @@
 
 import { pool } from "./database";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import {
-  CartType,
-  UpdateUserState,
-  UpdateCartState,
-  UserType,
-  LoginState,
-} from "@/lib/types";
+import { CartType, UpdateUserState, UpdateCartState, UserType, LoginState } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
 import { loginUser } from "@/lib/authActions";
 import { cookies } from "next/headers";
 import path from "path";
-import { writeFile } from "fs/promises";
+import { writeFile, rm } from "fs/promises";
 
 export const createUser = async (prevState: LoginState, formData: FormData) => {
   const name = formData.get("name")?.toString();
@@ -58,10 +52,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
     };
   }
 
-  const [existingUser] = await pool.execute<RowDataPacket[]>(
-    "SELECT * FROM users WHERE name = ?",
-    [name],
-  );
+  const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
   if (existingUser.length > 0) {
     return {
@@ -84,11 +75,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
       VALUES (?, ?, ?)
     `;
 
-    const [result] = await pool.execute<ResultSetHeader>(sql, [
-      name,
-      hashedPassword,
-      false,
-    ]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [name, hashedPassword, false]);
 
     if (result.affectedRows > 0) {
       const prevState = {
@@ -125,18 +112,23 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
 export const updateUserCart = async (
   userId: number,
   prevState: UpdateCartState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCartState> => {
   try {
-    const cart: CartType =
-      JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
-    const { userId, productId, name, cost, imageSrc } = cart;
+    const cart: CartType = JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
+    const { /* userId, */ productId, name, cost, imageSrc } = cart;
     const amount = Number(formData.get("amount"));
     const fromCart = formData.get("fromCart") === "true" || prevState.fromCart;
 
-    const amountUpdate = fromCart
-      ? "amount = VALUES(amount)"
-      : "amount = amount + VALUES(amount)";
+    if (!userId) {
+      return {
+        error: "Пользователь не найден",
+        message: "",
+        formData: prevState.formData,
+      };
+    }
+
+    const amountUpdate = fromCart ? "amount = VALUES(amount)" : "amount = amount + VALUES(amount)";
 
     const sql = `
       INSERT INTO carts (userId, productId, name, cost, imageSrc, amount)
@@ -148,14 +140,7 @@ export const updateUserCart = async (
         imageSrc = VALUES(imageSrc)
     `;
 
-    await pool.execute<ResultSetHeader>(sql, [
-      userId,
-      productId,
-      name,
-      cost,
-      imageSrc,
-      amount,
-    ]);
+    await pool.execute<ResultSetHeader>(sql, [userId, productId, name, cost, imageSrc, amount]);
 
     revalidatePath("/cart");
     return {
@@ -182,30 +167,42 @@ export const deleteProduct = async (id: number) => {
   revalidatePath("/cart");
 };
 
-export const updateUser = async (
-  prevState: UpdateUserState,
-  formData: FormData,
-) => {
+export const updateUser = async (prevState: UpdateUserState, formData: FormData): Promise<UpdateUserState> => {
   const id = prevState?.id;
   const imageFile = formData.get("avatar") as File;
   const dir = path.join(process.cwd(), "uploads");
 
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
   const filename = uniqueSuffix + "-" + imageFile.name.replace(/\s+/g, "_");
-  const filePath = path.join(dir, filename);
+  const filePath = path.join(dir, "users", filename);
 
   const bytes = await imageFile.arrayBuffer();
   const buffer = Buffer.from(bytes);
   await writeFile(filePath, new Uint8Array(buffer));
 
+  const [oldAvatar] = await pool.execute<RowDataPacket[]>("SELECT avatar FROM users WHERE id = ?", [id]);
+
+  if (oldAvatar[0].avatar) {
+    await rm(path.join(dir, "users", oldAvatar[0].avatar));
+  }
+
   try {
-    await pool.execute(`UPDATE users SET avatar = ? WHERE id = ?`, [
-      filename,
+    await pool.execute(`UPDATE users SET avatar = ? WHERE id = ?`, [filename, id]);
+
+    revalidatePath("/profile");
+
+    return {
       id,
-    ]);
+      error: null,
+      message: "Аватар успешно обновлен",
+      formData: {
+        avatar: filename,
+      },
+    };
   } catch (err) {
     console.error(err);
     return {
+      id,
       error: "Ошибка при обновлении аватара",
       message: null,
       formData: {
@@ -213,6 +210,4 @@ export const updateUser = async (
       },
     };
   }
-
-  revalidatePath("/profile");
 };

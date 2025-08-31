@@ -32,7 +32,7 @@ export type ProductType = {
   viewed: number;
   rating: { author: number; rating: number }[];
   cost: number;
-  imageSrc: string[] | string;
+  imageSrc: string[];
   description: string;
   comments: CommentType[];
 };
@@ -79,10 +79,10 @@ export type LoginState = {
 
 export type UpdateUserState = {
   id: number | null;
-  message?: string;
-  error?: string;
+  message?: string | null;
+  error?: string | null;
   formData: {
-    avatar?: string;
+    avatar?: string | null;
   };
 };
 

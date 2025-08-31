@@ -2,8 +2,8 @@
 
 import style from "./order.module.css";
 import Input from "./Input";
-import { useActionState, useState, useEffect } from "react";
-import { UserType, OrderType, CreateOrderState } from "@/lib/types";
+import { useActionState, useState, useEffect, startTransition } from "react";
+import { UserType, OrderType, CreateOrderState, CartType } from "@/lib/types";
 import { createOrder } from "@/lib/ordersActions";
 import { useMessage } from "@/lib/messageContext";
 import { useRouter } from "next/navigation";
@@ -16,14 +16,14 @@ export default function OrderForm({ currentUser }: { currentUser: Omit<UserType,
     message: "",
     formData: {
       id: null,
-      clientId: currentUser.id!,
+      clientId: currentUser?.id || 0,
       phone: "",
       email: "",
       city: "",
       street: "",
       house: "",
       apartment: "",
-      products: currentUser.cart,
+      products: currentUser?.cart,
       isDone: "0",
       date: new Date().toISOString(),
     },
@@ -35,11 +35,32 @@ export default function OrderForm({ currentUser }: { currentUser: Omit<UserType,
       setMessage(state.message);
       router.push("/");
     }
-  }, [state.message, setMessage]);
+  }, [state.message, setMessage, router]);
+
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+
+    startTransition(() => {
+      if (currentUser) {
+        formAction(formData);
+      } else {
+        const savedCart = localStorage.getItem("cart");
+        if (savedCart) {
+          formData.set("products", savedCart);
+          formAction(formData);
+          localStorage.clear();
+
+          const cartUpdateEvent = new CustomEvent("cartUpdated");
+          window.dispatchEvent(cartUpdateEvent);
+        }
+      }
+    });
+  };
 
   return (
     <div className={style.order}>
-      <form action={formAction}>
+      <form /* action={formAction} */ onSubmit={onSubmit}>
         <h2>Данные покупателя</h2>
         <Input type="tel" name="phone" placeholder="телефон" isError={!!state.error} />
         <Input type="email" name="email" placeholder="email" isError={!!state.error} />

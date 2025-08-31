@@ -6,16 +6,10 @@ import CommentsList from "@/components/comments/CommentsList";
 import AddCommentForm from "@/components/comments/AddCommentForm";
 import { fetchProductById } from "@/lib/productsActions";
 
-export default async function Product({
-  id,
-  isAuth,
-  userId,
-}: {
-  id: number;
-  isAuth: boolean;
-  userId: number;
-}) {
-  const product: ProductType = (await fetchProductById(id)) ?? null;
+export default async function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: number }) {
+  const product: ProductType | null = (await fetchProductById(id)) ?? null;
+
+  if (!product) return null;
 
   return (
     <section className={style.productCard}>
@@ -28,23 +22,24 @@ export default async function Product({
             <h1 className={style.productName}>{product.name}</h1>
             <p className={style.rating}>
               Общий рейтинг:{" "}
-              {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) /
-                product?.rating.length || 0}{" "}
+              {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length || 0}{" "}
               <span className={style.star}>&#9733;</span>
             </p>
           </div>
           <div className={style.price}>
             <Form product={product} userId={userId} />
           </div>
-          <div
-            dangerouslySetInnerHTML={{ __html: product.description }}
-            className={style.description}
-          ></div>
+          <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>
         </div>
       </div>
 
-      {isAuth && <AddCommentForm product={product} userId={userId} />}
       <CommentsList comments={product.comments} />
+
+      {isAuth ? (
+        <AddCommentForm product={product} userId={userId} />
+      ) : (
+        <p>Чтобы оставить комментарий, войдите в свою учетную запись</p>
+      )}
     </section>
   );
 }

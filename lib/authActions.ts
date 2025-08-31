@@ -19,17 +19,11 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
 });
 
-export const loginUser = async (
-  prevState: LoginState | undefined,
-  formData: FormData,
-) => {
+export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
   try {
     const name = formData.get("name");
     const password = formData.get("password")?.toString();
-    const [existingUser] = await pool.execute<RowDataPacket[]>(
-      "SELECT * FROM users WHERE name = ?",
-      [name],
-    );
+    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
     if (!existingUser.length) {
       return {
@@ -41,10 +35,7 @@ export const loginUser = async (
       };
     }
 
-    if (
-      (password && !bycript.compareSync(password, existingUser[0].password)) ||
-      !existingUser.length
-    ) {
+    if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
       return {
         error: "Неверный логин или пароль",
         formData: {

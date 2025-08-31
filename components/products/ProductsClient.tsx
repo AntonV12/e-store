@@ -53,7 +53,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore],
+    [handleLoadMore]
   );
 
   useEffect(() => {
@@ -82,19 +82,22 @@ export default function ProductsClient({
     return () => observer.current?.disconnect();
   }, [products, callback, limit]);
 
+  if (!products.length) {
+    return (
+      <section className={style.products}>
+        <p>Ничего не найдено</p>
+      </section>
+    );
+  }
+
   return (
     <section className={style.products}>
       <ul className={style.list}>
         {products.map((p, index) => (
-          <ProductItem
-            key={p.id}
-            product={p}
-            ref={index === products.length - 1 ? lastItemRef : null}
-          />
+          <ProductItem key={p.id} product={p} ref={index === products.length - 1 ? lastItemRef : null} />
         ))}
       </ul>
       {isLoading && <p>Загрузка...</p>}
-      {!hasMore && <p>Все товары загружены</p>}
     </section>
   );
 }

@@ -26,7 +26,7 @@ export default function LoginForm() {
       setMessage(state.message);
       router.push("/");
     }
-  }, [state.message, setMessage]);
+  }, [state.message, setMessage, router]);
 
   return (
     <>

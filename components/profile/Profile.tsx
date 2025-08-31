@@ -7,11 +7,7 @@ import { UserType } from "@/lib/types";
 import LogoutForm from "./LogoutForm";
 import AvatarForm from "./AvatarForm";
 
-export default async function Profile({
-  currentUser,
-}: {
-  currentUser: UserType;
-}) {
+export default async function Profile({ currentUser }: { currentUser: UserType }) {
   return (
     <div className={style.profile}>
       <h2>Мои Данные</h2>
@@ -23,7 +19,7 @@ export default async function Profile({
             <PhotoCamera className={style.camera} />
             {currentUser.avatar ? (
               <Image
-                src={`/api/image?name=${currentUser.avatar}`}
+                src={`/api/image?name=${currentUser.avatar}&path=users`}
                 alt="avatar"
                 width={72}
                 height={72}
@@ -36,9 +32,7 @@ export default async function Profile({
           {currentUser.name}
         </div>
         <div className={style.profile__links}>
-          {currentUser.isAdmin ? (
-            <Link href="/add-product">Добавить новый товар</Link>
-          ) : null}
+          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
 
           <LogoutForm />
         </div>

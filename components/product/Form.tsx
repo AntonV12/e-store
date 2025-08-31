@@ -1,10 +1,10 @@
 "use client";
 
 import { updateUserCart } from "@/lib/usersActions";
-import { useActionState, useState, useEffect } from "react";
+import { useActionState, useState, useEffect, startTransition } from "react";
 import Amount from "@/components/amount/Amount";
 import style from "./product.module.css";
-import { ProductType, UpdateCartState } from "@/lib/types";
+import { ProductType, UpdateCartState, CartType } from "@/lib/types";
 import { useMessage } from "@/lib/messageContext";
 
 export default function Form({ product, userId }: { product: ProductType; userId: number }) {
@@ -36,9 +36,44 @@ export default function Form({ product, userId }: { product: ProductType; userId
     }
   }, [state, setMessage]);
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    startTransition(() => {
+      const formData = new FormData(e.currentTarget);
+      formData.set("amount", amount.toString());
+
+      if (userId) {
+        formAction(formData);
+      } else {
+        const savedCart = localStorage.getItem("cart");
+
+        if (savedCart) {
+          const parsedCart: CartType[] = JSON.parse(savedCart);
+          const existingCart = parsedCart.find((item) => item.productId === product.id);
+
+          if (existingCart) {
+            existingCart.amount += amount;
+            localStorage.setItem("cart", JSON.stringify(parsedCart));
+          } else {
+            if (!state.formData?.cart) return;
+            parsedCart.push({ ...state.formData?.cart, amount });
+            localStorage.setItem("cart", JSON.stringify(parsedCart));
+          }
+        } else {
+          localStorage.setItem("cart", JSON.stringify([{ ...state.formData?.cart, amount }]));
+        }
+
+        const cartUpdateEvent = new CustomEvent("cartUpdated");
+        window.dispatchEvent(cartUpdateEvent);
+        setAmount(1);
+        setMessage(`${product.name} добавлен в корзину`);
+      }
+    });
+  };
+
   return (
     <>
-      <form action={formAction}>
+      <form /* action={formAction} */ onSubmit={onSubmit}>
         <h2 className={style.priceInput}>{product.cost.toLocaleString("ru-RU")} ₽</h2>
         <Amount value={amount} setAmount={setAmount} />
         <input

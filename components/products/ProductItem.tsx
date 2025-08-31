@@ -29,4 +29,6 @@ const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(({ produ
   );
 });
 
+ProductItem.displayName = "ProductItem";
+
 export default memo(ProductItem);
