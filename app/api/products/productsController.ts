@@ -6,28 +6,45 @@ import { writeFile } from "fs/promises";
 import path from "path";
 
 export const fetchProducts = async (
-  limit: number,
+  limit?: number,
+  page?: number,
   name?: string,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc"
-): Promise<ProductType[] | null> => {
+  sortByDirection?: "asc" | "desc",
+): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
+    const offset = (page - 1) * 10 || 0;
+    console.log("page", page);
+
     const [results] = await pool.query(
       `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy || "viewed"} ${
         sortByDirection || "desc"
-      } LIMIT ?`,
-      [`%${name || ""}%`, category || null, category || null, limit || 10]
+      } LIMIT ? OFFSET ?`,
+      [
+        `%${name || ""}%`,
+        category || null,
+        category || null,
+        Number(limit) || Number(cookieStore.get("limit")?.value) || 10,
+        offset,
+      ],
     );
 
-    return results as ProductType[];
+    const [count] = await pool.query(`SELECT COUNT(*) FROM products`);
+
+    return {
+      products: results,
+      count: Math.ceil(count[0]["COUNT(*)"] / 10),
+    };
   } catch (err) {
     console.error(err);
     return null;
   }
 };
 
-export const createProduct = async (formData: FormData): Promise<ProductType | null> => {
+export const createProduct = async (
+  formData: FormData,
+): Promise<ProductType | null> => {
   try {
     const session = await verifySession();
     if (!session.userId) {
@@ -65,12 +82,15 @@ export const createProduct = async (formData: FormData): Promise<ProductType | n
       comments: [],
     };
 
-    const [result] = await pool.query<ResultSetHeader>(`INSERT INTO products SET ?`, {
-      ...newProduct,
-      rating: JSON.stringify(newProduct.rating),
-      imageSrc: JSON.stringify(newProduct.imageSrc),
-      comments: JSON.stringify(newProduct.comments),
-    });
+    const [result] = await pool.query<ResultSetHeader>(
+      `INSERT INTO products SET ?`,
+      {
+        ...newProduct,
+        rating: JSON.stringify(newProduct.rating),
+        imageSrc: JSON.stringify(newProduct.imageSrc),
+        comments: JSON.stringify(newProduct.comments),
+      },
+    );
 
     if (result.affectedRows > 0) {
       return newProduct;

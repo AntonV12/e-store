@@ -1,7 +1,12 @@
 "use server";
 
 import { pool } from "@/lib/database";
-import { ProductType, SortType, CommentType, UpdateCommentsState } from "@/lib/types";
+import {
+  ProductType,
+  SortType,
+  CommentType,
+  UpdateCommentsState,
+} from "@/lib/types";
 import { ResultSetHeader } from "mysql2/promise";
 import { RowDataPacket } from "mysql2";
 // import { verifySession } from "@/app/api/auth/authController";
@@ -13,25 +18,34 @@ import { revalidatePath } from "next/cache";
 export const fetchProducts = async (
   name?: string,
   limit?: number,
+  page?: number,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc"
-): Promise<ProductType[] | null> => {
+  sortByDirection?: "asc" | "desc",
+): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
-    const cookieStore = await cookies();
+    const offset = (page - 1) * 10 || 0;
+
     const [results] = await pool.query(
       `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy || "viewed"} ${
         sortByDirection || "desc"
-      } LIMIT ?`,
+      } LIMIT ? OFFSET ?`,
       [
         `%${name || ""}%`,
         category || null,
         category || null,
-        Number(limit) || Number(cookieStore.get("limit")?.value) || 10,
-      ]
+        Number(limit) || 10,
+        offset,
+      ],
     );
 
-    return results as ProductType[];
+    const [count] = await pool.query(`SELECT COUNT(*) FROM products`);
+
+    // return results as ProductType[];
+    return {
+      products: results,
+      count: Math.ceil(count[0]["COUNT(*)"] / 10),
+    };
   } catch (err) {
     console.error(err);
     return null;
@@ -102,7 +116,7 @@ export const fetchProducts = async (
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {
     const [rows] = await pool.execute<(string[] & RowDataPacket)[]>(
-      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories"
+      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories",
     );
 
     return rows[0].categories ?? null;
@@ -112,9 +126,14 @@ export const fetchCategories = async (): Promise<string[] | null> => {
   }
 };
 
-export const fetchProductById = async (id: number): Promise<ProductType | null> => {
+export const fetchProductById = async (
+  id: number,
+): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [id]);
+    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(
+      "SELECT * FROM products WHERE id = ?",
+      [id],
+    );
 
     return rows[0] ?? null;
   } catch (err) {
@@ -126,11 +145,12 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 export const updateComments = async (
   productId: number,
   prevState: UpdateCommentsState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UpdateCommentsState> => {
-  const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>("SELECT comments FROM products WHERE id = ?", [
-    productId,
-  ]);
+  const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>(
+    "SELECT comments FROM products WHERE id = ?",
+    [productId],
+  );
 
   if (!productId) return { error: "Invalid product ID" };
 
@@ -139,17 +159,24 @@ export const updateComments = async (
   const date = new Date();
   const authorId = formData.get("author");
 
-  const author = await pool.execute<(string & RowDataPacket)[]>(`SELECT name FROM users WHERE id = ${authorId}`);
+  const author = await pool.execute<(string & RowDataPacket)[]>(
+    `SELECT name FROM users WHERE id = ${authorId}`,
+  );
 
-  const newComment = { id, text, date: date.toISOString(), author: author[0][0].name };
+  const newComment = {
+    id,
+    text,
+    date: date.toISOString(),
+    author: author[0][0].name,
+  };
 
   const updatedComments = [...(comments[0].comments ?? []), newComment];
 
   try {
-    await pool.execute<ResultSetHeader>("UPDATE products SET comments = ? WHERE id = ?", [
-      JSON.stringify(updatedComments),
-      productId,
-    ]);
+    await pool.execute<ResultSetHeader>(
+      "UPDATE products SET comments = ? WHERE id = ?",
+      [JSON.stringify(updatedComments), productId],
+    );
 
     revalidatePath(`/products/${productId}`);
 
