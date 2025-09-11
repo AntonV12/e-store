@@ -5,7 +5,11 @@ import { fetchProductById } from "@/lib/productsActions";
 import { ProductSkeleton } from "@/components/skeletons/skeletons";
 import { Suspense } from "react";
 
-export async function generateMetadata({ params }: { params: { id: number } }): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: number };
+}): Promise<Metadata> {
   const p = await params;
   const product = await fetchProductById(p.id);
   return {
@@ -14,7 +18,9 @@ export async function generateMetadata({ params }: { params: { id: number } }): 
   };
 }
 
-export default async function ProductPage(props: { params: Promise<{ id: number }> }) {
+export default async function ProductPage(props: {
+  params: Promise<{ id: number }>;
+}) {
   const params = await props.params;
   const id = params.id;
   // const product = (await fetchProductById(id)) ?? null;
@@ -27,7 +33,7 @@ export default async function ProductPage(props: { params: Promise<{ id: number 
 
   return (
     <Suspense fallback={<ProductSkeleton />}>
-      <Product id={id} isAuth={isAuth} userId={Number(userId)} />
+      <Product id={id} isAuth={isAuth} userId={userId} />
     </Suspense>
   );
 }

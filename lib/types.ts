@@ -1,6 +1,6 @@
 export type CartType = {
   id: number | null;
-  userId: number | null;
+  userId: string | null;
   productId: number | null;
   name: string;
   cost: number;
@@ -9,13 +9,14 @@ export type CartType = {
 };
 
 export type UserType = {
-  id: number | null;
+  id: string | null;
   name: string;
   password: string;
   isAdmin: boolean;
   cart: CartType[];
   avatar: string;
   needRefresh: boolean;
+  ratings: number[];
 };
 
 export type CommentType = {
@@ -30,7 +31,8 @@ export type ProductType = {
   name: string;
   category: string;
   viewed: number;
-  rating: { author: number; rating: number }[];
+  // rating: { author: number; rating: number }[];
+  rating: number;
   cost: number;
   imageSrc: string[];
   description: string;
@@ -41,7 +43,8 @@ export type SortType = "name" | "cost" | "rating" | "viewed";
 
 export type OrderType = {
   id: number | null;
-  clientId: number;
+  clientId: string;
+  username: string;
   phone: string;
   email: string;
   address?: string;
@@ -79,7 +82,7 @@ export type LoginState = {
 };
 
 export type UpdateUserState = {
-  id: number | null;
+  id: string | null;
   message?: string | null;
   error?: string | null;
   formData: {
@@ -92,6 +95,14 @@ export type UpdateCommentsState = {
   message?: string;
   formData?: {
     text: string;
+  };
+};
+
+export type UpdateProductState = {
+  error?: string;
+  message?: string;
+  formData?: {
+    rating?: number;
   };
 };
 

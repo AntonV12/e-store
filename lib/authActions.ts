@@ -19,11 +19,41 @@ export const verifySession = cache(async () => {
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
 });
 
-export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
+const mergeCarts = async (userId: string | null) => {
+  const cookieStore = await cookies();
+  const tempId: string | null = cookieStore.get("tempId")?.value || null;
+
+  if (tempId && userId) {
+    await pool.execute(
+      `
+      INSERT INTO carts (userId, productId, name, cost, imageSrc, amount)
+      SELECT *
+      FROM (
+        SELECT ? AS userId, productId, name, cost, imageSrc, amount
+        FROM carts
+        WHERE userId = ?
+      ) AS src
+      ON DUPLICATE KEY UPDATE amount = carts.amount + src.amount
+      `,
+      [userId, tempId],
+    );
+
+    await pool.execute("DELETE FROM carts WHERE userId = ?", [tempId]);
+    // cookieStore.delete("tempId");
+  }
+};
+
+export const loginUser = async (
+  prevState: LoginState | undefined,
+  formData: FormData,
+) => {
   try {
     const name = formData.get("name");
     const password = formData.get("password")?.toString();
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
+    const [existingUser] = await pool.execute<RowDataPacket[]>(
+      "SELECT * FROM users WHERE name = ?",
+      [name],
+    );
 
     if (!existingUser.length) {
       return {
@@ -35,7 +65,10 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
       };
     }
 
-    if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
+    if (
+      (password && !bycript.compareSync(password, existingUser[0].password)) ||
+      !existingUser.length
+    ) {
       return {
         error: "Неверный логин или пароль",
         formData: {
@@ -46,9 +79,10 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
     }
 
     await createSession(existingUser[0].id, existingUser[0].isAdmin);
+    await mergeCarts(existingUser[0].id);
 
     return {
-      message: `Здравствуй, ${name}`,
+      message: `Здравствуйте, ${name}`,
       formData: {
         name: formData.get("name") as string,
         password: formData.get("password") as string,
@@ -63,16 +97,13 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
 
 export async function getCurrentUser() {
   const session = await verifySession();
-
-  if (!session.userId) {
-    return null;
-  }
-
   let needRefresh = false;
 
-  const cookie = (await cookies()).get("session")?.value;
+  const cookieStore = await cookies();
+  const cookie = cookieStore.get("session")?.value;
   const payload = await decrypt(cookie);
   const expiresAt = payload?.expiresAt as string;
+  const tempId = cookieStore.get("tempId")?.value;
 
   if (expiresAt) {
     const expires = new Date(expiresAt);
@@ -81,34 +112,38 @@ export async function getCurrentUser() {
     }
   }
 
-  const sql = `SELECT 
-                  u.id,
-                  u.name,
-                  u.isAdmin,
-                  u.avatar,
-                  COALESCE(
-                      (
-                          SELECT JSON_ARRAYAGG(
-                              JSON_OBJECT(
-                                  'id', c.id,
-                                  'userId', c.userId,
-                                  'productId', c.productId,
-                                  'name', c.name,
-                                  'cost', c.cost,
-                                  'imageSrc', c.imageSrc,
-                                  'amount', c.amount
-                              )
-                          )
-                          FROM carts c
-                          WHERE c.userId = u.id
-                      ),
-                      JSON_ARRAY()
-                  ) AS cart
-              FROM users u
-              WHERE u.id = ?;
-            `;
+  // const sql = `SELECT
+  //                 u.id,
+  //                 u.name,
+  //                 u.isAdmin,
+  //                 u.avatar,
+  //                 COALESCE(
+  //                     (
+  //                         SELECT JSON_ARRAYAGG(
+  //                             JSON_OBJECT(
+  //                                 'id', c.id,
+  //                                 'userId', c.userId,
+  //                                 'productId', c.productId,
+  //                                 'name', c.name,
+  //                                 'cost', c.cost,
+  //                                 'imageSrc', c.imageSrc,
+  //                                 'amount', c.amount
+  //                             )
+  //                         )
+  //                         FROM carts c
+  //                         WHERE c.userId = u.id OR c.userId = ?
+  //                     ),
+  //                     JSON_ARRAY()
+  //                 ) AS cart
+  //             FROM users u
+  //             WHERE u.id = ?;
+  //           `;
+  const sql = "SELECT * FROM users u WHERE u.id = ?";
 
-  const [results] = await pool.execute<RowDataPacket[]>(sql, [session.userId]);
+  const [results] = await pool.execute<RowDataPacket[]>(sql, [
+    // tempId,
+    session.userId,
+  ]);
 
   if (!results.length) {
     return null;
@@ -122,7 +157,7 @@ export async function getCurrentUser() {
     name,
     isAdmin,
     avatar,
-    cart,
+    // cart,
     needRefresh,
   };
 }

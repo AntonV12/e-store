@@ -16,7 +16,10 @@ export default function AvatarForm({ currentUser }: { currentUser: UserType }) {
     },
   };
 
-  const [state, formAction] = useActionState<UpdateUserState, FormData>(updateUser, initialState);
+  const [state, formAction] = useActionState<UpdateUserState, FormData>(
+    updateUser,
+    initialState,
+  );
 
   const handleChange = () => {
     if (!formRef.current) return;
@@ -24,7 +27,7 @@ export default function AvatarForm({ currentUser }: { currentUser: UserType }) {
   };
 
   return (
-    <form action={formAction} ref={formRef}>
+    <form action={formAction} ref={formRef} className={style.avatar__form}>
       <input
         type="file"
         name="avatar"

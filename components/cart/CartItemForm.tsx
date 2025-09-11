@@ -37,7 +37,10 @@ export default function CartItemForm({
 
   // const [amount, setAmount] = useState<number>(product.amount);
   const updateUserCartWithId = updateUserCart.bind(null, userId);
-  const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
+  const [state, formAction] = useActionState<UpdateCartState, FormData>(
+    updateUserCartWithId,
+    initialState,
+  );
 
   const debouncedSubmit = useDebouncedCallback(() => {
     startTransition(() => {
@@ -47,19 +50,6 @@ export default function CartItemForm({
 
       if (userId) {
         formAction(formData);
-      } else {
-        const savedCart = localStorage.getItem("cart");
-        if (savedCart) {
-          const parsedCart: CartType[] = JSON.parse(savedCart);
-          const existingCart = parsedCart.find((item) => item.productId === product.productId);
-          if (existingCart) {
-            existingCart.amount = amount;
-            localStorage.setItem("cart", JSON.stringify(parsedCart));
-          } else {
-            parsedCart.push({ ...product, amount });
-            localStorage.setItem("cart", JSON.stringify(parsedCart));
-          }
-        }
       }
     });
   }, 500);
@@ -92,7 +82,12 @@ export default function CartItemForm({
       <button type="button" onClick={handleAmountDecrease}>
         -
       </button>
-      <input type="text" name="amount" value={amount} onChange={handleAmountChange} />
+      <input
+        type="text"
+        name="amount"
+        value={amount}
+        onChange={handleAmountChange}
+      />
       <button type="button" onClick={handleAmountIncrease}>
         +
       </button>

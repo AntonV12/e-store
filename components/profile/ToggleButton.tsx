@@ -1,15 +1,15 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export default function ToggleButton() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-
+	const pathname = usePathname();
 	const done = searchParams.get("done") === "true";
 
 	const toggleDone = () => {
-		router.replace(`/profile?done=${!done}`, { scroll: false });
+		router.replace(`${pathname}?done=${!done}`, { scroll: false });
 	};
 
 	return (

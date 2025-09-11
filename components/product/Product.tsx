@@ -5,8 +5,17 @@ import Form from "./Form";
 import CommentsList from "@/components/comments/CommentsList";
 import AddCommentForm from "@/components/comments/AddCommentForm";
 import { fetchProductById } from "@/lib/productsActions";
+import { nanoid } from "nanoid";
 
-export default async function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: number }) {
+export default async function Product({
+  id,
+  isAuth,
+  userId,
+}: {
+  id: number;
+  isAuth: boolean;
+  userId: string;
+}) {
   const product: ProductType | null = (await fetchProductById(id)) ?? null;
 
   if (!product) return null;
@@ -21,15 +30,17 @@ export default async function Product({ id, isAuth, userId }: { id: number; isAu
           <div className={style.title}>
             <h1 className={style.productName}>{product.name}</h1>
             <p className={style.rating}>
-              Общий рейтинг:{" "}
-              {product?.rating.reduce((acc, rating) => acc + rating.rating, 0) / product?.rating.length || 0}{" "}
+              Общий рейтинг: {product.rating.toFixed(1)}
               <span className={style.star}>&#9733;</span>
             </p>
           </div>
           <div className={style.price}>
             <Form product={product} userId={userId} />
           </div>
-          <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>
+          <div
+            dangerouslySetInnerHTML={{ __html: product.description }}
+            className={style.description}
+          ></div>
         </div>
       </div>
 

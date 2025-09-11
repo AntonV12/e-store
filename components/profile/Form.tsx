@@ -9,17 +9,20 @@ import { UpdateOrderState } from "@/lib/types";
 export default function Form({
   isDone,
   id,
+  isAdmin,
 }: {
   isDone: "0" | "1";
   id: number;
+  isAdmin: boolean;
 }) {
   const initialState: UpdateOrderState = {
     error: null,
     message: "",
     formData: { isDone, id },
   };
+  const updateOrderWithIsAdmin = updateOrder.bind(null, isAdmin);
   const [state, formAction] = useActionState<UpdateOrderState, FormData>(
-    updateOrder,
+    updateOrderWithIsAdmin,
     initialState,
   );
 
@@ -30,6 +33,7 @@ export default function Form({
         name="isDone"
         className={style.checkButton}
         value={isDone.toString()}
+        disabled={!isAdmin}
       >
         <CheckIcon
           className={style.checkIcon}

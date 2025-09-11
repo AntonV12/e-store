@@ -20,8 +20,8 @@ const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(
       >
         <Link
           href={`/products/${product.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
+          // target="_blank"
+          // rel="noopener noreferrer"
         >
           <Image
             src={`/api/image?name=${product.imageSrc[0]}`}

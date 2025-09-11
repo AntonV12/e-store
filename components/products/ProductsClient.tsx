@@ -17,6 +17,7 @@ export default function ProductsClient({
   const [products, setProducts] = useState(initialProducts.products);
   const totalPages = initialProducts.count;
   const [page, setPage] = useState<number>(Number(searchParams?.page) || 1);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     setProducts(initialProducts.products);
@@ -29,6 +30,7 @@ export default function ProductsClient({
 
   const handleLoadMore = useCallback(async () => {
     if (page >= totalPages) return;
+    setIsLoading(true);
 
     const params = new URLSearchParams({
       ...searchParams,
@@ -43,6 +45,7 @@ export default function ProductsClient({
 
     setProducts((prev) => [...prev, ...data.products]);
     setPage((prev) => prev + 1);
+    setIsLoading(false);
   }, [page, totalPages, searchParams]);
 
   const callback = useCallback(
@@ -91,6 +94,7 @@ export default function ProductsClient({
           />
         ))}
       </ul>
+      {isLoading && <div>loading...</div>}
     </section>
   );
 }

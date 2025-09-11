@@ -135,7 +135,12 @@ export const fetchProductById = async (
       [id],
     );
 
-    return rows[0] ?? null;
+    const [rating] = await pool.execute(
+      "SELECT AVG(rating) AS avg FROM ratings WHERE productId = ?",
+      [id],
+    );
+
+    return { ...rows[0], rating: rating[0]?.avg || 0 } ?? null;
   } catch (err) {
     console.error(err);
     return null;
@@ -159,15 +164,16 @@ export const updateComments = async (
   const date = new Date();
   const authorId = formData.get("author");
 
-  const author = await pool.execute<(string & RowDataPacket)[]>(
-    `SELECT name FROM users WHERE id = ${authorId}`,
+  const [author] = await pool.execute<(string & RowDataPacket)[]>(
+    `SELECT name FROM users WHERE id = ?`,
+    [authorId],
   );
 
   const newComment = {
     id,
     text,
     date: date.toISOString(),
-    author: author[0][0].name,
+    author: author[0].name,
   };
 
   const updatedComments = [...(comments[0].comments ?? []), newComment];
@@ -184,5 +190,30 @@ export const updateComments = async (
   } catch (err) {
     console.error(err);
     return { error: "Internal server error" };
+  }
+};
+
+export const updateRating = async (
+  productId: number,
+  userId: string,
+  rating: number,
+) => {
+  try {
+    await pool.execute(
+      `INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)`,
+      [productId, userId, rating],
+    );
+  } catch (err) {
+    console.error(err);
+    return { message: "Вы уже оценили этот товар" };
+  }
+};
+
+export const fetchRating = async (productId: number) => {
+  try {
+    const [results] = await pool.execute(`SELECT rating from ratings`);
+    console.log(results);
+  } catch (err) {
+    console.error(err);
   }
 };

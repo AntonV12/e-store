@@ -1,29 +1,69 @@
+"use client";
+
 import { CartType } from "@/lib/types";
 import style from "./rating.module.css";
+import { useState } from "react";
+import RatingItem from "./RatingItem";
 
-export function RatingArea({ product }: { product: CartType }) {
+export default function RatingArea({
+  id,
+  clientId,
+  rating,
+}: {
+  id: number;
+  clientId: string;
+  rating: number;
+}) {
+  const [target, setTarget] = useState<number>(rating);
+  const [isRated, setIsRated] = useState<boolean>(!!target);
+
   return (
     <div className={style.rating}>
-      <input type="radio" name="star" />
-      <label htmlFor="5" title="5">
-        &#9733;
-      </label>
-      <input type="radio" name="star" />
-      <label htmlFor="4" title="4">
-        &#9733;
-      </label>
-      <input type="radio" name="star" />
-      <label htmlFor="3" title="3">
-        &#9733;
-      </label>
-      <input type="radio" name="star" />
-      <label htmlFor="2" title="2">
-        &#9733;
-      </label>
-      <input type="radio" name="star" />
-      <label htmlFor="1" title="1">
-        &#9733;
-      </label>
+      <RatingItem
+        title={5}
+        target={target}
+        setTarget={setTarget}
+        id={id}
+        clientId={clientId}
+        isRated={isRated}
+        setIsRated={setIsRated}
+      />
+      <RatingItem
+        title={4}
+        target={target}
+        setTarget={setTarget}
+        id={id}
+        clientId={clientId}
+        isRated={isRated}
+        setIsRated={setIsRated}
+      />
+      <RatingItem
+        title={3}
+        target={target}
+        setTarget={setTarget}
+        id={id}
+        clientId={clientId}
+        isRated={isRated}
+        setIsRated={setIsRated}
+      />
+      <RatingItem
+        title={2}
+        target={target}
+        setTarget={setTarget}
+        id={id}
+        clientId={clientId}
+        isRated={isRated}
+        setIsRated={setIsRated}
+      />
+      <RatingItem
+        title={1}
+        target={target}
+        setTarget={setTarget}
+        id={id}
+        clientId={clientId}
+        isRated={isRated}
+        setIsRated={setIsRated}
+      />
     </div>
   );
 }

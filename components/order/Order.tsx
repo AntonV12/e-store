@@ -2,11 +2,18 @@ import { getCurrentUser } from "@/lib/authActions";
 import style from "./order.module.css";
 import Input from "./Input";
 import OrderForm from "./OrderForm";
+import { cookies } from "next/headers";
+import { CartType } from "@/lib/types";
+import { fetchUserCart } from "@/lib/usersActions";
 
 export default async function Order() {
   const currentUser = await getCurrentUser();
+  const tempId: string | null = (await cookies()).get("tempId")?.value || null;
+  const cart: CartType = await fetchUserCart(currentUser?.id);
 
-  return <OrderForm currentUser={currentUser!} />;
+  return (
+    <OrderForm currentUser={currentUser!} tempId={tempId} cart={cart.cart} />
+  );
 }
 
 // "use client";

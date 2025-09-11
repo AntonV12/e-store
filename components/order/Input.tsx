@@ -6,13 +6,15 @@ export default function Input({
   name,
   placeholder,
   isError,
+  defaultValue,
 }: {
   type: string;
   name: string;
   placeholder: string;
   isError: boolean;
+  defaultValue: string | null;
 }) {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>(defaultValue || "");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -21,13 +23,17 @@ export default function Input({
       case "tel":
         function formatPhoneNumber(value: string) {
           const phoneNumber = value.replace(/[^\d]/g, "");
-          const match = phoneNumber.match(/^(\d{1})(\d{0,3})(\d{0,3})(\d{0,4})$/);
+          const match = phoneNumber.match(
+            /^(\d{1})(\d{0,3})(\d{0,3})(\d{0,4})$/,
+          );
 
           if (!match) {
             return phoneNumber;
           } else {
             if (phoneNumber.length === 1) {
-              return phoneNumber === "8" || phoneNumber === "7" ? "+7" : `+7 (${match[1]})`;
+              return phoneNumber === "8" || phoneNumber === "7"
+                ? "+7"
+                : `+7 (${match[1]})`;
             } else {
               return `+${match[1]} (${match[2]}) ${match[3]}-${match[4]}`;
             }

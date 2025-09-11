@@ -7,7 +7,11 @@ import { UserType } from "@/lib/types";
 import LogoutForm from "./LogoutForm";
 import AvatarForm from "./AvatarForm";
 
-export default async function Profile({ currentUser }: { currentUser: UserType }) {
+export default async function Profile({
+  currentUser,
+}: {
+  currentUser: UserType;
+}) {
   return (
     <div className={style.profile}>
       <h2>Мои Данные</h2>
@@ -24,6 +28,7 @@ export default async function Profile({ currentUser }: { currentUser: UserType }
                 width={72}
                 height={72}
                 className={style.avatar__img}
+                priority
               />
             ) : (
               <LoginIcon className={style.loginIcon} />
@@ -32,7 +37,9 @@ export default async function Profile({ currentUser }: { currentUser: UserType }
           {currentUser.name}
         </div>
         <div className={style.profile__links}>
-          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
+          {currentUser.isAdmin ? (
+            <Link href="/add-product">Добавить новый товар</Link>
+          ) : null}
 
           <LogoutForm />
         </div>
