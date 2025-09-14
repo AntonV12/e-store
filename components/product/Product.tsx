@@ -5,17 +5,8 @@ import Form from "./Form";
 import CommentsList from "@/components/comments/CommentsList";
 import AddCommentForm from "@/components/comments/AddCommentForm";
 import { fetchProductById } from "@/lib/productsActions";
-import { nanoid } from "nanoid";
 
-export default async function Product({
-  id,
-  isAuth,
-  userId,
-}: {
-  id: number;
-  isAuth: boolean;
-  userId: string;
-}) {
+export default async function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: string | null }) {
   const product: ProductType | null = (await fetchProductById(id)) ?? null;
 
   if (!product) return null;
@@ -26,6 +17,7 @@ export default async function Product({
         <div className={style.imgContainer}>
           <Slider images={product.imageSrc} />
         </div>
+
         <div className={style.info}>
           <div className={style.title}>
             <h1 className={style.productName}>{product.name}</h1>
@@ -37,10 +29,7 @@ export default async function Product({
           <div className={style.price}>
             <Form product={product} userId={userId} />
           </div>
-          <div
-            dangerouslySetInnerHTML={{ __html: product.description }}
-            className={style.description}
-          ></div>
+          <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>
         </div>
       </div>
 

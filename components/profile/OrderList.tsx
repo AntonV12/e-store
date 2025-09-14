@@ -12,7 +12,7 @@ export default function OrderList({
   currentUser,
 }: {
   order: OrderType;
-  currentUser: UserType;
+  currentUser: Omit<UserType, "password">;
 }) {
   const date = new Date(order.date).toLocaleString("ru-RU", {
     year: "numeric",
@@ -31,8 +31,7 @@ export default function OrderList({
   const toggleShow = (e: React.MouseEvent<HTMLDivElement>) => {
     const target: HTMLElement = e.target as HTMLElement;
 
-    if (target.classList.contains(style.checkIcon) || target.closest("svg"))
-      return;
+    if (target.classList.contains(style.checkIcon) || target.closest("svg")) return;
 
     const newIsShow = !isShow;
     setIsShow(newIsShow);
@@ -41,26 +40,16 @@ export default function OrderList({
 
   return (
     <li key={order.id}>
-      <article
-        className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}
-      >
+      <article className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}>
         <div className={style.title} onClick={toggleShow}>
-          <Form
-            isDone={order.isDone}
-            id={order.id!}
-            isAdmin={currentUser?.isAdmin || false}
-          />
+          <Form isDone={order.isDone} id={order.id!} isAdmin={currentUser?.isAdmin || false} />
           <h3>
             Заказ #{order.id} от {date}
           </h3>
-          <Chevron
-            className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`}
-          />
+          <Chevron className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`} />
         </div>
 
-        <div
-          className={`${style.info} ${isShow ? style.visible : style.hidden}`}
-        >
+        <div className={`${style.info} ${isShow ? style.visible : style.hidden}`}>
           <OrderListItem
             products={order.products}
             isDone={order.isDone}
@@ -69,20 +58,13 @@ export default function OrderList({
           />
           <p className={style.product__total}>
             Итого:{" "}
-            {order.products
-              .reduce(
-                (total, product) => total + product.cost * product.amount,
-                0,
-              )
-              .toLocaleString()}{" "}
-            ₽
+            {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
           </p>
 
           {currentUser.isAdmin ? (
             <div className={style.order__info}>
               <p>
-                <span>Клиент: {order.username}</span>{" "}
-                <span className={style.product__total}>{order.clientId}</span>
+                <span>Клиент: {order.username}</span> <span className={style.product__total}>{order.clientId}</span>
               </p>
               <p>
                 <span>Телефон:</span> {order.phone}
@@ -100,102 +82,3 @@ export default function OrderList({
     </li>
   );
 }
-
-// import style from "./order.module.css";
-// import { OrderType } from "@/lib/types";
-// import CheckIcon from "@/public/check.svg";
-// import ChevronIcon from "@/public/chevron.svg";
-// import { useState } from "react";
-// import OrderListItem from "./OrderListItem";
-// import { useUpdateOrderMutation } from "@/lib/features/orders/ordersApiSlice";
-// import { useAppDispatch } from "@/lib/hooks";
-// import { setMessage } from "@/lib/features/message/messageSlice";
-
-// export default function OrderList({ order, isAdmin }: { order: OrderType; isAdmin: boolean }) {
-//   const [isShow, setIsShow] = useState(isAdmin ? true : false);
-//   const [showCheckIcon, setShowCheckIcon] = useState(false);
-//   const [updateOrder] = useUpdateOrderMutation();
-//   const dispatch = useAppDispatch();
-
-//   const handleShow = (e: React.MouseEvent<HTMLDivElement>) => {
-//     if ((e.target as HTMLElement).classList.contains(style.checkIcon)) return;
-//     setIsShow(!isShow);
-//   };
-
-//   const handleCheckClick = async () => {
-//     if (isAdmin) {
-//       try {
-//         if (order.id) {
-//           const response = await updateOrder({ id: order.id, param: "isDone", value: !order.isDone }).unwrap();
-
-//           if (response.message) {
-//             dispatch(setMessage(response.message));
-//           }
-//         }
-//       } catch (error) {
-//         console.error("Ошибка при обновлении статуса заказа:", error);
-//       }
-//     }
-//   };
-
-//   const onMouseEnter = () => {
-//     if (!isAdmin) return;
-//     setShowCheckIcon(true);
-//   };
-//   const onMouseLeave = () => {
-//     if (!isAdmin) return;
-//     setShowCheckIcon(false);
-//   };
-
-//   return (
-//     <div className={style.orderList}>
-//       <li key={order.id}>
-//         <article
-//           className={`${style.order__item} ${order.isDone ? style.order__done : ""}`}
-//           onMouseEnter={onMouseEnter}
-//           onMouseLeave={onMouseLeave}
-//         >
-//           <div className={style.title} onClick={handleShow}>
-//             {order.isDone || showCheckIcon ? (
-//               <CheckIcon
-//                 className={style.checkIcon}
-//                 style={{ fill: order.isDone ? "green" : "grey" }}
-//                 onClick={handleCheckClick}
-//               />
-//             ) : null}
-//             <h3>
-//               Заказ #{order.id} от {order.date}
-//             </h3>
-//             <ChevronIcon className={`${style.chevronIcon} ${isShow ? style.rotated : ""}`} />
-//           </div>
-//           {isShow && (
-//             <>
-//               <OrderListItem products={order.products} isDone={order.isDone} clientId={order.clientId} />
-//               <p className={style.product__total}>
-//                 Итого:{" "}
-//                 {order.products.reduce((total, product) => total + product.cost * product.amount, 0).toLocaleString()} ₽
-//               </p>
-//             </>
-//           )}
-
-//           {isAdmin ? (
-//             <div className={style.order__info}>
-//               <p>
-//                 <span>Клиент id:</span> {order.clientId}
-//               </p>
-//               <p>
-//                 <span>Телефон:</span> {order.phone}
-//               </p>
-//               <p>
-//                 <span>Email:</span> {order.email}
-//               </p>
-//               <p>
-//                 <span>Адрес:</span> {order.address}
-//               </p>
-//             </div>
-//           ) : null}
-//         </article>
-//       </li>
-//     </div>
-//   );
-// }

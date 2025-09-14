@@ -31,8 +31,15 @@
 }
 
 .mySwiper .swiper-slide {
-  width: 100%;
+  width: 100% !important;
+  height: 160px !important;
   opacity: 0.4;
+}
+
+.mySwiper2 .swiper-slide {
+  width: 100% !important;
+  height: 500px;
+  position: relative;
 }
 
 .mySwiper .swiper-slide-thumb-active {
@@ -64,5 +71,6 @@
   }
   .mySwiper .swiper-slide {
     width: 33.33% !important;
+    height: 100px !important;
   }
 }

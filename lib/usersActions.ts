@@ -2,32 +2,26 @@
 
 import { pool } from "./database";
 import { ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import {
-  CartType,
-  UpdateUserState,
-  UpdateCartState,
-  UserType,
-  LoginState,
-} from "@/lib/types";
+import { CartType, UpdateUserState, UpdateCartState, LoginState } from "@/lib/types";
 import { revalidatePath } from "next/cache";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 import { loginUser } from "@/lib/authActions";
 import { cookies } from "next/headers";
 import path from "path";
 import { writeFile, rm } from "fs/promises";
 import { nanoid } from "nanoid";
+import sharp from "sharp";
 
-export const createUser = async (prevState: LoginState, formData: FormData) => {
-  const name = formData.get("name")?.toString();
-  const password = formData.get("password")?.toString();
-  const confirmPassword = formData.get("confirmPassword")?.toString();
+export const createUser = async (prevState: LoginState, formData: FormData): Promise<LoginState> => {
+  const name = (formData.get("name") as string)?.toString();
+  const password = (formData.get("password") as string)?.toString();
+  const confirmPassword = (formData.get("confirmPassword") as string)?.toString();
   const id: string = nanoid();
 
   if (!name || !password || !confirmPassword) {
     return {
       error: "Заполните все поля",
-      message: null,
+      message: "",
       formData: {
         name: name,
         password: password,
@@ -39,7 +33,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
   if (password !== confirmPassword) {
     return {
       error: "Пароли не совпадают",
-      message: null,
+      message: "",
       formData: {
         name: name,
         password: "",
@@ -51,7 +45,7 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
   if (!name.trim() || !password.trim()) {
     return {
       error: "Имя и пароль обязательны",
-      message: null,
+      message: "",
       formData: {
         name: name,
         password: password,
@@ -60,15 +54,12 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
     };
   }
 
-  const [existingUser] = await pool.execute<RowDataPacket[]>(
-    "SELECT * FROM users WHERE name = ?",
-    [name],
-  );
+  const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
   if (existingUser.length > 0) {
     return {
       error: "Пользователь с таким именем уже существует",
-      message: null,
+      message: "",
       formData: {
         name: name,
         password: password,
@@ -82,16 +73,11 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
 
   try {
     const sql = `
-      INSERT INTO users (id, name, password, isAdmin)
-      VALUES (?, ?, ?, ?)
+      INSERT INTO users (id, name, password, isAdmin, avatar)
+      VALUES (?, ?, ?, ?, ?)
     `;
 
-    const [result] = await pool.execute<ResultSetHeader>(sql, [
-      id,
-      name,
-      hashedPassword,
-      false,
-    ]);
+    const [result] = await pool.execute<ResultSetHeader>(sql, [id, name, hashedPassword, false, ""]);
 
     if (result.affectedRows > 0) {
       const prevState = {
@@ -107,11 +93,21 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
       await loginUser(prevState, formData);
 
       return {
-        error: null,
+        error: "",
         message: "Пользователь успешно зарегистрирован",
         formData: {
           name: "",
           password: "",
+        },
+      };
+    } else {
+      return {
+        error: "Не удалось создать пользователя",
+        message: "",
+        formData: {
+          name: "",
+          password: "",
+          confirmPassword: "",
         },
       };
     }
@@ -119,8 +115,12 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
     console.error(err);
     return {
       error: "Ошибка при регистрации пользователя",
-      message: null,
-      formData: {},
+      message: "",
+      formData: {
+        name: "",
+        password: "",
+        confirmPassword: "",
+      },
     };
   }
 };
@@ -128,11 +128,10 @@ export const createUser = async (prevState: LoginState, formData: FormData) => {
 export const updateUserCart = async (
   userId: string | null,
   prevState: UpdateCartState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCartState> => {
   try {
-    const cart: CartType =
-      JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
+    const cart: CartType = JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
     const { /* userId, */ productId, name, cost, imageSrc } = cart;
     const amount = Number(formData.get("amount"));
     const fromCart = formData.get("fromCart") === "true" || prevState.fromCart;
@@ -153,9 +152,7 @@ export const updateUserCart = async (
       // };
     }
 
-    const amountUpdate = fromCart
-      ? "amount = VALUES(amount)"
-      : "amount = amount + VALUES(amount)";
+    const amountUpdate = fromCart ? "amount = VALUES(amount)" : "amount = amount + VALUES(amount)";
 
     const sql = `
       INSERT INTO carts (userId, productId, name, cost, imageSrc, amount)
@@ -167,14 +164,7 @@ export const updateUserCart = async (
         imageSrc = VALUES(imageSrc)
     `;
 
-    await pool.execute<ResultSetHeader>(sql, [
-      userId || tempId,
-      productId,
-      name,
-      cost,
-      imageSrc,
-      amount,
-    ]);
+    await pool.execute<ResultSetHeader>(sql, [userId || tempId, productId, name, cost, imageSrc, amount]);
 
     revalidatePath("/cart");
     return {
@@ -201,12 +191,19 @@ export const deleteProduct = async (id: number) => {
   revalidatePath("/cart");
 };
 
-export const updateUser = async (
-  prevState: UpdateUserState,
-  formData: FormData,
-): Promise<UpdateUserState> => {
+export const updateUser = async (prevState: UpdateUserState, formData: FormData): Promise<UpdateUserState> => {
   const id = prevState?.id;
   const imageFile = formData.get("avatar") as File;
+
+  if (imageFile.size > 10 * 1024 * 1024) {
+    return {
+      id,
+      error: "Размер файла не должен превышать 10 МБ",
+      message: "",
+      formData: prevState.formData,
+    };
+  }
+
   const dir = path.join(process.cwd(), "uploads");
 
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
@@ -215,22 +212,26 @@ export const updateUser = async (
 
   const bytes = await imageFile.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  await writeFile(filePath, new Uint8Array(buffer));
+  const processedImageBuffer = await sharp(buffer)
+    .resize(85, 85, {
+      fit: "contain",
+      position: "center",
+    })
+    .jpeg({
+      quality: 100,
+      mozjpeg: true,
+    });
 
-  const [oldAvatar] = await pool.execute<RowDataPacket[]>(
-    "SELECT avatar FROM users WHERE id = ?",
-    [id],
-  );
+  await writeFile(filePath, processedImageBuffer);
+
+  const [oldAvatar] = await pool.execute<RowDataPacket[]>("SELECT avatar FROM users WHERE id = ?", [id]);
 
   if (oldAvatar[0].avatar) {
     await rm(path.join(dir, "users", oldAvatar[0].avatar));
   }
 
   try {
-    await pool.execute(`UPDATE users SET avatar = ? WHERE id = ?`, [
-      filename,
-      id,
-    ]);
+    await pool.execute(`UPDATE users SET avatar = ? WHERE id = ?`, [filename, id]);
 
     revalidatePath("/profile");
 
@@ -255,22 +256,21 @@ export const updateUser = async (
   }
 };
 
-export const fetchUserCart = async (userId: string | null) => {
+export const fetchUserCart = async (userId: string | null): Promise<{ cart: CartType[]; count: number }> => {
   const cookieStore = await cookies();
   const tempId: string | null = cookieStore.get("tempId")?.value || null;
 
   if (!userId && !tempId) {
-    return [];
+    return { cart: [], count: 0 };
   }
 
   try {
-    const [result] = await pool.execute<RowDataPacket[]>(
-      "SELECT * FROM carts WHERE userId = ?",
-      [userId ?? tempId],
-    );
-    return { cart: result, count: result.length } as CartType[];
+    const [result] = await pool.execute<CartType[] & RowDataPacket[]>("SELECT * FROM carts WHERE userId = ?", [
+      userId ?? tempId,
+    ]);
+    return { cart: result, count: result.length };
   } catch (err) {
     console.error(err);
-    return [];
+    return { cart: [], count: 0 };
   }
 };

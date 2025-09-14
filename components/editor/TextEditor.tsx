@@ -11,7 +11,7 @@ import TableRow from "@tiptap/extension-table-row";
 import Text from "@tiptap/extension-text";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
-import { Tooltip } from "@/components/Tooltip";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 
 import TextStyle from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";

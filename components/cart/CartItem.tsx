@@ -7,15 +7,7 @@ import CartItemForm from "./CartItemForm";
 import DeleteForm from "./DeleteForm";
 import { useState, useEffect } from "react";
 
-export default function CartItem({
-  product,
-  userId,
-  setCart,
-}: {
-  product: CartType;
-  userId: number;
-  setCart: React.Dispatch<React.SetStateAction<CartType[]>>;
-}) {
+export default function CartItem({ product, userId }: { product: CartType; userId: string | null }) {
   const [amount, setAmount] = useState<number>(product.amount);
   const [cost, setCost] = useState<number>(product.cost * product.amount);
 
@@ -35,15 +27,10 @@ export default function CartItem({
       />
       <div className={style.info}>
         <h3>{product.name}</h3>
-        <CartItemForm
-          product={product}
-          userId={userId}
-          amount={amount}
-          setAmount={setAmount}
-        />
+        <CartItemForm product={product} userId={userId} amount={amount} setAmount={setAmount} />
 
         <h3 className={style.cost}>{cost.toLocaleString()} ₽</h3>
-        <DeleteForm id={product.id!} productId={product.productId!} />
+        <DeleteForm id={product.id!} />
       </div>
     </li>
   );

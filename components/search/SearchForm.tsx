@@ -20,7 +20,6 @@ export default function SearchForm({ categories }: { categories: string[] }) {
 
   const handleSearch = useDebouncedCallback((term: string) => {
     const params = new URLSearchParams(searchParams);
-    // params.set("page", "1");
 
     if (term) {
       params.set("name", term);
@@ -46,7 +45,7 @@ export default function SearchForm({ categories }: { categories: string[] }) {
         </div>
 
         <input
-          type="text"
+          type="search"
           className={styles.input}
           onChange={(e) => {
             handleSearch(e.target.value);

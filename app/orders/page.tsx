@@ -1,26 +1,22 @@
 import OrdersList from "@/components/profile/OrdersList";
 import { getCurrentUser } from "@/lib/authActions";
 import { cookies } from "next/headers";
-import { UserType } from "@/lib/types";
+import { UserType, OrdersListParamsType } from "@/lib/types";
 
-export default async function OrdersPage({
-	searchParams,
-}: {
-	searchParams: Promise<ParamsType>;
-}) {
-	const params = await searchParams;
-	const currentUser: UserType | null = (await getCurrentUser()) || null;
-	const tempId: string | null = (await cookies()).get("tempId")?.value;
-	const user: UserType = currentUser
-		? currentUser
-		: {
-				id: tempId,
-				name: "Гость",
-				isAdmin: false,
-				cart: [],
-				avatar: "",
-				needRefresh: false,
-			};
+export default async function OrdersPage({ searchParams }: { searchParams: Promise<OrdersListParamsType> }) {
+  const params = await searchParams;
+  const currentUser: Omit<UserType, "password"> | null = (await getCurrentUser()) || null;
+  const tempId: string | null = (await cookies()).get("tempId")?.value || null;
 
-	return <OrdersList currentUser={user} params={params} />;
+  const user: Omit<UserType, "password"> = currentUser
+    ? currentUser
+    : {
+        id: tempId,
+        name: "Гость",
+        isAdmin: false,
+        avatar: "",
+        needRefresh: false,
+      };
+
+  return <OrdersList currentUser={user} params={params} />;
 }

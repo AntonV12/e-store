@@ -1,20 +1,11 @@
 "use client";
 
-import { CartType, UpdateCartState } from "@/lib/types";
+import { CartType } from "@/lib/types";
 import style from "./cart.module.css";
 import CartItem from "./CartItem";
 import Link from "next/link";
-import { useState, useEffect, startTransition, useActionState } from "react";
-import { CartSkeleton } from "@/components/skeletons/skeletons";
-import { updateUserCart } from "@/lib/usersActions";
 
-export default function CartList({
-  userCart,
-  userId,
-}: {
-  userCart: CartType[];
-  userId: string | null;
-}) {
+export default function CartList({ userCart, userId }: { userCart: CartType[]; userId: string | null }) {
   const total: number = userCart.reduce((sum, product) => {
     return sum + product.cost * product.amount;
   }, 0);
@@ -27,13 +18,7 @@ export default function CartList({
     <>
       <ul className={style.list}>
         {userCart.map((product: CartType) => {
-          return (
-            <CartItem
-              key={product.productId}
-              product={product}
-              userId={userId}
-            />
-          );
+          return <CartItem key={product.productId} product={product} userId={userId} />;
         })}
       </ul>
       <div className={style.total}>

@@ -1,6 +1,5 @@
 import "./globals.css";
 import { Play, Press_Start_2P } from "next/font/google";
-// import MainPage from "@/components/MainPage";
 import styles from "@/app/page.module.css";
 import Logo from "@/components/logo/Logo";
 import SignLinks from "@/components/signLinks/SignLinks";
@@ -50,9 +49,7 @@ export default function RootLayout({
                 <SignLinks />
               </aside>
             </section>
-            <footer className={styles.footer}>
-              &copy; AntonV {currentYear}
-            </footer>
+            <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
           </MessageProvider>
         </>
       </body>

@@ -11,24 +11,15 @@ import "swiper/css/navigation";
 import "swiper/css/thumbs";
 import "swiper/css/scrollbar";
 
-import {
-  FreeMode,
-  Navigation,
-  Thumbs,
-  Mousewheel,
-  Scrollbar,
-} from "swiper/modules";
+import { FreeMode, Navigation, Thumbs, Mousewheel, Scrollbar } from "swiper/modules";
 
 interface SliderProps {
   images: string[];
-  // isImagesChanged: boolean;
 }
 
 export default function Slider({ images }: SliderProps) {
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
-  const [direction, setDirection] = useState<"horizontal" | "vertical">(
-    "vertical",
-  );
+  const [direction, setDirection] = useState<"horizontal" | "vertical">("vertical");
 
   useEffect(() => {
     const resizeObserver = new ResizeObserver((entries) => {
@@ -62,13 +53,7 @@ export default function Slider({ images }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image
-              src={`/api/image?name=${image}`}
-              alt="image"
-              fill
-              priority
-              sizes="100%"
-            />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority={false} sizes="100%" loading="eager" />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -83,13 +68,7 @@ export default function Slider({ images }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image
-              src={`/api/image?name=${image}`}
-              alt="image"
-              fill
-              priority
-              sizes="100%"
-            />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority={false} sizes="100%" loading="lazy" />
           </SwiperSlide>
         ))}
       </Swiper>

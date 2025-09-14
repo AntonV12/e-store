@@ -4,40 +4,24 @@ import Link from "next/link";
 import { ProductType } from "@/lib/types";
 import { forwardRef, memo } from "react";
 
-const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(
-  ({ product }, ref) => {
-    const handleSaveScrollPosition = () => {
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("scrollPosition", window.scrollY.toString());
-      }
-    };
-
-    return (
-      <li
-        className={`${style.product}`}
-        ref={ref}
-        onClick={handleSaveScrollPosition}
-      >
-        <Link
-          href={`/products/${product.id}`}
-          // target="_blank"
-          // rel="noopener noreferrer"
-        >
-          <Image
-            src={`/api/image?name=${product.imageSrc[0]}`}
-            alt={product.name}
-            className={style.img}
-            width={230}
-            height={180}
-            priority
-          />
-          <h3>{product.name}</h3>
-          <p>{product.cost.toLocaleString("ru-RU")} ₽</p>
-        </Link>
-      </li>
-    );
-  },
-);
+const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(({ product }, ref) => {
+  return (
+    <li className={`${style.product}`} ref={ref}>
+      <Link href={`/products/${product.id}`} target="_blank" rel="noopener noreferrer">
+        <Image
+          src={`/api/image?name=${product.imageSrc[0]}`}
+          alt={product.name}
+          className={style.img}
+          width={230}
+          height={180}
+          priority
+        />
+        <h3>{product.name}</h3>
+        <p>{product.cost.toLocaleString("ru-RU")} ₽</p>
+      </Link>
+    </li>
+  );
+});
 
 ProductItem.displayName = "ProductItem";
 

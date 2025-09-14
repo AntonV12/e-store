@@ -1,7 +1,7 @@
 "use client";
 
 import style from "./cart.module.css";
-import React, { useState, startTransition } from "react";
+import React, { startTransition } from "react";
 import { useActionState } from "react";
 import { updateUserCart } from "@/lib/usersActions";
 import { UpdateCartState, CartType } from "@/lib/types";
@@ -14,7 +14,7 @@ export default function CartItemForm({
   setAmount,
 }: {
   product: CartType;
-  userId: number;
+  userId: string | null;
   amount: number;
   setAmount: React.Dispatch<React.SetStateAction<number>>;
 }) {
@@ -30,27 +30,21 @@ export default function CartItemForm({
         cost: product.cost,
         imageSrc: product.imageSrc,
         amount: 1,
+        rating: 0,
       },
     },
     fromCart: true,
   };
 
-  // const [amount, setAmount] = useState<number>(product.amount);
   const updateUserCartWithId = updateUserCart.bind(null, userId);
-  const [state, formAction] = useActionState<UpdateCartState, FormData>(
-    updateUserCartWithId,
-    initialState,
-  );
+  const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
 
   const debouncedSubmit = useDebouncedCallback(() => {
     startTransition(() => {
       const formData = new FormData();
       formData.set("amount", amount.toString());
       formData.set("fromCart", "true");
-
-      if (userId) {
-        formAction(formData);
-      }
+      formAction(formData);
     });
   }, 500);
 
@@ -82,12 +76,7 @@ export default function CartItemForm({
       <button type="button" onClick={handleAmountDecrease}>
         -
       </button>
-      <input
-        type="text"
-        name="amount"
-        value={amount}
-        onChange={handleAmountChange}
-      />
+      <input type="text" name="amount" value={amount} onChange={handleAmountChange} />
       <button type="button" onClick={handleAmountIncrease}>
         +
       </button>

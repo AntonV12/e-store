@@ -6,6 +6,7 @@ export type CartType = {
   cost: number;
   imageSrc: string;
   amount: number;
+  rating: number;
 };
 
 export type UserType = {
@@ -13,10 +14,8 @@ export type UserType = {
   name: string;
   password: string;
   isAdmin: boolean;
-  cart: CartType[];
   avatar: string;
   needRefresh: boolean;
-  ratings: number[];
 };
 
 export type CommentType = {
@@ -31,7 +30,6 @@ export type ProductType = {
   name: string;
   category: string;
   viewed: number;
-  // rating: { author: number; rating: number }[];
   rating: number;
   cost: number;
   imageSrc: string[];
@@ -58,7 +56,7 @@ export type OrderType = {
 };
 
 export type EncryptedOrderType = Pick<OrderType, "id" | "isDone"> & {
-  clientId: number;
+  clientId: string;
   encryptedOrder: string;
 };
 
@@ -134,4 +132,10 @@ export type UpdateOrderState = {
     isDone: "0" | "1";
     id: number;
   };
+};
+
+export type SessionType = {
+  isAuth: boolean;
+  userId: string | null;
+  isAdmin: boolean;
 };

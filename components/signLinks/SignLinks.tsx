@@ -6,14 +6,8 @@ import { getOrdersLength } from "@/lib/ordersActions";
 
 export default async function SignLinks() {
   const currentUser: Omit<UserType, "password"> | null = await getCurrentUser();
-  const cartLength = (await fetchUserCart(currentUser?.id)).count;
-  const ordersLength = await getOrdersLength(currentUser?.id);
+  const cartLength = (await fetchUserCart(currentUser?.id || null)).count;
+  const ordersLength = await getOrdersLength(currentUser?.id || null);
 
-  return (
-    <SignLinksClient
-      currentUser={currentUser!}
-      cartLength={cartLength}
-      ordersLength={ordersLength}
-    />
-  );
+  return <SignLinksClient currentUser={currentUser!} cartLength={cartLength} ordersLength={ordersLength} />;
 }

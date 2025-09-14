@@ -1,12 +1,7 @@
 "use server";
 
 import { pool } from "@/lib/database";
-import {
-  ProductType,
-  SortType,
-  CommentType,
-  UpdateCommentsState,
-} from "@/lib/types";
+import { ProductType, SortType, CommentType, UpdateCommentsState } from "@/lib/types";
 import { ResultSetHeader } from "mysql2/promise";
 import { RowDataPacket } from "mysql2";
 // import { verifySession } from "@/app/api/auth/authController";
@@ -21,30 +16,40 @@ export const fetchProducts = async (
   page?: number,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc",
+  sortByDirection?: "asc" | "desc"
 ): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
-    const offset = (page - 1) * 10 || 0;
+    const offset = page ? (page - 1) * 10 : 0;
 
-    const [results] = await pool.query(
-      `SELECT * FROM products WHERE name LIKE ? AND (? IS NULL OR category = ?) ORDER BY ${sortBy || "viewed"} ${
-        sortByDirection || "desc"
-      } LIMIT ? OFFSET ?`,
-      [
-        `%${name || ""}%`,
-        category || null,
-        category || null,
-        Number(limit) || 10,
-        offset,
-      ],
+    const [count] = await pool.query<{ count: number } & RowDataPacket[]>(
+      `
+        SELECT COUNT(*) AS count FROM products
+        WHERE name LIKE ? AND (? IS NULL OR category = ?)
+      `,
+      [`%${name || ""}%`, category || null, category || null]
     );
 
-    const [count] = await pool.query(`SELECT COUNT(*) FROM products`);
+    const [results] = await pool.query<ProductType[] & RowDataPacket[]>(
+      `
+        SELECT 
+          p.*,
+          COALESCE((
+            SELECT AVG(rating) 
+            FROM ratings 
+            WHERE productId = p.id
+          ), 0) as rating
+        FROM products p
+        WHERE p.name LIKE ? AND (? IS NULL OR p.category = ?)
+        ORDER BY ${sortBy || "viewed"} ${sortByDirection || "desc"}, p.id DESC
+        LIMIT ?
+        OFFSET ?
+      `,
+      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset]
+    );
 
-    // return results as ProductType[];
     return {
       products: results,
-      count: Math.ceil(count[0]["COUNT(*)"] / 10),
+      count: Math.ceil(count[0].count / 10),
     };
   } catch (err) {
     console.error(err);
@@ -116,7 +121,7 @@ export const fetchProducts = async (
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {
     const [rows] = await pool.execute<(string[] & RowDataPacket)[]>(
-      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories",
+      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories"
     );
 
     return rows[0].categories ?? null;
@@ -126,21 +131,16 @@ export const fetchCategories = async (): Promise<string[] | null> => {
   }
 };
 
-export const fetchProductById = async (
-  id: number,
-): Promise<ProductType | null> => {
+export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
-    const [rows] = await pool.execute<(ProductType & RowDataPacket)[]>(
-      "SELECT * FROM products WHERE id = ?",
-      [id],
-    );
+    const [product] = await pool.execute<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [id]);
 
-    const [rating] = await pool.execute(
+    const [rating] = await pool.execute<{ avg: number } & RowDataPacket[]>(
       "SELECT AVG(rating) AS avg FROM ratings WHERE productId = ?",
-      [id],
+      [id]
     );
 
-    return { ...rows[0], rating: rating[0]?.avg || 0 } ?? null;
+    return { ...product[0], rating: rating[0]?.avg || 0 };
   } catch (err) {
     console.error(err);
     return null;
@@ -150,12 +150,11 @@ export const fetchProductById = async (
 export const updateComments = async (
   productId: number,
   prevState: UpdateCommentsState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCommentsState> => {
-  const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>(
-    "SELECT comments FROM products WHERE id = ?",
-    [productId],
-  );
+  const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>("SELECT comments FROM products WHERE id = ?", [
+    productId,
+  ]);
 
   if (!productId) return { error: "Invalid product ID" };
 
@@ -164,10 +163,7 @@ export const updateComments = async (
   const date = new Date();
   const authorId = formData.get("author");
 
-  const [author] = await pool.execute<(string & RowDataPacket)[]>(
-    `SELECT name FROM users WHERE id = ?`,
-    [authorId],
-  );
+  const [author] = await pool.execute<(string & RowDataPacket)[]>(`SELECT name FROM users WHERE id = ?`, [authorId]);
 
   const newComment = {
     id,
@@ -179,10 +175,10 @@ export const updateComments = async (
   const updatedComments = [...(comments[0].comments ?? []), newComment];
 
   try {
-    await pool.execute<ResultSetHeader>(
-      "UPDATE products SET comments = ? WHERE id = ?",
-      [JSON.stringify(updatedComments), productId],
-    );
+    await pool.execute<ResultSetHeader>("UPDATE products SET comments = ? WHERE id = ?", [
+      JSON.stringify(updatedComments),
+      productId,
+    ]);
 
     revalidatePath(`/products/${productId}`);
 
@@ -193,27 +189,11 @@ export const updateComments = async (
   }
 };
 
-export const updateRating = async (
-  productId: number,
-  userId: string,
-  rating: number,
-) => {
+export const updateRating = async (productId: number | null, userId: string, rating: number) => {
   try {
-    await pool.execute(
-      `INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)`,
-      [productId, userId, rating],
-    );
+    await pool.execute(`INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)`, [productId, userId, rating]);
   } catch (err) {
     console.error(err);
     return { message: "Вы уже оценили этот товар" };
-  }
-};
-
-export const fetchRating = async (productId: number) => {
-  try {
-    const [results] = await pool.execute(`SELECT rating from ratings`);
-    console.log(results);
-  } catch (err) {
-    console.error(err);
   }
 };

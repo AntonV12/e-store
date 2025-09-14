@@ -5,9 +5,9 @@ import style from "./SignLinks.module.css";
 import LoginIcon from "@/public/person-circle.svg";
 import CartIcon from "@/public/cart2.svg";
 import PackageIcon from "@/public/package.svg";
-import { UserType, CartType } from "@/lib/types";
+import { UserType } from "@/lib/types";
 import { updateSession } from "@/lib/sessions";
-import { useState, useEffect, useCallback } from "react";
+import { useEffect } from "react";
 
 export default function SignLinksClient({
   currentUser,
@@ -16,14 +16,13 @@ export default function SignLinksClient({
 }: {
   currentUser: Omit<UserType, "password">;
   cartLength: number;
-  ordersLength: number;
+  ordersLength: number | null;
 }) {
   useEffect(() => {
-    if (!currentUser) return;
-    if (currentUser.needRefresh) {
+    if (currentUser?.needRefresh) {
       updateSession();
     }
-  }, [currentUser, currentUser?.needRefresh]);
+  }, [currentUser?.needRefresh]);
 
   return (
     <div className={style.links}>
@@ -45,9 +44,7 @@ export default function SignLinksClient({
           </Link>
           <Link className={style.link} href="/orders">
             <PackageIcon />
-            {ordersLength && ordersLength > 0 ? (
-              <span>{ordersLength}</span>
-            ) : null}
+            {ordersLength && ordersLength > 0 ? <span>{ordersLength}</span> : null}
             <p>Заказы</p>
           </Link>
         </>
