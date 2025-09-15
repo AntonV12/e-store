@@ -34,8 +34,16 @@ export default function Form({ product, userId }: { product: ProductType; userId
     if (state?.message) {
       setAmount(1);
       setMessage(state.message);
+
+      const bc = new BroadcastChannel("cart");
+      bc.postMessage({
+        type: "update",
+        productId: product.id,
+        amount: state.formData?.cart?.amount ?? 1,
+      });
+      bc.close();
     }
-  }, [state, setMessage]);
+  }, [state, setMessage, product.id]);
 
   return (
     <>

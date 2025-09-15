@@ -11,7 +11,7 @@ export const fetchOrders = async (
   clientId: string | null,
   limit: number,
   done: boolean,
-  isAdmin: boolean
+  isAdmin: boolean,
 ): Promise<OrderType[] | null> => {
   try {
     const sql = isAdmin
@@ -54,13 +54,16 @@ export const fetchOrders = async (
 
       const [ratingRows] = await pool.query<{ productId: string; averageRating: number }[] & RowDataPacket[]>(
         ratingSql,
-        [allProductIds, clientId]
+        [allProductIds, clientId],
       );
 
-      productRatings = ratingRows.reduce((acc, row) => {
-        acc[row.productId] = Number(row.averageRating) || 0;
-        return acc;
-      }, {} as Record<string, number>);
+      productRatings = ratingRows.reduce(
+        (acc, row) => {
+          acc[row.productId] = Number(row.averageRating) || 0;
+          return acc;
+        },
+        {} as Record<string, number>,
+      );
     }
 
     for (const row of rows) {
@@ -135,7 +138,7 @@ export const createOrder = async (prevState: CreateOrderState, formData: FormDat
       products: products,
       date: date,
     }),
-    secretKey
+    secretKey,
   ).toString();
 
   const newOrder: EncryptedOrderType = {
@@ -173,7 +176,7 @@ export const createOrder = async (prevState: CreateOrderState, formData: FormDat
 export const updateOrder = async (
   isAdmin: boolean,
   prevState: UpdateOrderState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UpdateOrderState> => {
   const isDone = Number(formData.get("isDone"));
   const id = Number(prevState.formData?.id);

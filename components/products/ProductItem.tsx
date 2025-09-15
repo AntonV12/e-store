@@ -7,7 +7,7 @@ import { forwardRef, memo } from "react";
 const ProductItem = forwardRef<HTMLLIElement, { product: ProductType }>(({ product }, ref) => {
   return (
     <li className={`${style.product}`} ref={ref}>
-      <Link href={`/products/${product.id}`} target="_blank" rel="noopener noreferrer">
+      <Link href={`/products/${product.id}`} target="_blank" rel="noopener noreferer">
         <Image
           src={`/api/image?name=${product.imageSrc[0]}`}
           alt={product.name}

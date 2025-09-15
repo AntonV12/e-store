@@ -128,7 +128,7 @@ export const createUser = async (prevState: LoginState, formData: FormData): Pro
 export const updateUserCart = async (
   userId: string | null,
   prevState: UpdateCartState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UpdateCartState> => {
   try {
     const cart: CartType = JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
@@ -167,6 +167,7 @@ export const updateUserCart = async (
     await pool.execute<ResultSetHeader>(sql, [userId || tempId, productId, name, cost, imageSrc, amount]);
 
     revalidatePath("/cart");
+
     return {
       error: null,
       message: `${name} добавлен в корзину`,
@@ -214,7 +215,7 @@ export const updateUser = async (prevState: UpdateUserState, formData: FormData)
   const buffer = Buffer.from(bytes);
   const processedImageBuffer = await sharp(buffer)
     .resize(85, 85, {
-      fit: "contain",
+      fit: "cover",
       position: "center",
     })
     .jpeg({
@@ -268,6 +269,7 @@ export const fetchUserCart = async (userId: string | null): Promise<{ cart: Cart
     const [result] = await pool.execute<CartType[] & RowDataPacket[]>("SELECT * FROM carts WHERE userId = ?", [
       userId ?? tempId,
     ]);
+
     return { cart: result, count: result.length };
   } catch (err) {
     console.error(err);
