@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 import { cache } from "react";
 import { SessionType } from "@/lib/types";
 
-export const verifySession = cache(async (): Promise<SessionType> => {
+export const verifySession = async (): Promise<SessionType> => {
   const cookie = (await cookies()).get("session")?.value;
   const session = (await decrypt(cookie)) as { userId: string; isAdmin: boolean; expiresAt: Date } | null;
 
@@ -18,7 +18,7 @@ export const verifySession = cache(async (): Promise<SessionType> => {
   }
 
   return { isAuth: true, userId: session.userId, isAdmin: session.isAdmin };
-});
+};
 
 const mergeCartsAndOrders = async (userId: string | null) => {
   const cookieStore = await cookies();
@@ -36,7 +36,7 @@ const mergeCartsAndOrders = async (userId: string | null) => {
       ) AS src
       ON DUPLICATE KEY UPDATE amount = carts.amount + src.amount
       `,
-      [userId, tempId]
+      [userId, tempId],
     );
 
     await pool.execute(
@@ -45,7 +45,7 @@ const mergeCartsAndOrders = async (userId: string | null) => {
         SET clientId = ?
         WHERE clientId = ?
       `,
-      [userId, tempId]
+      [userId, tempId],
     );
 
     await pool.execute("DELETE FROM carts WHERE userId = ?", [tempId]);
@@ -106,7 +106,7 @@ export async function getCurrentUser() {
 
   if (expiresAt) {
     const expires = new Date(expiresAt);
-    if ((expires.getTime() - Date.now()) / 1000 / 60 / 60 / 24 < 1) {
+    if ((expires.getTime() - Date.now()) / 1000 < 50) {
       needRefresh = true;
     }
   }

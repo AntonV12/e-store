@@ -12,13 +12,14 @@
 }
 
 .imgContainer {
-  width: 40%;
+  width: 50%;
   flex-shrink: 0;
   flex-grow: 0;
   position: relative;
   display: flex;
   justify-content: center;
   gap: 14px;
+  border-radius: 8px;
 }
 
 .productCard .productName,

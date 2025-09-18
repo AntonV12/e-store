@@ -25,7 +25,7 @@ export default async function ProductPage(props: { params: Promise<{ id: number 
     return <h1>Session not found</h1>;
   }
 
-  const { isAuth, userId }: SessionType = session;
+  const { isAuth, userId, isAdmin }: SessionType = session;
 
   if (!id) {
     return <h1>Product not found</h1>;
@@ -33,7 +33,7 @@ export default async function ProductPage(props: { params: Promise<{ id: number 
 
   return (
     <Suspense fallback={<ProductSkeleton />}>
-      <Product id={id} isAuth={isAuth} userId={userId} />
+      <Product id={id} isAuth={isAuth} userId={userId} isAdmin={!!isAdmin} />
     </Suspense>
   );
 }

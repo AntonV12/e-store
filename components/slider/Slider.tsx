@@ -53,7 +53,7 @@ export default function Slider({ images }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image src={`/api/image?name=${image}`} alt="image" fill priority={false} sizes="100%" loading="eager" />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority sizes="100%" />
           </SwiperSlide>
         ))}
       </Swiper>
@@ -68,7 +68,7 @@ export default function Slider({ images }: SliderProps) {
       >
         {images.map((image) => (
           <SwiperSlide key={image}>
-            <Image src={`/api/image?name=${image}`} alt="image" fill priority={false} sizes="100%" loading="lazy" />
+            <Image src={`/api/image?name=${image}`} alt="image" fill priority sizes="100%" />
           </SwiperSlide>
         ))}
       </Swiper>

@@ -1,11 +1,11 @@
 import style from "./tooltip.module.css";
 
 export const Tooltip = ({
-  children,
+  content,
   coords,
   controlGroupRef,
 }: {
-  children: React.ReactNode;
+  content: React.ReactNode;
   coords: { x: number; y: number };
   controlGroupRef: React.RefObject<HTMLDivElement>;
 }) => {
@@ -21,7 +21,7 @@ export const Tooltip = ({
         transform: `translate(${translateX}px, ${translateY}px)`,
       }}
     >
-      {children}
+      {content}
     </div>
   );
 };

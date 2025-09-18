@@ -139,3 +139,9 @@ export type SessionType = {
   userId: string | null;
   isAdmin: boolean;
 };
+
+export type CreateProductState = {
+  error?: string | null;
+  message?: string;
+  formData?: ProductType;
+};

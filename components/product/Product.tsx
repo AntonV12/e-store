@@ -5,10 +5,20 @@ import Form from "./Form";
 import CommentsList from "@/components/comments/CommentsList";
 import AddCommentForm from "@/components/comments/AddCommentForm";
 import { fetchProductById } from "@/lib/productsActions";
+import Link from "next/link";
 
-export default async function Product({ id, isAuth, userId }: { id: number; isAuth: boolean; userId: string | null }) {
+export default async function Product({
+  id,
+  isAuth,
+  userId,
+  isAdmin,
+}: {
+  id: number;
+  isAuth: boolean;
+  userId: string | null;
+  isAdmin: boolean;
+}) {
   const product: ProductType | null = (await fetchProductById(id)) ?? null;
-
   if (!product) return null;
 
   return (
@@ -32,6 +42,8 @@ export default async function Product({ id, isAuth, userId }: { id: number; isAu
           <div dangerouslySetInnerHTML={{ __html: product.description }} className={style.description}></div>
         </div>
       </div>
+
+      {isAdmin ? <Link href={`/products/${product.id}/edit`}>Редактировать</Link> : null}
 
       <CommentsList comments={product.comments} />
 

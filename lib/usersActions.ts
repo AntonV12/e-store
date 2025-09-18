@@ -218,10 +218,7 @@ export const updateUser = async (prevState: UpdateUserState, formData: FormData)
       fit: "cover",
       position: "center",
     })
-    .jpeg({
-      quality: 100,
-      mozjpeg: true,
-    });
+    .webp();
 
   await writeFile(filePath, processedImageBuffer);
 

@@ -28,6 +28,35 @@ export default function ProductsClient({
     setPage(newPage);
   }, [searchParams]);
 
+  useEffect(() => {
+    const bc = new BroadcastChannel("products");
+
+    bc.onmessage = (event) => {
+      if (event.data.type === "update") {
+        const updatedProduct = event.data.product;
+        setProducts((prev) =>
+          prev.map((product) => {
+            if (product.id === updatedProduct.id) {
+              return updatedProduct;
+            } else {
+              return product;
+            }
+          }),
+        );
+      } else if (event.data.type === "delete") {
+        const { productId } = event.data;
+
+        setCart((prev) =>
+          prev.filter((item) => {
+            return item.productId !== productId;
+          }),
+        );
+      }
+    };
+
+    return () => bc.close();
+  }, []);
+
   const handleLoadMore = useCallback(async () => {
     if (page >= totalPages || products.length / 10 >= totalPages) return;
     setIsLoading(true);
@@ -59,7 +88,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore]
+    [handleLoadMore],
   );
 
   useEffect(() => {

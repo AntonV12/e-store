@@ -242,7 +242,7 @@ const TableEditor = () => {
             H6
           </button>
           {tooltipText && mouseCoords && (
-            <Tooltip children={<span>{tooltipText}</span>} coords={mouseCoords} controlGroupRef={controlGroupRef} />
+            <Tooltip content={<span>{tooltipText}</span>} coords={mouseCoords} controlGroupRef={controlGroupRef} />
           )}
         </div>
       </div>
@@ -251,10 +251,6 @@ const TableEditor = () => {
 };
 
 const extensions = [
-  Document,
-  Paragraph,
-  Text,
-  Gapcursor,
   Table.configure({
     resizable: true,
   }),
@@ -285,7 +281,7 @@ const content = `
       `;
 
 const TextEditor = forwardRef(({ onContentChange, initialContent = content }: TextEditorProps, ref) => {
-  const [editorInstance, setEditorInstance] = useState<any>(null);
+  const [editorInstance, setEditorInstance] = useState<unknown>(null);
 
   useImperativeHandle(ref, () => ({
     clearContent: () => {
@@ -308,6 +304,7 @@ const TextEditor = forwardRef(({ onContentChange, initialContent = content }: Te
       slotBefore={<TableEditor />}
       extensions={extensions}
       content={initialContent}
+      immediatelyRender={false}
       onUpdate={({ editor }) => {
         if (onContentChange) {
           onContentChange(editor.getHTML());
@@ -328,4 +325,5 @@ const TextEditor = forwardRef(({ onContentChange, initialContent = content }: Te
   );
 });
 
+TextEditor.displayName = "description";
 export default TextEditor;
