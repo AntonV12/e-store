@@ -2,60 +2,43 @@
 
 import style from "./add-product.module.css";
 import TextEditor from "@/components/editor/TextEditor";
-import { useActionState, useRef, startTransition, useState, useEffect } from "react";
+import { useActionState, useRef, startTransition, useState, useEffect, useCallback } from "react";
 import { CreateProductState, ProductType } from "@/lib/types";
 import { createProduct, updateProduct } from "@/lib/productsActions";
 import { useMessage } from "@/lib/messageContext";
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { SortableItem } from "./SortableItem";
 import { useRouter } from "next/navigation";
+import ImageList from "./ImageList";
 
-const initialProduct = {
-  id: 0,
-  name: "",
-  category: "",
-  viewed: 0,
-  rating: 0,
-  cost: 0,
-  imageSrc: [],
-  description: "",
-  comments: [],
+type DescriptionType = {
+  clearContent: () => void;
+  getContent: () => string;
+  setContent: (content: string) => void;
 };
 
-export default function AddProduct({
-  product = initialProduct,
-  isEdit = false,
-}: {
-  product: ProductType;
-  isEdit: boolean;
-}) {
-  const editorRef = useRef<HTMLDivElement | null>(null);
-  const [images, setImages] = useState(product.imageSrc); // условный тип сделать
+export type ImageType = {
+  id: string;
+  name: string;
+  url: string;
+  file: File | null;
+};
+
+export default function AddProduct({ product, isEdit = false }: { product: ProductType; isEdit: boolean }) {
+  const editorRef = useRef<DescriptionType | null>(null);
+  const [images, setImages] = useState<(ImageType | string)[]>(product.imageSrc); // условный тип сделать
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { setMessage } = useMessage();
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    }),
-  );
+
   const router = useRouter();
 
   const initialState: CreateProductState = {
     error: null,
     message: "",
-    formData: initialProduct,
+    formData: product,
   };
   const updateProductWithId = updateProduct.bind(null, product.id);
   const [state, formAction, isPending] = useActionState<CreateProductState, FormData>(
     isEdit ? updateProductWithId : createProduct,
-    initialState,
+    initialState
   );
 
   useEffect(() => {
@@ -73,43 +56,45 @@ export default function AddProduct({
       });
       bc.close();
 
-      router.push(`/products/${product.id}`);
+      router.push(`/products/${product.id || state.formData?.id}`);
     }
   }, [state, setMessage, product, router]);
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    startTransition(() => {
-      const form = e.currentTarget;
-      const formData = new FormData(form);
-      const description = editorRef.current.getContent() || "";
+  const onSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      startTransition(() => {
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const description: string = (editorRef.current as unknown as DescriptionType)?.getContent() || "";
+        formData.append("description", description);
 
-      formData.append("description", description);
-
-      const files = images.map((image) => (typeof image === "string" ? image : image.file));
-      if (files) {
-        files.forEach((file) => formData.append("images", file));
-      }
-
-      formAction(formData);
-
-      if (state?.message) {
-        form.reset();
-        setImages([]);
-        if (editorRef.current) {
-          editorRef.current.clearContent();
+        const files = images.map((image) => (typeof image === "string" ? image : image.file));
+        if (files) {
+          files.forEach((file) => formData.append("images", file as File | string));
         }
-      }
-    });
-  };
 
-  const handleFileSelect = (event: ChangeEvent<HTMLInputElement>) => {
+        formAction(formData);
+
+        if (state?.message) {
+          form.reset();
+          setImages([]);
+          if (editorRef.current) {
+            editorRef.current.clearContent();
+          }
+        }
+      });
+    },
+    [images, formAction, state?.message]
+  );
+
+  const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
     setIsLoading(true);
 
-    const newImages = [];
+    const newImages: (ImageType | string)[] = [];
 
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
@@ -123,27 +108,14 @@ export default function AddProduct({
         });
 
         if (newImages.length === files.length) {
-          setImages(newImages);
+          setImages((prev) => [...prev, ...newImages]);
           setIsLoading(false);
         }
       };
 
       reader.readAsDataURL(file);
     });
-  };
-
-  function handleDragEnd(event) {
-    const { active, over } = event;
-
-    if (active.id !== over.id) {
-      setImages((items) => {
-        const oldIndex = items.findIndex((item) => (item.id || item) === active.id);
-        const newIndex = items.findIndex((item) => (item.id || item) === over.id);
-
-        return arrayMove(items, oldIndex, newIndex);
-      });
-    }
-  }
+  }, []);
 
   return (
     <div className={style.container}>
@@ -159,7 +131,10 @@ export default function AddProduct({
         </div>
         <div>
           <label htmlFor="images">Изображения:</label>
-          <label htmlFor="images" className={`${style.imgBtn} ${isLoading || isPending ? style.disabled : ""}`}>
+          <label
+            htmlFor="images"
+            className={`${style.imgBtn} ${isLoading || isPending || images.length ? style.disabled : ""}`}
+          >
             {isLoading ? "Загрузка файлов..." : "Выбрать файлы"}
           </label>
           <input
@@ -174,29 +149,24 @@ export default function AddProduct({
             disabled={isLoading || isPending}
           />
           <div className={style.images}>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext items={images} strategy={horizontalListSortingStrategy}>
-                {images.map((image) => (
-                  <SortableItem
-                    key={image.id || image}
-                    id={image.id || image}
-                    name={image.name || image}
-                    url={image.url || image}
-                    isEdit={product.imageSrc.length > 0}
-                    setImages={setImages}
-                  />
-                ))}
-              </SortableContext>
-            </DndContext>
+            <ImageList images={images} setImages={setImages} isEdit={product.imageSrc.length > 0} />
+            {images.length ? (
+              <>
+                <label htmlFor="extraImages" className={style.extraImages}>
+                  +
+                </label>
+                <input type="file" id="extraImages" accept="image/*" multiple hidden onChange={handleFileSelect} />
+              </>
+            ) : null}
           </div>
         </div>
         <div>
           <label htmlFor="cost">Цена:</label>
-          <input type="number" id="cost" name="cost" required defaultValue={product.cost} />
+          <input type="number" id="cost" name="cost" required defaultValue={product.cost || ""} />
         </div>
         <div>
           <label>Описание:</label>
-          <TextEditor ref={editorRef} initialContent={product.description} />
+          <TextEditor ref={editorRef} initialContent={product.description || ""} />
         </div>
         <button type="submit" disabled={isPending}>
           {isPending ? "Загрузка..." : "Сохранить"}

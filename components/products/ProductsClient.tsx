@@ -41,9 +41,9 @@ export default function ProductsClient({
             } else {
               return product;
             }
-          }),
+          })
         );
-      } else if (event.data.type === "delete") {
+      } /* else if (event.data.type === "delete") {
         const { productId } = event.data;
 
         setCart((prev) =>
@@ -51,7 +51,7 @@ export default function ProductsClient({
             return item.productId !== productId;
           }),
         );
-      }
+      } */
     };
 
     return () => bc.close();
@@ -88,7 +88,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore],
+    [handleLoadMore]
   );
 
   useEffect(() => {

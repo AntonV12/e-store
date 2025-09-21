@@ -47,10 +47,27 @@
   gap: 10px;
   margin: 10px 0;
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-start;
+  align-items: center;
 }
 .images img {
   object-fit: contain;
+}
+
+.extraImages {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 50px;
+  color: #a7a7a7;
+  width: 50px !important;
+  height: 50px !important;
+}
+.extraImages:hover {
+  cursor: pointer;
+  color: var(--secondary-color);
+  background-color: rgba(112, 76, 182, 0.1);
+  border-radius: 5px;
 }
 
 .imageItem {
@@ -60,12 +77,19 @@
   align-items: center;
   cursor: grab;
   position: relative;
+  margin: 0 !important;
 }
 .imageItem[aria-pressed="true"] {
   cursor: grabbing !important;
 }
 
 .disabled {
+  background-color: lightgray;
+  color: gray;
+  cursor: not-allowed;
+}
+
+.disabled:hover {
   background-color: lightgray;
   color: gray;
   cursor: not-allowed;
@@ -89,4 +113,8 @@
 .closeBtn:hover {
   cursor: pointer;
   background-color: red;
+}
+
+.picture {
+  display: flex;
 }

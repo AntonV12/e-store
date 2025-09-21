@@ -7,9 +7,9 @@ export const Tooltip = ({
 }: {
   content: React.ReactNode;
   coords: { x: number; y: number };
-  controlGroupRef: React.RefObject<HTMLDivElement>;
+  controlGroupRef: HTMLDivElement;
 }) => {
-  const controlGroupRect = controlGroupRef.current?.getBoundingClientRect();
+  const controlGroupRect = controlGroupRef?.getBoundingClientRect();
   const translateY = coords.y > 50 ? coords.y - controlGroupRect!.top - 50 : coords.y - controlGroupRect!.top + 20;
   const translateX = coords.x < controlGroupRect!.width - 50 ? 0 : -50;
 

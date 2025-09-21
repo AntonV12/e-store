@@ -18,7 +18,7 @@ export default async function ProductEditPage(props: { params: Promise<{ id: num
   const params = await props.params;
   const id = params.id;
   const session: SessionType | null = await verifySession();
-  const product: ProductType = await fetchProductById(id);
+  const product: ProductType | null = await fetchProductById(id);
 
   if (!session.isAdmin) {
     return <h1>Вы не можете редактировать</h1>;
@@ -28,5 +28,5 @@ export default async function ProductEditPage(props: { params: Promise<{ id: num
     return <h1>Продукт не найден</h1>;
   }
 
-  return <AddProduct product={product} isEdit={true} />;
+  return <AddProduct product={product!} isEdit={true} />;
 }

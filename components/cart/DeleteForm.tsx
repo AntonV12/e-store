@@ -3,7 +3,7 @@
 import style from "./cart.module.css";
 import { deleteProduct } from "@/lib/usersActions";
 
-export default function DeleteForm({ id, productId }: { id: number; productId: number }) {
+export default function DeleteForm({ id, productId }: { id: number; productId: number | null }) {
   const deleteProductWithId = deleteProduct.bind(null, id);
 
   const handleClick = () => {

@@ -5,9 +5,8 @@ import { ProductType, SortType, CommentType, UpdateCommentsState, CreateProductS
 import { ResultSetHeader } from "mysql2/promise";
 import { RowDataPacket } from "mysql2";
 import { verifySession } from "@/lib/authActions";
-import { writeFile } from "fs/promises";
+import { writeFile, rm } from "fs/promises";
 import path from "path";
-import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
 
@@ -17,7 +16,7 @@ export const fetchProducts = async (
   page?: number,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc",
+  sortByDirection?: "asc" | "desc"
 ): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
     const offset = page ? (page - 1) * 10 : 0;
@@ -27,7 +26,7 @@ export const fetchProducts = async (
         SELECT COUNT(*) AS count FROM products
         WHERE name LIKE ? AND (? IS NULL OR category = ?)
       `,
-      [`%${name || ""}%`, category || null, category || null],
+      [`%${name || ""}%`, category || null, category || null]
     );
 
     const [results] = await pool.query<ProductType[] & RowDataPacket[]>(
@@ -45,7 +44,7 @@ export const fetchProducts = async (
         LIMIT ?
         OFFSET ?
       `,
-      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset],
+      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset]
     );
 
     return {
@@ -62,7 +61,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
   try {
     const session = await verifySession();
     if (!session.userId) {
-      return null;
+      return { error: "Unauthorized" };
     }
 
     const name = formData.get("name") as string;
@@ -80,7 +79,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 
     const [existingProduct] = await pool.execute<ProductType & RowDataPacket[]>(
       `SELECT * FROM products WHERE name = ?`,
-      [name],
+      [name]
     );
 
     if (existingProduct.length > 0) {
@@ -131,20 +130,29 @@ export const createProduct = async (prevState: CreateProductState, formData: For
     if (result.affectedRows > 0) {
       return {
         message: "Товар успешно добавлен",
+        formData: {
+          ...newProduct,
+          id: result.insertId,
+          rating: 0,
+        },
       };
     }
 
-    return null;
+    return {
+      error: "Произошла ошибка при добавлении товара",
+    };
   } catch (err) {
     console.error(err);
-    return null;
+    return {
+      error: "Произошла ошибка при добавлении товара",
+    };
   }
 };
 
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {
     const [rows] = await pool.execute<(string[] & RowDataPacket)[]>(
-      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories",
+      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories"
     );
 
     return rows[0].categories ?? null;
@@ -160,7 +168,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 
     const [rating] = await pool.execute<{ avg: number } & RowDataPacket[]>(
       "SELECT AVG(rating) AS avg FROM ratings WHERE productId = ?",
-      [id],
+      [id]
     );
 
     return { ...product[0], rating: rating[0]?.avg || 0 };
@@ -173,7 +181,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 export const updateComments = async (
   productId: number,
   prevState: UpdateCommentsState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCommentsState> => {
   const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>("SELECT comments FROM products WHERE id = ?", [
     productId,
@@ -224,16 +232,16 @@ export const updateRating = async (productId: number | null, userId: string, rat
 export const updateProduct = async (
   id: number,
   prevState: CreateProductState,
-  formData: FormData,
+  formData: FormData
 ): Promise<CreateProductState> => {
   try {
     const session = await verifySession();
     if (!session.userId) {
-      return { success: false, message: "Unauthorized" };
+      return { message: "Unauthorized" };
     }
 
     if (!id) {
-      return { success: false, message: "Product ID not found" };
+      return { message: "Product ID not found" };
     }
 
     const [existingProduct] = await pool.execute<RowDataPacket[]>("SELECT * FROM products WHERE id = ?", [id]);
@@ -242,11 +250,11 @@ export const updateProduct = async (
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const cost = Number(formData.get("cost"));
-    const imageFiles: File[] | string[] = formData.getAll("images");
+    const imageFiles: File[] | string[] = formData.getAll("images") as File[] | string[];
     const description = formData.get("description") as string;
 
     const dir = path.join(process.cwd(), "uploads");
-    const fileNames = [];
+    const fileNames: string[] = [];
 
     if (imageFiles.length > 0 /* && imageFiles[0].size > 0 */) {
       for (const imageFile of imageFiles) {
@@ -264,14 +272,17 @@ export const updateProduct = async (
           if (imageFile.size) {
             await writeFile(filePath, new Uint8Array(buffer));
           }
-
-          if (imageSrc) {
-            for (const image of imageSrc) {
-              await rm(path.join(process.cwd(), "uploads", image));
-            }
-          }
         }
       }
+    }
+
+    if (imageSrc) {
+      imageSrc.forEach((image: string) => {
+        if (!fileNames.includes(image)) {
+          const filePath = path.join(dir, image);
+          rm(filePath);
+        }
+      });
     }
 
     if (existingProduct[0] as ProductType) {
@@ -283,11 +294,11 @@ export const updateProduct = async (
           existingProduct[0].imageSrc !== imageSrc ||
           existingProduct[0].description !== description)
       ) {
-        return { success: false, message: "Forbidden" };
+        return { message: "Forbidden" };
       }
     }
 
-    const updatedProduct: ProductType = {
+    const updatedProduct: Omit<ProductType, "rating"> = {
       id: +id,
       name,
       category,
