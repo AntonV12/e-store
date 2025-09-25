@@ -5,18 +5,18 @@ import { useActionState, useRef } from "react";
 import { UpdateUserState, UserType } from "@/lib/types";
 import { updateUser } from "@/lib/usersActions";
 
-export default function AvatarForm({ currentUser }: { currentUser: Omit<UserType, "password"> }) {
+export default function AvatarForm({ currentUser }: { currentUser: Omit<UserType, "password"> | null }) {
   const formRef = useRef<HTMLFormElement>(null);
   const initialState: UpdateUserState = {
-    id: currentUser.id,
+    id: currentUser?.id,
     error: null,
     message: "",
     formData: {
-      avatar: currentUser.avatar,
+      avatar: currentUser?.avatar,
     },
   };
 
-  const [state, formAction] = useActionState<UpdateUserState, FormData>(updateUser, initialState);
+  const [, formAction] = useActionState<UpdateUserState, FormData>(updateUser, initialState);
 
   const handleChange = () => {
     if (!formRef.current) return;

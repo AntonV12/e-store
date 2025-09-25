@@ -24,9 +24,19 @@ export default function LoginForm() {
   useEffect(() => {
     if (state.message) {
       setMessage(state.message);
-      router.push("/");
+
+      setTimeout(() => {
+        const bc = new BroadcastChannel("cart");
+        bc.postMessage({
+          type: "fetch",
+          cart: state.formData?.cart,
+        });
+
+        bc.close();
+        router.push("/");
+      }, 0);
     }
-  }, [state.message, setMessage, router]);
+  }, [state, setMessage, router]);
 
   return (
     <>

@@ -23,11 +23,10 @@ export default function CartItem({ product, userId }: { product: CartType; userI
         className={style.img}
         width={100}
         height={100}
-        priority
       />
       <div className={style.info}>
         <h3>{product.name}</h3>
-        <CartItemForm product={product} userId={userId} amount={amount} setAmount={setAmount} />
+        <CartItemForm product={product} userId={userId} amount={amount} setAmountAction={setAmount} />
 
         <h3 className={style.cost}>{cost.toLocaleString()} ₽</h3>
         <DeleteForm id={product.id!} productId={product.productId} />

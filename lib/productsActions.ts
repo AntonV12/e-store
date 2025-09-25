@@ -1,11 +1,19 @@
 "use server";
 
 import { pool } from "@/lib/database";
-import { ProductType, SortType, CommentType, UpdateCommentsState, CreateProductState } from "@/lib/types";
+import {
+  ProductType,
+  SortType,
+  CommentType,
+  UpdateCommentsState,
+  CreateProductState,
+  DeleteProductState,
+} from "@/lib/types";
 import { ResultSetHeader } from "mysql2/promise";
 import { RowDataPacket } from "mysql2";
 import { verifySession } from "@/lib/authActions";
 import { writeFile, rm } from "fs/promises";
+import { existsSync, mkdirSync, renameSync, rmSync } from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
@@ -16,7 +24,7 @@ export const fetchProducts = async (
   page?: number,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc"
+  sortByDirection?: "asc" | "desc",
 ): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
     const offset = page ? (page - 1) * 10 : 0;
@@ -26,7 +34,7 @@ export const fetchProducts = async (
         SELECT COUNT(*) AS count FROM products
         WHERE name LIKE ? AND (? IS NULL OR category = ?)
       `,
-      [`%${name || ""}%`, category || null, category || null]
+      [`%${name || ""}%`, category || null, category || null],
     );
 
     const [results] = await pool.query<ProductType[] & RowDataPacket[]>(
@@ -44,7 +52,7 @@ export const fetchProducts = async (
         LIMIT ?
         OFFSET ?
       `,
-      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset]
+      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset],
     );
 
     return {
@@ -79,7 +87,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 
     const [existingProduct] = await pool.execute<ProductType & RowDataPacket[]>(
       `SELECT * FROM products WHERE name = ?`,
-      [name]
+      [name],
     );
 
     if (existingProduct.length > 0) {
@@ -99,7 +107,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 
       const bytes = await imageFile.arrayBuffer();
       const buffer = Buffer.from(bytes);
-      const processedImageBuffer = await sharp(buffer)
+      const processedImageBuffer = sharp(buffer)
         .resize(500, 500, {
           fit: "contain",
           position: "center",
@@ -152,7 +160,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {
     const [rows] = await pool.execute<(string[] & RowDataPacket)[]>(
-      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories"
+      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories",
     );
 
     return rows[0].categories ?? null;
@@ -164,14 +172,25 @@ export const fetchCategories = async (): Promise<string[] | null> => {
 
 export const fetchProductById = async (id: number): Promise<ProductType | null> => {
   try {
-    const [product] = await pool.execute<(ProductType & RowDataPacket)[]>("SELECT * FROM products WHERE id = ?", [id]);
-
-    const [rating] = await pool.execute<{ avg: number } & RowDataPacket[]>(
-      "SELECT AVG(rating) AS avg FROM ratings WHERE productId = ?",
-      [id]
+    const [rows] = await pool.execute<(ProductType & { avg_rating: number } & RowDataPacket)[]>(
+      `
+      SELECT 
+        p.*,
+        COALESCE(AVG(r.rating), 0) as avg_rating
+      FROM products p
+      LEFT JOIN ratings r ON p.id = r.productId
+      WHERE p.id = ?
+      GROUP BY p.id
+    `,
+      [id],
     );
 
-    return { ...product[0], rating: rating[0]?.avg || 0 };
+    return rows[0]
+      ? {
+          ...rows[0],
+          rating: Number(rows[0].avg_rating),
+        }
+      : null;
   } catch (err) {
     console.error(err);
     return null;
@@ -181,7 +200,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 export const updateComments = async (
   productId: number,
   prevState: UpdateCommentsState,
-  formData: FormData
+  formData: FormData,
 ): Promise<UpdateCommentsState> => {
   const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>("SELECT comments FROM products WHERE id = ?", [
     productId,
@@ -222,7 +241,12 @@ export const updateComments = async (
 
 export const updateRating = async (productId: number | null, userId: string, rating: number) => {
   try {
-    await pool.execute(`INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)`, [productId, userId, rating]);
+    await pool.execute(
+      `
+        INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)
+        ON DUPLICATE KEY UPDATE rating = VALUES(rating)`,
+      [productId, userId, rating],
+    );
   } catch (err) {
     console.error(err);
     return { message: "Вы уже оценили этот товар" };
@@ -232,7 +256,7 @@ export const updateRating = async (productId: number | null, userId: string, rat
 export const updateProduct = async (
   id: number,
   prevState: CreateProductState,
-  formData: FormData
+  formData: FormData,
 ): Promise<CreateProductState> => {
   try {
     const session = await verifySession();
@@ -328,5 +352,66 @@ export const updateProduct = async (
   } catch (err) {
     console.error(err);
     return { message: "Database error" };
+  }
+};
+
+export const deleteProduct = async (id: number, prevState: DeleteProductState): Promise<DeleteProductState> => {
+  const connection = await pool.getConnection();
+  let transactionCommitted = false;
+  const tempDir = path.join(process.cwd(), "temp_deletion");
+
+  try {
+    await connection.beginTransaction();
+
+    const images = prevState.formData?.images;
+
+    if (images) {
+      const uploadsDir = path.join(process.cwd(), "uploads");
+      if (!existsSync(tempDir)) {
+        mkdirSync(tempDir, { recursive: true });
+      }
+
+      images.forEach((image) => {
+        const sourcePath = path.join(uploadsDir, image);
+        const tempPath = path.join(tempDir, `${Date.now()}_${image}`);
+        if (existsSync(sourcePath)) {
+          renameSync(sourcePath, tempPath);
+        }
+      });
+    }
+
+    await connection.execute(`DELETE FROM ratings WHERE productId = ?`, [id]);
+    await connection.execute(`DELETE FROM products WHERE id = ?`, [id]);
+
+    await connection.commit();
+    transactionCommitted = true;
+
+    if (images && existsSync(tempDir)) {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
+
+    return { message: "Продукт успешно удалён" };
+  } catch (error) {
+    if (!transactionCommitted) {
+      await connection.rollback();
+
+      const images = prevState.formData?.images;
+      if (images && existsSync(tempDir)) {
+        const uploadsDir = path.join(process.cwd(), "uploads");
+        images.forEach((image) => {
+          const tempPath = path.join(tempDir, image);
+          const targetPath = path.join(uploadsDir, image);
+          if (existsSync(tempPath)) {
+            renameSync(tempPath, targetPath);
+          }
+        });
+        rmSync(tempDir, { recursive: true });
+      }
+    }
+
+    console.error("Ошибка удаления продукта:", error);
+    return { error: "Не удалось удалить продукт" };
+  } finally {
+    connection.release();
   }
 };

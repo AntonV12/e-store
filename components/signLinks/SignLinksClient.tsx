@@ -30,7 +30,14 @@ export default function SignLinksClient({
   useEffect(() => {
     const bc = new BroadcastChannel("cart");
 
-    bc.onmessage = (event: MessageEvent<{ type: "update" | "delete"; productId: number; amount?: number }>) => {
+    bc.onmessage = (
+      event: MessageEvent<{
+        type: "update" | "delete" | "clear" | "fetch";
+        productId: number;
+        amount?: number;
+        cart?: CartType[];
+      }>,
+    ) => {
       if (event.data.type === "update") {
         const { productId, amount } = event.data;
 
@@ -59,8 +66,15 @@ export default function SignLinksClient({
         setCart((prev) =>
           prev.filter((item) => {
             return item.productId !== productId;
-          })
+          }),
         );
+      } else if (event.data.type === "clear") {
+        setCart([]);
+      } else if (event.data.type === "fetch") {
+        const { cart } = event.data;
+        if (cart) {
+          setCart(cart);
+        }
       }
     };
 

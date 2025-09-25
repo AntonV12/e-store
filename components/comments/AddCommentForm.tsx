@@ -11,9 +11,9 @@ const AddCommentForm = ({ product, userId }: { product: ProductType; userId: str
     message: "",
     formData: { text: "" },
   };
-  const [state, formAction, isPending] = useActionState<UpdateCommentsState, FormData>(
+  const [, formAction, isPending] = useActionState<UpdateCommentsState, FormData>(
     updateComments.bind(null, product.id),
-    initialState
+    initialState,
   );
 
   return (

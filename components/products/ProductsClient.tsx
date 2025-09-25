@@ -4,6 +4,8 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import ProductItem from "./ProductItem";
 import { ProductType, SearchParamsType } from "@/lib/types";
 import style from "./products.module.css";
+import { useMessage } from "@/lib/messageContext";
+import Loader from "@/components/loader/Loader";
 
 export default function ProductsClient({
   initialProducts,
@@ -18,6 +20,7 @@ export default function ProductsClient({
   const totalPages = initialProducts.count;
   const [page, setPage] = useState<number>(Number(searchParams?.page) || 1);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { setMessage } = useMessage();
 
   useEffect(() => {
     setProducts(initialProducts.products);
@@ -41,21 +44,22 @@ export default function ProductsClient({
             } else {
               return product;
             }
-          })
-        );
-      } /* else if (event.data.type === "delete") {
-        const { productId } = event.data;
-
-        setCart((prev) =>
-          prev.filter((item) => {
-            return item.productId !== productId;
           }),
         );
-      } */
+      } else if (event.data.type === "delete") {
+        const { productId, message } = event.data;
+
+        setProducts((prev) =>
+          prev.filter((item) => {
+            return item.id !== Number(productId);
+          }),
+        );
+        setMessage(message);
+      }
     };
 
     return () => bc.close();
-  }, []);
+  }, [setMessage]);
 
   const handleLoadMore = useCallback(async () => {
     if (page >= totalPages || products.length / 10 >= totalPages) return;
@@ -88,7 +92,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore]
+    [handleLoadMore],
   );
 
   useEffect(() => {
@@ -104,12 +108,27 @@ export default function ProductsClient({
 
   return (
     <section className={style.products}>
-      <ul className={style.list}>
-        {products.map((p, index) => (
-          <ProductItem key={p.id} product={p} ref={index === products.length - 1 ? lastItemRef : null} />
-        ))}
-      </ul>
-      {isLoading && <div>loading...</div>}
+      {products.length ? (
+        <ul className={style.list}>
+          <>
+            {products.map((p, index) => (
+              <ProductItem
+                key={p.id}
+                product={p}
+                ref={index === products.length - 1 ? lastItemRef : null}
+                isPriority={index < 11}
+              />
+            ))}
+            {isLoading && (
+              <div className={style.loading}>
+                <Loader />
+              </div>
+            )}
+          </>
+        </ul>
+      ) : (
+        <p>Не найдено</p>
+      )}
     </section>
   );
 }

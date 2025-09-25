@@ -2,7 +2,6 @@
 
 import style from "./cart.module.css";
 import React, { startTransition } from "react";
-import { useActionState } from "react";
 import { updateUserCart } from "@/lib/usersActions";
 import { UpdateCartState, CartType } from "@/lib/types";
 import { useDebouncedCallback } from "use-debounce";
@@ -11,12 +10,12 @@ export default function CartItemForm({
   product,
   userId,
   amount,
-  setAmount,
+  setAmountAction,
 }: {
   product: CartType;
   userId: string | null;
   amount: number;
-  setAmount: React.Dispatch<React.SetStateAction<number>>;
+  setAmountAction: React.Dispatch<React.SetStateAction<number>>;
 }) {
   const initialState: UpdateCartState = {
     message: "",
@@ -36,20 +35,17 @@ export default function CartItemForm({
     fromCart: true,
   };
 
-  const updateUserCartWithId = updateUserCart.bind(null, userId);
-  const [state, formAction] = useActionState<UpdateCartState, FormData>(updateUserCartWithId, initialState);
-
   const debouncedSubmit = useDebouncedCallback(() => {
     startTransition(() => {
       const formData = new FormData();
       formData.set("amount", amount.toString());
       formData.set("fromCart", "true");
-      formAction(formData);
+      updateUserCart(userId, initialState, formData);
     });
   }, 500);
 
   const handleAmountDecrease = () => {
-    setAmount((prev) => {
+    setAmountAction((prev) => {
       const newAmount = prev > 1 ? prev - 1 : prev;
       debouncedSubmit();
       return newAmount;
@@ -57,7 +53,7 @@ export default function CartItemForm({
   };
 
   const handleAmountIncrease = () => {
-    setAmount((prev) => {
+    setAmountAction((prev) => {
       const newAmount = prev + 1;
       debouncedSubmit();
       return newAmount;
@@ -67,7 +63,7 @@ export default function CartItemForm({
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = +e.target.value;
     if (val < 1) return;
-    setAmount(val);
+    setAmountAction(val);
     debouncedSubmit();
   };
 

@@ -12,21 +12,7 @@ export default async function AddProductPage() {
     rating: 0,
     cost: 0,
     imageSrc: [],
-    description: `
-          <h1>Общие параметры</h1>
-          <table>
-            <tbody>
-              <tr>
-                <td>Тип</td>
-                <td></td>
-              </tr>
-              <tr>
-                <td>Модель</td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
-        `,
+    description: "",
     comments: [],
   };
 

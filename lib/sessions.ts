@@ -2,7 +2,6 @@
 
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const secretKey = process.env.SESSION_SECRET;
 const encodedKey = new TextEncoder().encode(secretKey);
@@ -11,7 +10,7 @@ export async function encrypt(payload: { userId: string; isAdmin: boolean; expir
   return new SignJWT(payload)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
-    .setExpirationTime("2d")
+    .setExpirationTime("7d")
     .sign(encodedKey);
 }
 
@@ -71,5 +70,4 @@ export async function updateSession() {
 export async function deleteSession() {
   const cookieStore = await cookies();
   cookieStore.delete("session");
-  redirect("/");
 }

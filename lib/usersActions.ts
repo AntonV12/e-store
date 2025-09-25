@@ -213,7 +213,7 @@ export const updateUser = async (prevState: UpdateUserState, formData: FormData)
 
   const bytes = await imageFile.arrayBuffer();
   const buffer = Buffer.from(bytes);
-  const processedImageBuffer = await sharp(buffer)
+  const processedImageBuffer = sharp(buffer)
     .resize(85, 85, {
       fit: "cover",
       position: "center",

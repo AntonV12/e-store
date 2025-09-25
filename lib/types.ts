@@ -74,13 +74,14 @@ export type LoginState = {
   message?: string;
   formData?: {
     name: string;
-    password: string;
+    password?: string;
     confirmPassword?: string;
+    cart?: CartType[];
   };
 };
 
 export type UpdateUserState = {
-  id: string | null;
+  id?: string | null;
   message?: string | null;
   error?: string | null;
   formData: {
@@ -144,4 +145,17 @@ export type CreateProductState = {
   error?: string | null;
   message?: string;
   formData?: ProductType;
+};
+
+export type DeleteProductState = {
+  error?: string | null;
+  message?: string;
+  formData?: {
+    images: string[];
+  };
+};
+
+export type LogoutStateType = {
+  error?: string | null;
+  message?: string | null;
 };

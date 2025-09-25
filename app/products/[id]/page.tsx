@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: { id: number } }): 
 
 export default async function ProductPage(props: { params: Promise<{ id: number }> }) {
   const params = await props.params;
-  const id = params.id;
+  const id = Number(params.id);
   const session: SessionType | null = await verifySession();
 
   if (!session) {
@@ -26,10 +26,6 @@ export default async function ProductPage(props: { params: Promise<{ id: number 
   }
 
   const { isAuth, userId, isAdmin }: SessionType = session;
-
-  if (!id) {
-    return <h1>Product not found</h1>;
-  }
 
   return (
     <Suspense fallback={<ProductSkeleton />}>

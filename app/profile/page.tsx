@@ -2,6 +2,12 @@ import Profile from "@/components/profile/Profile";
 import { getCurrentUser } from "@/lib/authActions";
 import OrdersList from "@/components/profile/OrdersList";
 import { OrdersListParamsType, UserType } from "@/lib/types";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Страница профиля",
+  description: "Личный кабинет. Просмотр заказов.",
+};
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<OrdersListParamsType> }) {
   const params = await searchParams;

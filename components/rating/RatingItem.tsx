@@ -6,45 +6,44 @@ import { updateRating } from "@/lib/productsActions";
 export default function RatingItem({
   title,
   target,
-  setTarget,
+  setTargetAction,
   id,
   clientId,
   isRated,
-  setIsRated,
+  setIsRatedAction,
 }: {
   title: number;
   target: number;
-  setTarget: React.Dispatch<React.SetStateAction<number>>;
+  setTargetAction: React.Dispatch<React.SetStateAction<number>>;
   id: number | null;
   clientId: string;
   isRated: boolean;
-  setIsRated: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRatedAction: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const highlight = (e: React.MouseEvent<HTMLLabelElement>) => {
     const target: HTMLElement = e.target as HTMLElement;
 
     if (target.closest(`.${style.rating}`)) {
-      if (!isRated) setTarget(Number(target.title));
+      if (!isRated) setTargetAction(Number(target.title));
     }
   };
 
   const clear = () => {
     if (!isRated) {
-      setTarget(0);
+      setTargetAction(0);
     }
   };
 
   const onSubmit = async (rating: number) => {
-    if (isRated) return;
+    setTargetAction(rating);
+    setIsRatedAction(true);
 
-    setTarget(rating);
     await updateRating(id, clientId, rating);
-    setIsRated(true);
   };
 
   return (
     <>
-      <input type="radio" name="star" disabled={isRated} />
+      <input type="radio" name="star" />
       <label
         htmlFor={title.toString()}
         title={title.toString()}

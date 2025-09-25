@@ -5,12 +5,18 @@ const user = process.env.DB_USER;
 const pass = process.env.DB_PASS;
 const db = process.env.DB_DATABASE;
 
-export const pool = mysql.createPool({
-  host: host,
-  user: user,
-  password: pass,
-  database: db,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+declare global {
+  var _pool: mysql.Pool | undefined;
+}
+
+export const pool =
+  globalThis._pool ||
+  (globalThis._pool = mysql.createPool({
+    host,
+    user,
+    password: pass,
+    database: db,
+    connectionLimit: 50,
+    waitForConnections: true,
+    queueLimit: 0,
+  }));

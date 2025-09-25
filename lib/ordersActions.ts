@@ -157,19 +157,28 @@ export const createOrder = async (prevState: CreateOrderState, formData: FormDat
     };
   }
 
+  const connection = await pool.getConnection();
+
   try {
-    const [results] = await pool.query<ResultSetHeader>("INSERT INTO orders SET ?", [newOrder]);
-    await pool.query<ResultSetHeader>("DELETE FROM carts WHERE userId = ?", [clientId]);
+    await connection.beginTransaction();
+    const [results] = await connection.query<ResultSetHeader>("INSERT INTO orders SET ?", [newOrder]);
+    await connection.query<ResultSetHeader>("DELETE FROM carts WHERE userId = ?", [clientId]);
+    await connection.commit();
+
     revalidatePath("/cart");
 
     return {
       message: `Заказ № ${results.insertId} успешно создан`,
     };
   } catch (err) {
+    await connection.rollback();
     console.error(err);
     return {
       error: "Internal server error",
+      formData: prevState.formData,
     };
+  } finally {
+    connection.release();
   }
 };
 

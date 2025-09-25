@@ -1,12 +1,11 @@
 "use server";
 
 import { pool } from "@/lib/database";
-import { LoginState, UserType } from "@/lib/types";
+import { CartType, LoginState, UserType } from "@/lib/types";
 import { RowDataPacket } from "mysql2";
-import { createSession, decrypt } from "@/lib/sessions";
+import { createSession, decrypt, deleteSession } from "@/lib/sessions";
 import bycript from "bcryptjs";
 import { cookies } from "next/headers";
-import { cache } from "react";
 import { SessionType } from "@/lib/types";
 
 export const verifySession = async (): Promise<SessionType> => {
@@ -23,10 +22,14 @@ export const verifySession = async (): Promise<SessionType> => {
 const mergeCartsAndOrders = async (userId: string | null) => {
   const cookieStore = await cookies();
   const tempId: string | null = cookieStore.get("tempId")?.value || null;
+  const connection = await pool.getConnection();
 
   if (tempId && userId) {
-    await pool.execute(
-      `
+    await connection.beginTransaction();
+
+    try {
+      await connection.execute(
+        `
       INSERT INTO carts (userId, productId, name, cost, imageSrc, amount)
       SELECT *
       FROM (
@@ -36,28 +39,35 @@ const mergeCartsAndOrders = async (userId: string | null) => {
       ) AS src
       ON DUPLICATE KEY UPDATE amount = carts.amount + src.amount
       `,
-      [userId, tempId],
-    );
+        [userId, tempId],
+      );
 
-    await pool.execute(
-      `
+      await connection.execute(
+        `
         UPDATE orders
         SET clientId = ?
         WHERE clientId = ?
       `,
-      [userId, tempId],
-    );
+        [userId, tempId],
+      );
 
-    await pool.execute("DELETE FROM carts WHERE userId = ?", [tempId]);
-    cookieStore.delete("tempId");
+      await connection.execute("DELETE FROM carts WHERE userId = ?", [tempId]);
+      await connection.commit();
+      cookieStore.delete("tempId");
+    } catch (err) {
+      await connection.rollback();
+      console.error(err);
+    } finally {
+      connection.release();
+    }
   }
 };
 
-export const loginUser = async (prevState: LoginState | undefined, formData: FormData) => {
+export const loginUser = async (prevState: LoginState | undefined, formData: FormData): Promise<LoginState> => {
   try {
     const name = formData.get("name");
     const password = formData.get("password")?.toString();
-    const [existingUser] = await pool.execute<RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
+    const [existingUser] = await pool.execute<UserType & RowDataPacket[]>("SELECT * FROM users WHERE name = ?", [name]);
 
     if (!existingUser.length) {
       return {
@@ -68,6 +78,10 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
         },
       };
     }
+
+    const [cart] = await pool.execute<CartType[] & RowDataPacket[]>("SELECT * FROM carts WHERE userId = ?", [
+      existingUser[0].id,
+    ]);
 
     if ((password && !bycript.compareSync(password, existingUser[0].password)) || !existingUser.length) {
       return {
@@ -86,7 +100,7 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
       message: `Здравствуйте, ${name}`,
       formData: {
         name: formData.get("name") as string,
-        password: formData.get("password") as string,
+        cart: cart,
       },
     };
   } catch (error) {
@@ -96,37 +110,55 @@ export const loginUser = async (prevState: LoginState | undefined, formData: For
 };
 
 export async function getCurrentUser() {
-  const session = await verifySession();
-  let needRefresh = false;
-
-  const cookieStore = await cookies();
-  const cookie = cookieStore.get("session")?.value;
-  const payload = await decrypt(cookie);
-  const expiresAt = payload?.expiresAt as string;
-
-  if (expiresAt) {
-    const expires = new Date(expiresAt);
-    if ((expires.getTime() - Date.now()) / 1000 < 50) {
-      needRefresh = true;
+  try {
+    const session = await verifySession();
+    if (!session?.userId) {
+      console.log("No valid session found");
+      return null;
     }
+
+    let needRefresh = false;
+
+    try {
+      const cookieStore = await cookies();
+      const cookie = cookieStore.get("session")?.value;
+      const payload = await decrypt(cookie);
+      const expiresAt = payload?.expiresAt as string;
+
+      if (expiresAt) {
+        const expires = new Date(expiresAt);
+        if ((expires.getTime() - Date.now()) / (1000 * 60 * 60 * 24) < 1) {
+          needRefresh = true;
+        }
+      }
+    } catch (err) {
+      console.error("Error processing cookies:", err);
+    }
+
+    const sql = "SELECT * FROM users WHERE id = ?";
+
+    const [results] = await pool.execute<RowDataPacket[]>(sql, [session.userId]);
+
+    if (!results.length) {
+      return null;
+    }
+
+    const user = results[0] as Omit<UserType, "password">;
+    const { id, name, isAdmin, avatar } = user;
+
+    return {
+      id,
+      name,
+      isAdmin,
+      avatar,
+      needRefresh,
+    };
+  } catch (err) {
+    console.error("Error in getCurrentUser:", err);
   }
-
-  const sql = "SELECT * FROM users WHERE id = ?";
-
-  const [results] = await pool.execute<RowDataPacket[]>(sql, [session.userId]);
-
-  if (!results.length) {
-    return null;
-  }
-
-  const user = results[0] as Omit<UserType, "password">;
-  const { id, name, isAdmin, avatar } = user;
-
-  return {
-    id,
-    name,
-    isAdmin,
-    avatar,
-    needRefresh,
-  };
 }
+
+export const logoutUser = async () => {
+  await deleteSession();
+  return { message: "Успешный выход из системы" };
+};

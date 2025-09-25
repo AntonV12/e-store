@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-// import { fetchProducts, createProduct } from "./productsController";
 import { fetchProducts } from "@/lib/productsActions";
 import { SortType } from "@/lib/types";
 
@@ -24,14 +23,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Internal Server Error", err }, { status: 500 });
   }
 }
-
-// export async function POST(request: NextRequest) {
-//   try {
-//     const formData = await request.formData();
-
-//     const createdProduct = await createProduct(formData);
-//     return NextResponse.json(createdProduct);
-//   } catch (err) {
-//     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
-//   }
-// }

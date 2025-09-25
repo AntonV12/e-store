@@ -42,6 +42,13 @@ export default function OrderForm({
   useEffect(() => {
     if (state.message) {
       setMessage(state.message);
+
+      const bc = new BroadcastChannel("cart");
+      bc.postMessage({
+        type: "clear",
+      });
+      bc.close();
+
       router.push("/");
     }
 

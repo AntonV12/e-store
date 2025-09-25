@@ -8,7 +8,6 @@ import LogoutForm from "./LogoutForm";
 import AvatarForm from "./AvatarForm";
 
 export default async function Profile({ currentUser }: { currentUser: Omit<UserType, "password"> | null }) {
-  if (!currentUser) return null;
   return (
     <div className={style.profile}>
       <h2>Мои Данные</h2>
@@ -18,7 +17,7 @@ export default async function Profile({ currentUser }: { currentUser: Omit<UserT
             <AvatarForm currentUser={currentUser} />
 
             <PhotoCamera className={style.camera} />
-            {currentUser.avatar ? (
+            {currentUser?.avatar ? (
               <Image
                 src={`/api/image?name=${currentUser.avatar}&path=users`}
                 alt="avatar"
@@ -31,10 +30,10 @@ export default async function Profile({ currentUser }: { currentUser: Omit<UserT
               <LoginIcon className={style.loginIcon} />
             )}
           </div>
-          {currentUser.name}
+          {currentUser?.name}
         </div>
         <div className={style.profile__links}>
-          {currentUser.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
+          {currentUser?.isAdmin ? <Link href="/add-product">Добавить новый товар</Link> : null}
 
           <LogoutForm />
         </div>

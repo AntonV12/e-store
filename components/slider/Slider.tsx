@@ -64,6 +64,7 @@ export default function Slider({ images }: SliderProps) {
         navigation={true}
         thumbs={{ swiper: thumbsSwiper }}
         modules={[FreeMode, Navigation, Thumbs]}
+        direction="horizontal"
         className="mySwiper2"
       >
         {images.map((image) => (

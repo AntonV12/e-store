@@ -22,9 +22,25 @@ export type ImageType = {
   file: File | null;
 };
 
+const initialContent: string = `
+        <h1>Общие параметры</h1>
+        <table>
+          <tbody>
+            <tr>
+              <td>Тип</td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Модель</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+
 export default function AddProduct({ product, isEdit = false }: { product: ProductType; isEdit: boolean }) {
   const editorRef = useRef<DescriptionType | null>(null);
-  const [images, setImages] = useState<(ImageType | string)[]>(product.imageSrc); // условный тип сделать
+  const [images, setImages] = useState<(ImageType | string)[]>(product.imageSrc);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { setMessage } = useMessage();
 
@@ -38,7 +54,7 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
   const updateProductWithId = updateProduct.bind(null, product.id);
   const [state, formAction, isPending] = useActionState<CreateProductState, FormData>(
     isEdit ? updateProductWithId : createProduct,
-    initialState
+    initialState,
   );
 
   useEffect(() => {
@@ -56,9 +72,11 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
       });
       bc.close();
 
-      router.push(`/products/${product.id || state.formData?.id}`);
+      if (isEdit) {
+        router.push(`/products/${product.id || state.formData?.id}`);
+      }
     }
-  }, [state, setMessage, product, router]);
+  }, [state, setMessage, product, router, isEdit]);
 
   const onSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
@@ -76,16 +94,14 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
 
         formAction(formData);
 
-        if (state?.message) {
-          form.reset();
-          setImages([]);
-          if (editorRef.current) {
-            editorRef.current.clearContent();
-          }
+        form.reset();
+        setImages([]);
+        if (editorRef.current) {
+          editorRef.current.setContent(initialContent);
         }
       });
     },
-    [images, formAction, state?.message]
+    [images, formAction],
   );
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -166,7 +182,7 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
         </div>
         <div>
           <label>Описание:</label>
-          <TextEditor ref={editorRef} initialContent={product.description || ""} />
+          <TextEditor ref={editorRef} initialContent={product.description || initialContent} />
         </div>
         <button type="submit" disabled={isPending}>
           {isPending ? "Загрузка..." : "Сохранить"}

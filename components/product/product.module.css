@@ -6,20 +6,64 @@
   gap: 20px;
 }
 .container {
+  width: 100%;
   display: flex;
   gap: 20px;
-  width: 100%;
+  align-items: flex-start;
 }
 
 .imgContainer {
-  width: 50%;
-  flex-shrink: 0;
-  flex-grow: 0;
+  width: 40%;
   position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 14px;
   border-radius: 8px;
+}
+
+.sliderContainer {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+}
+
+.editButtons {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.editButtons a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.editButtons a:hover svg {
+  fill: var(--secondary-color);
+}
+
+.deleteButton {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 1rem;
+  display: flex;
+  gap: 5px;
+}
+.deleteButton:hover {
+  color: var(--secondary-color);
+  background: none;
+}
+.deleteButton:hover svg {
+  fill: var(--secondary-color);
+}
+
+.info {
+  min-height: 300px;
+  width: 60%;
 }
 
 .productCard .productName,
@@ -99,12 +143,9 @@
 .description h4 {
   font-size: 1rem;
 }
-
-.editButtons,
-.editButton {
-  display: flex;
-  gap: 5px;
-  margin: 0 0 0 auto;
+.description table tr td:first-child {
+  width: 55%;
+  padding-right: 10px;
 }
 
 .imageForm {
@@ -139,11 +180,6 @@
 .imageForm:hover .cameraIcon {
   visibility: visible;
   opacity: 1;
-}
-
-.info {
-  flex-grow: 1;
-  min-height: 300px;
 }
 
 .editForm {
