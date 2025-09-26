@@ -28,6 +28,7 @@ export const fetchProducts = async (
   sortByDirection?: "asc" | "desc",
 ): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
+    console.log(name, limit, page, category, sortBy, sortByDirection);
     const offset = page ? (page - 1) * 10 : 0;
 
     const [count] = await pool.query<{ count: number } & RowDataPacket[]>(

@@ -1,6 +1,6 @@
 import "./globals.css";
 import { Play, Press_Start_2P } from "next/font/google";
-import styles from "@/app/page.module.css";
+import styles from "@/app/layout.module.css";
 import Logo from "@/components/logo/Logo";
 import SignLinks from "@/components/signLinks/SignLinks";
 import { MessageProvider } from "@/lib/messageContext";
