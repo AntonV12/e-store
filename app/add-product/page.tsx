@@ -1,5 +1,11 @@
 import AddProduct from "@/components/add-product/AddProduct";
 import { verifySession } from "@/lib/authActions";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Добавить продукт",
+  description: "Добавить новый продукт в базу",
+};
 
 export default async function AddProductPage() {
   const { isAdmin } = await verifySession();

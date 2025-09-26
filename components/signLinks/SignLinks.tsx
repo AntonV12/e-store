@@ -5,7 +5,7 @@ import { fetchUserCart } from "@/lib/usersActions";
 import { getOrdersLength } from "@/lib/ordersActions";
 
 export default async function SignLinks() {
-  const currentUser: Omit<UserType, "password"> | null = await getCurrentUser();
+  const currentUser: Omit<UserType, "password"> | null = (await getCurrentUser()) || null;
   const cart = await fetchUserCart(currentUser?.id || null);
   const ordersLength = await getOrdersLength(currentUser?.id || null);
 

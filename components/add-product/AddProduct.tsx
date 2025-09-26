@@ -8,6 +8,7 @@ import { createProduct, updateProduct } from "@/lib/productsActions";
 import { useMessage } from "@/lib/messageContext";
 import { useRouter } from "next/navigation";
 import ImageList from "./ImageList";
+import { translit } from "@/utils/translit";
 
 type DescriptionType = {
   clearContent: () => void;
@@ -73,7 +74,7 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
       bc.close();
 
       if (isEdit) {
-        router.push(`/products/${product.id || state.formData?.id}`);
+        router.push(`/products/${product.id || state.formData?.id}/${translit(product.name)}`);
       }
     }
   }, [state, setMessage, product, router, isEdit]);

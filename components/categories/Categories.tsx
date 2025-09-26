@@ -8,7 +8,8 @@ export default function Categories({ categories }: { categories: string[] }) {
   const { replace } = useRouter();
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
-    const term = (e.target as HTMLLIElement).textContent.trim();
+    const target = e.target as HTMLLIElement;
+    const term = target?.textContent?.trim() || "";
 
     if (params.size) {
       if (params.get("category") === term) {
@@ -29,11 +30,7 @@ export default function Categories({ categories }: { categories: string[] }) {
 
       <ul className={style.list}>
         {categories.map((category) => (
-          <li
-            key={category}
-            onClick={handleClick}
-            className={params.get("category") === category ? style.active : ""}
-          >
+          <li key={category} onClick={handleClick} className={params.get("category") === category ? style.active : ""}>
             {category}
           </li>
         ))}

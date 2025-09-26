@@ -10,6 +10,7 @@ import DeleteForm from "./DeleteForm";
 import EditIcon from "@/public/edit.svg";
 import { ProductType } from "@/lib/types";
 import { useEffect } from "react";
+import { translit } from "@/utils/translit";
 
 export default function ProductClient({
 	product,
@@ -56,7 +57,7 @@ export default function ProductClient({
 
 					{isAdmin ? (
 						<div className={style.editButtons}>
-							<Link href={`/products/${product.id}/edit`}>
+							<Link href={`/products/${product.id}/${translit(product.name)}/edit`}>
 								<EditIcon /> Редактировать
 							</Link>
 							<DeleteForm id={product.id} images={product.imageSrc} />

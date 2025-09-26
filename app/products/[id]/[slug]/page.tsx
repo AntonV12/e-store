@@ -6,7 +6,7 @@ import { ProductSkeleton } from "@/components/skeletons/skeletons";
 import { Suspense } from "react";
 import { SessionType } from "@/lib/types";
 
-export async function generateMetadata({ params }: { params: { id: number } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: number }> }): Promise<Metadata> {
   const p = await params;
   const product = await fetchProductById(p.id);
 

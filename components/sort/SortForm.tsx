@@ -1,7 +1,7 @@
 import style from "./sort.module.css";
 import SortButton from "./SortButton";
 
-export default function SortForm() {
+export default async function SortForm() {
 	return (
 		<div className={style.sort}>
 			<SortButton term="cost" value="цена" />

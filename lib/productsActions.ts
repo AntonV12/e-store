@@ -17,6 +17,7 @@ import { existsSync, mkdirSync, renameSync, rmSync } from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
+import { reverseTranslit } from "@/utils/translit";
 
 export const fetchProducts = async (
   name?: string,
@@ -174,7 +175,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
   try {
     const [rows] = await pool.execute<(ProductType & { avg_rating: number } & RowDataPacket)[]>(
       `
-      SELECT 
+      SELECT
         p.*,
         COALESCE(AVG(r.rating), 0) as avg_rating
       FROM products p

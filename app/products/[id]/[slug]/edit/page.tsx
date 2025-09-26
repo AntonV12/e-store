@@ -4,7 +4,7 @@ import { fetchProductById } from "@/lib/productsActions";
 import { SessionType, ProductType } from "@/lib/types";
 import AddProduct from "@/components/add-product/AddProduct";
 
-export async function generateMetadata({ params }: { params: { id: number } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ id: number }> }): Promise<Metadata> {
   const p = await params;
   const product = await fetchProductById(p.id);
 

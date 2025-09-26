@@ -4,13 +4,7 @@ import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import style from "./sort.module.css";
 
-export default function SortButton({
-	term,
-	value,
-}: {
-	term: string;
-	value: string;
-}) {
+export default function SortButton({ term, value }: { term: string; value: string }) {
 	const searchParams = useSearchParams();
 	const sortBy = searchParams.get("sortBy") || "viewed";
 	const sortByDirection = searchParams.get("sortByDirection");
@@ -35,18 +29,16 @@ export default function SortButton({
 	}, [term, sortBy, sortByDirection]);
 
 	const handleSort = () => {
-		replace(`${pathname}?sortBy=${term}&sortByDirection=${direction}`, {
-			scroll: false,
-		});
+		const params = new URLSearchParams(searchParams.toString());
+		params.set("sortBy", term);
+		params.set("sortByDirection", direction);
+
+		replace(`${pathname}?${params.toString()}`, { scroll: false });
 	};
 
 	return (
-		<button
-			onClick={handleSort}
-			className={`${term === sortBy && style.active} ${style.sortLink}`}
-		>
-			{value}{" "}
-			{`${term === sortBy ? (sortByDirection === "asc" ? "↑" : "↓") : ""}`}
+		<button onClick={handleSort} className={`${term === sortBy && style.active} ${style.sortLink}`}>
+			{value} {`${term === sortBy ? (sortByDirection === "asc" ? "↑" : "↓") : ""}`}
 		</button>
 	);
 }
