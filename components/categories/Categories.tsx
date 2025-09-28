@@ -1,27 +1,22 @@
 import style from "./categories.module.css";
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { updatePath } from "@/utils/updatePath";
 
 export default function Categories({ categories }: { categories: string[] }) {
-  const searchParams = useSearchParams();
-  const params = new URLSearchParams(searchParams);
   const pathname = usePathname();
   const { replace } = useRouter();
+  const currentCategory = decodeURIComponent(pathname.split("/")[2] || "");
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
     const target = e.target as HTMLLIElement;
     const term = target?.textContent?.trim() || "";
 
-    if (params.size) {
-      if (params.get("category") === term) {
-        params.delete("category");
-      } else {
-        params.set("category", term);
-      }
-    } else {
-      params.set("category", term);
-    }
+    const newPath = updatePath(pathname, {
+      category: currentCategory === term ? "" : term,
+      page: 1,
+    });
 
-    replace(`${pathname}?${params.toString()}`, { scroll: false });
+    replace(newPath, { scroll: false });
   };
 
   return (
@@ -30,7 +25,7 @@ export default function Categories({ categories }: { categories: string[] }) {
 
       <ul className={style.list}>
         {categories.map((category) => (
-          <li key={category} onClick={handleClick} className={params.get("category") === category ? style.active : ""}>
+          <li key={category} onClick={handleClick} className={currentCategory === category ? style.active : ""}>
             {category}
           </li>
         ))}

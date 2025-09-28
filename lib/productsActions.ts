@@ -17,26 +17,26 @@ import { existsSync, mkdirSync, renameSync, rmSync } from "fs";
 import path from "path";
 import { revalidatePath } from "next/cache";
 import sharp from "sharp";
-import { reverseTranslit } from "@/utils/translit";
 
 export const fetchProducts = async (
-  name?: string,
+  search?: string,
   limit?: number,
   page?: number,
   category?: string,
   sortBy?: SortType,
-  sortByDirection?: "asc" | "desc",
+  sortByDirection?: "asc" | "desc"
 ): Promise<{ products: ProductType[]; count: number } | null> => {
   try {
-    console.log(name, limit, page, category, sortBy, sortByDirection);
-    const offset = page ? (page - 1) * 10 : 0;
+    const offset = page ? (page - 1) * (Number(limit) || Number(process.env.DEFAULT_LIMIT) || 20) : 0;
+    const decodedName = decodeURIComponent(search || "");
+    const decodedCategory = decodeURIComponent(category || "");
 
     const [count] = await pool.query<{ count: number } & RowDataPacket[]>(
       `
         SELECT COUNT(*) AS count FROM products
         WHERE name LIKE ? AND (? IS NULL OR category = ?)
       `,
-      [`%${name || ""}%`, category || null, category || null],
+      [`%${decodedName || ""}%`, decodedCategory || null, decodedCategory || null]
     );
 
     const [results] = await pool.query<ProductType[] & RowDataPacket[]>(
@@ -54,12 +54,18 @@ export const fetchProducts = async (
         LIMIT ?
         OFFSET ?
       `,
-      [`%${name || ""}%`, category || null, category || null, Number(limit) || 10, offset],
+      [
+        `%${decodedName || ""}%`,
+        decodedCategory || null,
+        decodedCategory || null,
+        Number(limit) || Number(process.env.DEFAULT_LIMIT) || 20,
+        offset,
+      ]
     );
 
     return {
       products: results,
-      count: Math.ceil(count[0].count / 10),
+      count: Math.ceil(count[0].count / (limit || Number(process.env.DEFAULT_LIMIT) || 20)),
     };
   } catch (err) {
     console.error(err);
@@ -89,7 +95,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 
     const [existingProduct] = await pool.execute<ProductType & RowDataPacket[]>(
       `SELECT * FROM products WHERE name = ?`,
-      [name],
+      [name]
     );
 
     if (existingProduct.length > 0) {
@@ -162,7 +168,7 @@ export const createProduct = async (prevState: CreateProductState, formData: For
 export const fetchCategories = async (): Promise<string[] | null> => {
   try {
     const [rows] = await pool.execute<(string[] & RowDataPacket)[]>(
-      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories",
+      "SELECT JSON_ARRAYAGG(category) AS categories FROM (SELECT DISTINCT category FROM products) AS distinct_categories"
     );
 
     return rows[0].categories ?? null;
@@ -184,7 +190,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
       WHERE p.id = ?
       GROUP BY p.id
     `,
-      [id],
+      [id]
     );
 
     return rows[0]
@@ -202,7 +208,7 @@ export const fetchProductById = async (id: number): Promise<ProductType | null> 
 export const updateComments = async (
   productId: number,
   prevState: UpdateCommentsState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCommentsState> => {
   const [comments] = await pool.execute<(CommentType & RowDataPacket)[]>("SELECT comments FROM products WHERE id = ?", [
     productId,
@@ -247,7 +253,7 @@ export const updateRating = async (productId: number | null, userId: string, rat
       `
         INSERT INTO ratings (productId, userId, rating) VALUES(?, ?, ?)
         ON DUPLICATE KEY UPDATE rating = VALUES(rating)`,
-      [productId, userId, rating],
+      [productId, userId, rating]
     );
   } catch (err) {
     console.error(err);
@@ -258,7 +264,7 @@ export const updateRating = async (productId: number | null, userId: string, rat
 export const updateProduct = async (
   id: number,
   prevState: CreateProductState,
-  formData: FormData,
+  formData: FormData
 ): Promise<CreateProductState> => {
   try {
     const session = await verifySession();

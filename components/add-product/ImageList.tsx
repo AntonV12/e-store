@@ -9,12 +9,7 @@ import {
   useSensors,
   DragEndEvent,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  // horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import SortableItem from "./SortableItem";
 
 const ImageList = ({
@@ -51,7 +46,7 @@ const ImageList = ({
 
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={images} /* strategy={horizontalListSortingStrategy} */>
+      <SortableContext items={images}>
         {images.map((image) => (
           <SortableItem
             key={typeof image === "string" ? image : image.id}

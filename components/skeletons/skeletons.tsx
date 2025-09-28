@@ -14,14 +14,7 @@ export function ProductsListSkeleton() {
     return skeletons;
   }
 
-  return (
-    <div className={styles.skeleton}>
-      {/*<div
-        className={`${styles.skeleton} ${styles.skeleton__searchForm}`}
-      ></div>*/}
-      {render()}
-    </div>
-  );
+  return <div className={styles.skeleton}>{render()}</div>;
 }
 
 export function ProductSkeleton() {

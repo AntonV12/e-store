@@ -1,32 +1,28 @@
 "use client";
 
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import styles from "./searchForm.module.css";
 import ListIcon from "@/public/list.svg";
 import { useState } from "react";
 import SearchIcon from "@/public/search.svg";
 import Categories from "@/components/categories/Categories";
+import { updatePath } from "@/utils/updatePath";
 
 export default function SearchForm({ categories }: { categories: string[] }) {
-  const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
   const [isShowCategories, setIsShowCategories] = useState<boolean>(false);
+  const currentName =
+    decodeURIComponent(pathname.split("/")[pathname.split("/").findIndex((item) => item === "search") + 1]) || "";
 
   const toggleShowCategories = () => {
     setIsShowCategories(!isShowCategories);
   };
 
   const handleSearch = useDebouncedCallback((term: string) => {
-    const params = new URLSearchParams(searchParams);
-
-    if (term) {
-      params.set("name", term);
-    } else {
-      params.delete("name");
-    }
-    replace(`${pathname}?${params.toString()}`);
+    const newPath = updatePath(pathname, { search: term, page: 1 });
+    replace(newPath);
   }, 300);
 
   return (
@@ -50,8 +46,9 @@ export default function SearchForm({ categories }: { categories: string[] }) {
           onChange={(e) => {
             handleSearch(e.target.value);
           }}
-          defaultValue={searchParams.get("name")?.toString()}
+          defaultValue={currentName}
           placeholder="Поиск..."
+          autoFocus
         />
       </div>
     </div>

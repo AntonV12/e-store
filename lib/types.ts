@@ -61,7 +61,7 @@ export type EncryptedOrderType = Pick<OrderType, "id" | "isDone"> & {
 };
 
 export type SearchParamsType = {
-  name?: string;
+  search?: string;
   limit?: number;
   page?: number;
   category?: string;

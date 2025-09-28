@@ -44,7 +44,7 @@ export default function ProductsClient({
             } else {
               return product;
             }
-          }),
+          })
         );
       } else if (event.data.type === "delete") {
         const { productId, message } = event.data;
@@ -52,7 +52,7 @@ export default function ProductsClient({
         setProducts((prev) =>
           prev.filter((item) => {
             return item.id !== Number(productId);
-          }),
+          })
         );
         setMessage(message);
       }
@@ -62,13 +62,13 @@ export default function ProductsClient({
   }, [setMessage]);
 
   const handleLoadMore = useCallback(async () => {
-    if (page >= totalPages || products.length / 10 >= totalPages) return;
+    if (page >= totalPages || products.length / (Number(process.env.DEFAULT_LIMIT) || 20) >= totalPages) return;
     setIsLoading(true);
 
     const params = new URLSearchParams({
       page: String(page + 1),
-      name: searchParams?.name || "",
-      limit: searchParams?.limit?.toString() || "10",
+      name: searchParams?.search || "",
+      limit: searchParams?.limit?.toString() || process.env.DEFAULT_LIMIT || "20",
       category: searchParams?.category || "",
       sortBy: searchParams?.sortBy || "viewed",
       sortByDirection: searchParams?.sortByDirection || "desc",
@@ -92,7 +92,7 @@ export default function ProductsClient({
         handleLoadMore();
       }
     },
-    [handleLoadMore],
+    [handleLoadMore]
   );
 
   useEffect(() => {
@@ -109,8 +109,8 @@ export default function ProductsClient({
   return (
     <section className={style.products}>
       {products.length ? (
-        <ul className={style.list}>
-          <>
+        <>
+          <ul className={style.list}>
             {products.map((p, index) => (
               <ProductItem
                 key={p.id}
@@ -119,13 +119,13 @@ export default function ProductsClient({
                 isPriority={index < 11}
               />
             ))}
-            {isLoading && (
-              <div className={style.loading}>
-                <Loader />
-              </div>
-            )}
-          </>
-        </ul>
+          </ul>
+          {isLoading && (
+            <div className={style.loading}>
+              <Loader />
+            </div>
+          )}
+        </>
       ) : (
         <p>Не найдено</p>
       )}

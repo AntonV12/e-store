@@ -13,11 +13,11 @@ const AddCommentForm = ({ product, userId }: { product: ProductType; userId: str
   };
   const [, formAction, isPending] = useActionState<UpdateCommentsState, FormData>(
     updateComments.bind(null, product.id),
-    initialState,
+    initialState
   );
 
   return (
-    <form action={formAction}>
+    <form action={formAction} className={style.form}>
       <textarea className={style.textarea} name="text" placeholder="Оставить комментарий"></textarea>
       <input type="text" hidden name="author" defaultValue={userId || ""} />
       <button type="submit" disabled={isPending}>

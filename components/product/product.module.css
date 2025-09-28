@@ -143,8 +143,11 @@
 .description h4 {
   font-size: 1rem;
 }
+.description table {
+  width: 100% !important;
+}
 .description table tr td:first-child {
-  width: 55%;
+  width: 45%;
   padding-right: 10px;
 }
 
@@ -210,11 +213,15 @@
   .info {
     width: 100%;
   }
-  .imgContainer {
+  .imgContainer,
+  .sliderContainer {
     width: 100%;
     flex-direction: column-reverse;
   }
   .imageForm {
     width: 100%;
+  }
+  .description table {
+    width: 100% !important;
   }
 }

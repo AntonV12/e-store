@@ -5,7 +5,7 @@ import { CommentType } from "@/lib/types";
 import { useState } from "react";
 
 const CommentsList = ({ comments }: { comments: CommentType[] }) => {
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(Number(process.env.DEFAULT_LIMIT) || 20);
   const reversedComments = [...comments].reverse().slice(0, limit);
 
   return (

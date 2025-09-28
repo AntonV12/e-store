@@ -128,11 +128,11 @@ export const createUser = async (prevState: LoginState, formData: FormData): Pro
 export const updateUserCart = async (
   userId: string | null,
   prevState: UpdateCartState,
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateCartState> => {
   try {
     const cart: CartType = JSON.parse(formData.get("cart") as string) || prevState.formData?.cart;
-    const { /* userId, */ productId, name, cost, imageSrc } = cart;
+    const { productId, name, cost, imageSrc } = cart;
     const amount = Number(formData.get("amount"));
     const fromCart = formData.get("fromCart") === "true" || prevState.fromCart;
     const cookieStore = await cookies();
@@ -144,12 +144,6 @@ export const updateUserCart = async (
         maxAge: 60 * 60 * 24 * 7,
       });
       tempId = cookieStore.get("tempId")?.value || null;
-
-      // return {
-      //   error: "Пользователь не найден",
-      //   message: "Пользователь не найден",
-      //   formData: prevState.formData,
-      // };
     }
 
     const amountUpdate = fromCart ? "amount = VALUES(amount)" : "amount = amount + VALUES(amount)";
