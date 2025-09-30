@@ -2,6 +2,12 @@ import OrdersList from "@/components/profile/OrdersList";
 import { getCurrentUser } from "@/lib/authActions";
 import { cookies } from "next/headers";
 import { UserType, OrdersListParamsType } from "@/lib/types";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Заказы",
+  description: "Список Ваших заказов",
+};
 
 export default async function OrdersPage({ searchParams }: { searchParams: Promise<OrdersListParamsType> }) {
   const params = await searchParams;

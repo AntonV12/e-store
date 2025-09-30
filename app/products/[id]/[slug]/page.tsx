@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: numbe
 
   return {
     title: product?.name,
-    description: product?.description,
+    description: "Страница описанием товара",
   };
 }
 

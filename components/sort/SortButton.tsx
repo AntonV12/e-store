@@ -4,14 +4,19 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import style from "./sort.module.css";
 import { updatePath } from "@/utils/updatePath";
-import { SortType } from "@/lib/types";
+import { SortType, SearchParamsType } from "@/lib/types";
 
-export default function SortButton({ term, value }: { term: SortType; value: string }) {
+export default function SortButton({
+  term,
+  value,
+  updatedParams,
+}: {
+  term: SortType;
+  value: string;
+  updatedParams: SearchParamsType;
+}) {
   const pathname = usePathname();
-  const sortBy =
-    decodeURIComponent(pathname.split("/")[pathname.split("/").findIndex((item) => item === "sort") + 1]) || "viewed";
-  const sortByDirection =
-    decodeURIComponent(pathname.split("/")[pathname.split("/").findIndex((item) => item === "sort") + 2]) || "desc";
+  const { sortBy = "viewed", sortByDirection, search } = updatedParams;
   const { replace } = useRouter();
   const [direction, setDirection] = useState<"asc" | "desc">("desc");
 
@@ -32,12 +37,12 @@ export default function SortButton({ term, value }: { term: SortType; value: str
   }, [term, sortBy, sortByDirection]);
 
   const handleSort = () => {
-    const newPath = updatePath(pathname, { sortBy: term, sortByDirection: direction, page: 1 });
+    const newPath = `${updatePath(pathname, { sortBy: term, sortByDirection: direction, page: 1 })}${search ? `?search=${search || ""}` : ""}`;
     replace(newPath, { scroll: false });
   };
 
   return (
-    <button onClick={handleSort} className={`${term === sortBy && style.active} ${style.sortLink}`}>
+    <button onClick={handleSort} className={`${term === sortBy ? style.active : ""} ${style.sortLink}`}>
       {value} {`${term === sortBy ? (sortByDirection === "asc" ? "↑" : "↓") : ""}`}
     </button>
   );
