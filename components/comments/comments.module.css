@@ -1,3 +1,7 @@
+.comments {
+  width: 100%;
+}
+
 .comments li {
   margin-bottom: 10px;
   box-shadow: 0 1px 1px var(--shadow-color);
@@ -8,4 +12,8 @@
   height: 150px;
   font-family: var(--font-play);
   resize: none;
+}
+
+.form {
+  width: 100%;
 }

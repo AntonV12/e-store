@@ -30,7 +30,16 @@
 }
 
 .skeleton__productsList {
-  width: 250px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: min(1290px, 100%);
+}
+.skeleton__productItem {
+  width: 100%;
   height: 245px;
   background-image: var(--bg);
   animation: var(--animation);

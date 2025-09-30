@@ -1,18 +1,10 @@
-import type { ReactNode } from "react";
-import { StoreProvider } from "./StoreProvider";
-import "@/styles/globals.css";
+import "./globals.css";
 import { Play, Press_Start_2P } from "next/font/google";
-import MainPage from "@/components/MainPage";
-
-interface Props {
-  readonly children: ReactNode;
-}
-
-export const metadata = {
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+import styles from "@/app/layout.module.css";
+import Logo from "@/components/logo/Logo";
+import SignLinks from "@/components/signLinks/SignLinks";
+import { MessageProvider } from "@/lib/messageContext";
+import Message from "@/components/message/Message";
 
 const play = Play({
   weight: "400",
@@ -28,14 +20,41 @@ const press_Start_2P = Press_Start_2P({
   display: "swap",
 });
 
-export default function RootLayout({ children }: Props) {
+export const metadata = {
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const dynamic = "force-dynamic";
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const currentYear = new Date().getFullYear();
+
   return (
-    <StoreProvider>
-      <html lang="en" className={`html ${play.variable} ${press_Start_2P.variable}`}>
-        <body>
-          <MainPage children={children} />
-        </body>
-      </html>
-    </StoreProvider>
+    <html lang="ru-ru">
+      <body className={`html ${play.variable} ${press_Start_2P.variable}`}>
+        <>
+          <MessageProvider>
+            <Message />
+            <section className={styles.container}>
+              <aside className={styles.sidebar}>
+                <Logo />
+              </aside>
+
+              <main className={styles.main}>{children}</main>
+              <aside className={styles.sidebar}>
+                <SignLinks />
+              </aside>
+            </section>
+            <footer className={styles.footer}>&copy; AntonV {currentYear}</footer>
+          </MessageProvider>
+        </>
+      </body>
+    </html>
   );
 }

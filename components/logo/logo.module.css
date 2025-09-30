@@ -1,0 +1,19 @@
+.nav {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-family: "Press Start 2P", system-ui;
+}
+
+@media screen and (max-width: 1089px) {
+  .nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .logo {
+    font-size: 1.5rem;
+  }
+}

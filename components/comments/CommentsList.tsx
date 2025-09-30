@@ -1,9 +1,11 @@
+"use client";
+
 import style from "./comments.module.css";
-import { CommentType } from "@/lib/types/types";
+import { CommentType } from "@/lib/types";
 import { useState } from "react";
 
-export const CommentsList = ({ comments }: { comments: CommentType[] }) => {
-  const [limit, setLimit] = useState<number>(10);
+const CommentsList = ({ comments }: { comments: CommentType[] }) => {
+  const [limit, setLimit] = useState<number>(Number(process.env.DEFAULT_LIMIT) || 20);
   const reversedComments = [...comments].reverse().slice(0, limit);
 
   return (
@@ -17,7 +19,7 @@ export const CommentsList = ({ comments }: { comments: CommentType[] }) => {
             {reversedComments.map((comment) => (
               <li key={comment.id}>
                 <strong>
-                  [{comment.date}] {comment.author}
+                  [{comment.date.split("T")[0]}] {comment.author}
                 </strong>
                 {": "}
                 {comment.text}
@@ -30,3 +32,5 @@ export const CommentsList = ({ comments }: { comments: CommentType[] }) => {
     </div>
   );
 };
+
+export default CommentsList;

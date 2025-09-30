@@ -26,42 +26,52 @@
   align-items: center;
   position: relative;
 }
-.avatar__camera {
+
+.avatar .loginIcon,
+.camera {
+  transform: scale(3);
   position: absolute;
-  opacity: 0;
-  fill: rgba(247, 247, 247, 0.5);
-  visibility: hidden;
-  pointer-events: none;
   transition: all 0.5s ease;
+}
+
+.avatar .loginIcon {
+  stroke: rgba(247, 247, 247, 0.5);
+}
+
+.avatar .camera {
   width: 12px;
   height: 12px;
-}
-.avatar svg {
-  transform: scale(3);
-  stroke: rgba(247, 247, 247, 0.5);
-  transition: all 0.5s ease;
+  opacity: 0;
+  visibility: hidden;
+  fill: rgba(247, 247, 247, 0.5);
 }
 .avatar:hover {
   cursor: pointer;
 }
-.avatar:hover .avatar__camera {
+.avatar:hover .camera {
   visibility: visible;
   opacity: 1;
 }
-.avatar:hover svg {
-  visibility: hidden;
+.avatar:hover .loginIcon {
   opacity: 0;
+  visibility: hidden;
 }
+
 .avatar__input {
   display: none;
+}
+.avatar__form {
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 .avatar__label {
   cursor: pointer;
   width: 100%;
   height: 100%;
   position: absolute;
+  z-index: 9999;
   border-radius: 50%;
-  z-index: 5;
 }
 .avatar__img {
   border-radius: 50%;
@@ -69,6 +79,10 @@
   object-position: center;
   width: 100%;
   height: 100%;
+}
+
+.profile__orders {
+  width: min(100%, 900px);
 }
 
 .profile__orders__header {

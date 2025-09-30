@@ -1,0 +1,30 @@
+.sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+  margin-right: auto;
+}
+
+.sortLink {
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 0.85rem;
+  background-color: transparent;
+  border: 2px solid var(--secondary-color);
+  color: var(--secondary-color);
+  cursor: pointer;
+}
+.sortLink:hover {
+  background-color: var(--secondary-color);
+  color: white;
+}
+
+.active {
+  font-weight: bold;
+  background-color: var(--secondary-color);
+  color: white;
+}
+.active:hover {
+  color: white;
+}

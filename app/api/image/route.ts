@@ -5,12 +5,13 @@ import path from "path";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const name = searchParams.get("name");
+  const pathname = searchParams.get("path") || "";
 
   if (!name) {
     return new Response("Не указано имя файла", { status: 400 });
   }
 
-  const filePath = path.join(process.cwd(), "uploads", name);
+  const filePath = path.join(process.cwd(), "uploads", pathname, name);
 
   if (!fs.existsSync(filePath)) {
     return new Response("Файл не найден", { status: 404 });
@@ -28,7 +29,7 @@ export async function GET(req: NextRequest) {
 
   const fileBuffer = fs.readFileSync(filePath);
 
-  return new Response(fileBuffer, {
+  return new Response(new Uint8Array(fileBuffer), {
     headers: {
       "Content-Type": contentType,
     },

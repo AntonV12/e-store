@@ -1,42 +1,42 @@
 "use client";
+
+import { useActionState, useEffect } from "react";
 import styles from "./login.module.css";
-import { useAuthUserMutation } from "@/lib/features/auth/authApiSlice";
+import { loginUser } from "@/lib/authActions";
 import Link from "next/link";
+import { LoginState } from "@/lib/types";
+import { useMessage } from "@/lib/messageContext";
 import { useRouter } from "next/navigation";
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
-import { UserType } from "@/lib/types/types";
 
-export function isFetchBaseQueryError(error: unknown): error is FetchBaseQueryError {
-  return typeof error === "object" && error != null && "status" in error;
-}
-export function isSerializedError(error: unknown): error is { message?: string } {
-  return typeof error === "object" && error != null && "message" in error;
-}
-
-export const LoginForm = () => {
-  const [authUser, { isLoading, isSuccess, isError, error }] = useAuthUserMutation();
+export default function LoginForm() {
+  const initialState: LoginState = {
+    error: "",
+    message: "",
+    formData: {
+      name: "",
+      password: "",
+    },
+  };
+  const [state, formAction, isPending] = useActionState<LoginState, FormData>(loginUser, initialState);
+  const { setMessage } = useMessage();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
+  useEffect(() => {
+    if (state.message) {
+      setMessage(state.message);
 
-    const user: UserType = {
-      id: null,
-      name: formData.get("name") as string,
-      password: formData.get("password") as string,
-      isAdmin: false,
-      cart: [],
-      avatar: "",
-    };
+      setTimeout(() => {
+        const bc = new BroadcastChannel("cart");
+        bc.postMessage({
+          type: "fetch",
+          cart: state.formData?.cart,
+        });
 
-    try {
-      await authUser(user).unwrap();
-      router.push("/");
-    } catch (err) {
-      console.error("Ошибка входа:", err);
+        bc.close();
+        router.push("/");
+      }, 0);
     }
-  };
+  }, [state, setMessage, router]);
 
   return (
     <>
@@ -47,29 +47,28 @@ export const LoginForm = () => {
           Зарегистрируйтесь
         </Link>
       </p>
-      <form method="post" className={styles.form} onSubmit={handleLogin}>
-        <input type="text" name="name" placeholder="Имя" className={`${styles.input} ${isError && styles.error}`} />
+
+      <form action={formAction} className={styles.form}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Имя"
+          className={`${styles.input}`}
+          defaultValue={state.formData?.name}
+        />
         <input
           type="password"
           name="password"
           placeholder="Пароль"
-          className={`${styles.input} ${isError && styles.error}`}
+          className={`${styles.input}`}
+          defaultValue={state.formData?.password}
+          autoComplete="off"
         />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Отправка..." : "Войти"}
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Отправка..." : "Войти"}
         </button>
-        {isError && (
-          <span className={styles.errorMessage}>
-            {isError &&
-              error &&
-              (isFetchBaseQueryError(error)
-                ? (error.data as { error?: string })?.error || "Ошибка сервера"
-                : isSerializedError(error)
-                ? error.message || "Неизвестная ошибка"
-                : "Ошибка при регистрации")}
-          </span>
-        )}
+        {state.error && <span className={styles.errorMessage}>{state.error}</span>}
       </form>
     </>
   );
-};
+}

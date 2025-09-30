@@ -1,17 +1,13 @@
 import "./textEditor.css";
 import style from "./textEditor.module.css";
 
-import Document from "@tiptap/extension-document";
-import Gapcursor from "@tiptap/extension-gapcursor";
-import Paragraph from "@tiptap/extension-paragraph";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
-import Text from "@tiptap/extension-text";
 import { EditorProvider, useCurrentEditor } from "@tiptap/react";
 import React, { useState, useRef, forwardRef, useImperativeHandle } from "react";
-import { Tooltip } from "@/components/Tooltip";
+import { Tooltip } from "@/components/tooltip/Tooltip";
 
 import TextStyle from "@tiptap/extension-text-style";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -27,6 +23,8 @@ import DeleteRow from "@/public/delete-row.svg";
 import DeleteIcon from "@/public/delete.svg";
 import MergeCells from "@/public/table-cells-merge.svg";
 import SplitCells from "@/public/table-cell-split.svg";
+
+import { Editor } from "@tiptap/react";
 
 interface TextEditorProps {
   onContentChange?: (content: string) => void;
@@ -241,8 +239,12 @@ const TableEditor = () => {
           >
             H6
           </button>
-          {tooltipText && mouseCoords && (
-            <Tooltip children={<span>{tooltipText}</span>} coords={mouseCoords} controlGroupRef={controlGroupRef} />
+          {tooltipText && mouseCoords && controlGroupRef.current && (
+            <Tooltip
+              content={<span>{tooltipText}</span>}
+              coords={mouseCoords}
+              controlGroupRef={controlGroupRef?.current}
+            />
           )}
         </div>
       </div>
@@ -251,10 +253,6 @@ const TableEditor = () => {
 };
 
 const extensions = [
-  Document,
-  Paragraph,
-  Text,
-  Gapcursor,
   Table.configure({
     resizable: true,
   }),
@@ -268,24 +266,8 @@ const extensions = [
   StarterKit.configure({}),
 ];
 
-const content = `
-        <h1>Общие параметры</h1>
-        <table>
-          <tbody>
-            <tr>
-              <td>Тип</td>
-              <td></td>
-            </tr>
-            <tr>
-              <td>Модель</td>
-              <td></td>
-            </tr>
-          </tbody>
-        </table>
-      `;
-
-const TextEditor = forwardRef(({ onContentChange, initialContent = content }: TextEditorProps, ref) => {
-  const [editorInstance, setEditorInstance] = useState<any>(null);
+const TextEditor = forwardRef(({ onContentChange, initialContent }: TextEditorProps, ref) => {
+  const [editorInstance, setEditorInstance] = useState<Editor | null>(null);
 
   useImperativeHandle(ref, () => ({
     clearContent: () => {
@@ -308,6 +290,7 @@ const TextEditor = forwardRef(({ onContentChange, initialContent = content }: Te
       slotBefore={<TableEditor />}
       extensions={extensions}
       content={initialContent}
+      immediatelyRender={false}
       onUpdate={({ editor }) => {
         if (onContentChange) {
           onContentChange(editor.getHTML());
@@ -328,4 +311,5 @@ const TextEditor = forwardRef(({ onContentChange, initialContent = content }: Te
   );
 });
 
+TextEditor.displayName = "description";
 export default TextEditor;

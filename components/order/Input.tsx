@@ -5,14 +5,16 @@ export default function Input({
   type,
   name,
   placeholder,
-  isSubmit,
+  isError,
+  defaultValue,
 }: {
   type: string;
   name: string;
   placeholder: string;
-  isSubmit: boolean;
+  isError: boolean;
+  defaultValue: string | null;
 }) {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>(defaultValue || "");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -70,7 +72,7 @@ export default function Input({
         placeholder={placeholder}
         value={value}
         onChange={handleChange}
-        className={`${isSubmit && !validation() ? style.error : isSubmit && style.success}`}
+        className={`${isError && !validation() ? style.error : isError && style.success}`}
       />
     </>
   );

@@ -38,3 +38,7 @@
   color: red;
   font-size: 14px;
 }
+
+.errorInput {
+  border: 1px solid red;
+}

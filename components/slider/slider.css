@@ -31,8 +31,15 @@
 }
 
 .mySwiper .swiper-slide {
-  width: 100%;
+  width: 100% !important;
+  height: 140px !important;
   opacity: 0.4;
+}
+
+.mySwiper2 .swiper-slide {
+  width: 100% !important;
+  height: 500px;
+  position: relative;
 }
 
 .mySwiper .swiper-slide-thumb-active {
@@ -45,6 +52,13 @@
 }
 .swiper-scrollbar-drag {
   opacity: 0.5 !important;
+}
+
+.swiper-button-next {
+  right: var(--swiper-navigation-sides-offset, 0) !important;
+}
+.swiper-button-prev {
+  left: var(--swiper-navigation-sides-offset, 0) !important;
 }
 
 @media screen and (max-width: 890px) {
@@ -64,5 +78,6 @@
   }
   .mySwiper .swiper-slide {
     width: 33.33% !important;
+    height: 100px !important;
   }
 }

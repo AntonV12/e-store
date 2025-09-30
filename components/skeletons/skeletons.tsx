@@ -9,17 +9,12 @@ export function ProductsListSkeleton() {
     const skeletons: React.ReactNode[] = [];
 
     for (let i = 0; i < 20; i++) {
-      skeletons.push(<div key={i} className={`${styles.skeleton} ${styles.skeleton__productsList}`}></div>);
+      skeletons.push(<div key={i} className={`${styles.skeleton} ${styles.skeleton__productItem}`}></div>);
     }
     return skeletons;
   }
 
-  return (
-    <div className={styles.skeleton}>
-      <div className={`${styles.skeleton} ${styles.skeleton__searchForm}`}></div>
-      {render()}
-    </div>
-  );
+  return <div className={`${styles.skeleton} ${styles.skeleton__productsList}`}>{render()}</div>;
 }
 
 export function ProductSkeleton() {

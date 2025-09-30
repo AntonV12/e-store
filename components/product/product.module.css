@@ -6,19 +6,64 @@
   gap: 20px;
 }
 .container {
+  width: 100%;
   display: flex;
   gap: 20px;
+  align-items: flex-start;
 }
 
 .imgContainer {
   width: 40%;
-  flex-shrink: 0;
-  flex-grow: 0;
-  flex-basis: 280px;
   position: relative;
   display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 14px;
+  border-radius: 8px;
+}
+
+.sliderContainer {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+}
+
+.editButtons {
+  display: flex;
+  width: 100%;
+  gap: 14px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.editButtons a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.editButtons a:hover svg {
+  fill: var(--secondary-color);
+}
+
+.deleteButton {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 1rem;
+  display: flex;
+  gap: 5px;
+}
+.deleteButton:hover {
+  color: var(--secondary-color);
+  background: none;
+}
+.deleteButton:hover svg {
+  fill: var(--secondary-color);
+}
+
+.info {
+  min-height: 300px;
+  width: 60%;
 }
 
 .productCard .productName,
@@ -98,12 +143,12 @@
 .description h4 {
   font-size: 1rem;
 }
-
-.editButtons,
-.editButton {
-  display: flex;
-  gap: 5px;
-  margin: 0 0 0 auto;
+.description table {
+  width: 100% !important;
+}
+.description table tr td:first-child {
+  width: 45%;
+  padding-right: 10px;
 }
 
 .imageForm {
@@ -140,11 +185,6 @@
   opacity: 1;
 }
 
-.info {
-  flex-grow: 1;
-  min-height: 300px;
-}
-
 .editForm {
   width: 100%;
 }
@@ -173,11 +213,15 @@
   .info {
     width: 100%;
   }
-  .imgContainer {
+  .imgContainer,
+  .sliderContainer {
     width: 100%;
     flex-direction: column-reverse;
   }
   .imageForm {
     width: 100%;
+  }
+  .description table {
+    width: 100% !important;
   }
 }
