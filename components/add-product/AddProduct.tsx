@@ -44,6 +44,7 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
   const [images, setImages] = useState<(ImageType | string)[]>(product.imageSrc);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { setMessage } = useMessage();
+  const formRef = useRef<HTMLFormElement>(null);
 
   const router = useRouter();
 
@@ -73,6 +74,14 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
       });
       bc.close();
 
+      if (formRef.current) {
+        formRef.current.reset();
+      }
+      setImages([]);
+      if (editorRef.current) {
+        editorRef.current.setContent(initialContent);
+      }
+
       if (isEdit) {
         router.push(`/products/${product.id || state.formData?.id}/${translit(product.name)}`);
       }
@@ -94,17 +103,9 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
         }
 
         formAction(formData);
-
-        if (state.message) {
-          form.reset();
-          setImages([]);
-          if (editorRef.current) {
-            editorRef.current.setContent(initialContent);
-          }
-        }
       });
     },
-    [images, formAction, state],
+    [images, formAction],
   );
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -139,7 +140,7 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
   return (
     <div className={style.container}>
       <h2>Добавить новый товар</h2>
-      <form className={style.form} onSubmit={onSubmit}>
+      <form className={style.form} onSubmit={onSubmit} ref={formRef}>
         <div>
           <label htmlFor="name">Название товара:</label>
           <input type="text" id="name" name="name" required defaultValue={product.name} />
