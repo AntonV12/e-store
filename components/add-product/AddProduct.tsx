@@ -95,14 +95,16 @@ export default function AddProduct({ product, isEdit = false }: { product: Produ
 
         formAction(formData);
 
-        form.reset();
-        setImages([]);
-        if (editorRef.current) {
-          editorRef.current.setContent(initialContent);
+        if (state.message) {
+          form.reset();
+          setImages([]);
+          if (editorRef.current) {
+            editorRef.current.setContent(initialContent);
+          }
         }
       });
     },
-    [images, formAction],
+    [images, formAction, state],
   );
 
   const handleFileSelect = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
